@@ -10,6 +10,7 @@ import { Bet, Match, Result } from './datastructures';
 const COLLECTION_NAME_BETS: string = 'bets';
 const COLLECTION_NAME_MATCHES: string = 'matches';
 const COLLECTION_NAME_RESULTS: string = 'results';
+const COLLECTION_NAME_TEAMS: string = 'teams';
 
 @Injectable({
   providedIn: 'root'
@@ -183,6 +184,28 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return match$;
   }
 
+  getTeamNameByTeamId(teamId: number, shortName: boolean = false): Observable<string | null> {
+    // returns the name of the team with the given teamId. If the shortName flag is set
+    // to true, the abbreviation of the team name will be returned
+
+    let teamQuery$: Observable<unknown[]> = this.firestore.collection(COLLECTION_NAME_TEAMS, ref =>
+      ref.where("id", "==", teamId))
+      .valueChanges();
+
+      let team$: Observable<string | null> = teamQuery$.pipe(
+        map(teamArray => {
+          if (teamArray.length == 0) {
+            return null;
+          }
+          else {
+            return this.makeTeamNameFromDocument(teamArray[0], shortName);
+          }
+        })
+      );
+
+      return team$;
+  }
+
   private makeMatchFromDocument(docItem: unknown) {
     // creates a Match Struct of the requested document of Firestore collection
 
@@ -217,6 +240,17 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       goalsHome: castedItem.goalsHome,
       goalsAway: castedItem.goalsAway
     };
+  }
+
+  private makeTeamNameFromDocument(docItem: unknown, shortName: boolean) {
+
+    let castedItem = docItem as any;
+    if (shortName) {
+      return castedItem.nameShort;
+    }
+    else {
+      return castedItem.nameLong;
+    }
   }
 
 }

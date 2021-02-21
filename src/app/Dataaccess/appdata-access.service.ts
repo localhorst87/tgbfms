@@ -13,4 +13,5 @@ export abstract class AppdataAccessService {
   public abstract getMatchdayByMatchId(matchId: number): Observable<number | null>;
   public abstract getNextMatch(): Observable<Match | null>;
   public abstract getLastMatch(): Observable<Match | null>;
+  public abstract getTeamNameByTeamId(teamId: number, shortName?: boolean): Observable<string | null>;
 }

@@ -9,6 +9,9 @@ import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 
+import { AppdataAccessService } from './Dataaccess/appdata-access.service';
+import { AppdataAccessFirestoreService } from './Dataaccess/appdata-access-firestore.service';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -20,7 +23,7 @@ import { environment } from '../environments/environment';
     AngularFireAnalyticsModule,
     AngularFirestoreModule
   ],
-  providers: [],
+  providers: [{ provide: AppdataAccessService, useClass: AppdataAccessFirestoreService }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

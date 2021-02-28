@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "tgbfms": {
+      "hosting": {
+        "tgbfms": [
+          "tgbfms"
+        ]
+      }
+    }
+  }
+}

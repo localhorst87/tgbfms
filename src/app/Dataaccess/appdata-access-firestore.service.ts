@@ -11,6 +11,7 @@ const COLLECTION_NAME_BETS: string = 'bets';
 const COLLECTION_NAME_MATCHES: string = 'matches';
 const COLLECTION_NAME_RESULTS: string = 'results';
 const COLLECTION_NAME_TEAMS: string = 'teams';
+const SECONDS_PER_DAY: number = 86400;
 
 @Injectable()
 export class AppdataAccessFirestoreService implements AppdataAccessService {
@@ -90,6 +91,30 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       ref.where("day", "==", matchday)
         .orderBy("time"))
       .valueChanges(); // requires additional index in firestore
+
+    let matches$: Observable<Match> = matchQuery$.pipe(
+      switchMap(matchArray => {
+        let matches: Match[] = [];
+        for (let matchItem of matchArray) {
+          matches.push(this.makeMatchFromDocument(matchItem));
+        }
+        return from(matches);
+      })
+    );
+
+    return matches$;
+  }
+
+  getNextMatchesByTime(nextDays: number): Observable<Match> {
+    // returns all matches within the nextDays days
+    let timestampNow: Timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+    let timestampFuture = new Date(Date.now() + nextDays * SECONDS_PER_DAY * 1000);
+    let timeStampNextDays = new Date(timestampFuture.getFullYear(), timestampFuture.getMonth(), timestampFuture.getDate(), 23, 59, 59); // ceil to end of day
+
+    let matchQuery$: Observable<unknown[]> = this.firestore.collection(COLLECTION_NAME_MATCHES, ref =>
+      ref.where("time", ">", timestampNow).where("time", "<", timeStampNextDays)
+        .orderBy("time"))
+      .valueChanges();
 
     let matches$: Observable<Match> = matchQuery$.pipe(
       switchMap(matchArray => {

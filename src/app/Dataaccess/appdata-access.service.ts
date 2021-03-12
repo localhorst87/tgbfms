@@ -8,6 +8,7 @@ export abstract class AppdataAccessService {
   public abstract getResult(matchId: number): Observable<Result>
   public abstract getMatch(matchId: number): Observable<Match>;
   public abstract getMatchesByMatchday(matchday: number): Observable<Match>;
+  public abstract getNextMatchesByTime(nextDays: number): Observable<Match>;
   public abstract getMatchdayByMatchId(matchId: number): Observable<number>;
   public abstract getNextMatch(): Observable<Match>;
   public abstract getLastMatch(): Observable<Match>;

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { Observable, merge, combineLatest } from 'rxjs';
-import { switchMap, mergeMap } from 'rxjs/operators';
-import { Bet, Match, Result } from '../Dataaccess/datastructures';
+import { Observable, combineLatest } from 'rxjs';
+import { mergeMap, distinct } from 'rxjs/operators';
+import { Bet, Match, Result, BetExtended, MatchExtended, ResultExtended } from '../Dataaccess/database_datastructures';
 import { BetWriteData } from './output_datastructures';
 
 @Injectable({
@@ -14,13 +14,15 @@ export class FetchBetWriteDataService {
 
   public fetchDataByMatchday(matchday: number, userId: number): Observable<BetWriteData> {
     return this.appData.getMatchesByMatchday(matchday).pipe(
-      mergeMap(match => this.makeBetWriteData(match, userId))
+      mergeMap(match => this.makeBetWriteData(match, userId)),
+      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet
     );
   }
 
   public fetchDataByTime(nextDays: number, userId: number): Observable<BetWriteData> {
     return this.appData.getNextMatchesByTime(nextDays).pipe(
-      mergeMap(match => this.makeBetWriteData(match, userId))
+      mergeMap(match => this.makeBetWriteData(match, userId)),
+      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet
     );
   }
 
@@ -32,11 +34,13 @@ export class FetchBetWriteDataService {
       (teamHome, teamAway, bet) => {
         return {
           matchId: match.matchId,
+          matchTimestamp: match.timestamp,
           teamNameHome: teamHome,
           teamNameAway: teamAway,
           betGoalsHome: bet.goalsHome,
           betGoalsAway: bet.goalsAway,
-          isBetFixed: bet.isFixed
+          isBetFixed: bet.isFixed,
+          betDocumentId: bet.documentId
         };
       });
   }

@@ -35,6 +35,7 @@ export class FetchBetWriteDataService {
         return {
           matchId: match.matchId,
           matchTimestamp: match.timestamp,
+          isTopMatch: match.isTopMatch,
           teamNameHome: teamHome,
           teamNameAway: teamAway,
           betGoalsHome: bet.goalsHome,

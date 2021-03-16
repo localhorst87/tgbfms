@@ -130,7 +130,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
           return -1;
         }
         else {
-          return matchArray[0].day;
+          return matchArray[0].matchday;
         }
       })
     );
@@ -238,9 +238,12 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     return {
       documentId: "",
-      day: -1,
+      season: -1,
+      matchday: -1,
       matchId: matchId,
       timestamp: -1,
+      isFinished: false,
+      isTopMatch: false,
       teamIdHome: -1,
       teamIdAway: -1
     };

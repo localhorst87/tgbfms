@@ -1,7 +1,10 @@
 export interface Match {
-  day: number;
+  season: number;
+  matchday: number;
   matchId: number;
   timestamp: number;
+  isFinished: boolean;
+  isTopMatch: boolean;
   teamIdHome: number;
   teamIdAway: number;
 }

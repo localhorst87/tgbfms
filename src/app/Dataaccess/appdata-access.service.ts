@@ -15,5 +15,8 @@ export abstract class AppdataAccessService {
   public abstract getTeamNameByTeamId(teamId: number, shortName?: boolean): Observable<string>;
   public abstract addBet(bet: Bet): void;
   public abstract addMatch(match: Match): void;
+  public abstract addResult(result: Result): void;
   public abstract updateBet(documentId: string, bet: Bet): void;
+  public abstract updateMatch(documentId: string, match: Match): void;
+  public abstract updateResult(documentId: string, result: Result): void;
 }

@@ -220,17 +220,31 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return team$;
   }
 
-  updateBet(documentId: string, bet: Bet): void {
-    let betDocument: AngularFirestoreDocument<Bet> = this.firestore.doc<Bet>(COLLECTION_NAME_BETS + "/" + documentId);
-    betDocument.update(bet);
+  addMatch(match: Match): void {
+    this.firestore.collection<Match>(COLLECTION_NAME_MATCHES).add(match);
   }
 
   addBet(bet: Bet): void {
     this.firestore.collection<Bet>(COLLECTION_NAME_BETS).add(bet);
   }
 
-  addMatch(match: Match): void {
-    this.firestore.collection<Match>(COLLECTION_NAME_MATCHES).add(match);
+  addResult(result: Result): void {
+    this.firestore.collection<Result>(COLLECTION_NAME_RESULTS).add(result);
+  }
+
+  updateMatch(documentId: string, match: Match): void {
+    let matchDocument: AngularFirestoreDocument<Match> = this.firestore.doc<Match>(COLLECTION_NAME_MATCHES + "/" + documentId);
+    matchDocument.update(match);
+  }
+
+  updateBet(documentId: string, bet: Bet): void {
+    let betDocument: AngularFirestoreDocument<Bet> = this.firestore.doc<Bet>(COLLECTION_NAME_BETS + "/" + documentId);
+    betDocument.update(bet);
+  }
+
+  updateResult(documentId: string, result: Result): void {
+    let resultDocument: AngularFirestoreDocument<Result> = this.firestore.doc<Result>(COLLECTION_NAME_RESULTS + "/" + documentId);
+    resultDocument.update(result);
   }
 
   private makeUnknownMatch(matchId: number): MatchExtended {

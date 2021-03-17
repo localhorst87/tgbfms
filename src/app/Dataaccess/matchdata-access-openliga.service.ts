@@ -25,7 +25,7 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     // converts the openligadb structure to MatchImportData structure
 
     let matchArray: MatchImportData[] = [];
-    for (let match of matchdayJson) {
+    for (let match of matchdayJson) { // no conversion if no match available
       let goals: number[] = this.extractResult(match);
       let matchImport: MatchImportData = {
         matchday: match.Group.GroupOrderID,
@@ -46,15 +46,32 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     // searches for the final result in the result structure of a specific
     // match structure of openligadb
 
-    let extractedResult: number[] = [-1, -1];
-    if (matchJson.MatchResults.length > 0) {
-      for (let result of matchJson.MatchResults) {
-        if (result.ResultTypeID == 2) { // search for final result
-          extractedResult = [result.PointsTeam1, result.PointsTeam2];
-          break;
+    let extractedResult: number[] = [-1, -1]; // default value
+
+    if (this.isMatchStarted(matchJson)) {
+
+      if (matchJson.MatchResults.length == 2) { // final result available?
+        for (let result of matchJson.MatchResults) {
+          if (result.ResultTypeID == 2) { // ResultTypeID == 2 -> final result
+            extractedResult = [result.PointsTeam1, result.PointsTeam2];
+            break;
+          }
+        }
+      }
+      else { // if final result not available, extract live score instead
+        extractedResult = [0, 0]; // basic value if no goals scored, yet
+        for (let goal of matchJson.Goals) {
+          extractedResult = [goal.ScoreTeam1, goal.ScoreTeam2]; // last goal will be stored on variable
         }
       }
     }
+
     return extractedResult;
+  }
+
+  private isMatchStarted(matchJson: any): boolean {
+    let matchTimestamp: number = new Date(matchJson.MatchDateTime).getTime();
+    let currentTimestamp: number = Date.now();
+    return currentTimestamp >= matchTimestamp;
   }
 }

@@ -4,5 +4,5 @@ import { MatchImportData } from './matchdata_datastructures';
 
 @Injectable()
 export abstract class MatchdataAccessService {
-  public abstract importMatchdata(season: number, matchday: number): Observable<MatchImportData>;
+  public abstract importMatchdata$(season: number, matchday: number): Observable<MatchImportData>;
 }

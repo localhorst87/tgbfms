@@ -11,17 +11,17 @@ const URL_TRUNK: string = "https://www.openligadb.de/api/getmatchdata/bl1";
 export class MatchdataAccessOpenligaService implements MatchdataAccessService {
   constructor(private http: HttpClient) { }
 
-  importMatchdata(season: number, matchday: number): Observable<MatchImportData> {
+  importMatchdata$(season: number, matchday: number): Observable<MatchImportData> {
     // imports the data of the given season and matchday
     // and extracts the required information to MatchImportData
 
     let fullUrl: string = URL_TRUNK + "/" + String(season) + "/" + String(matchday);
     return this.http.get(fullUrl, { responseType: 'json' }).pipe(
-      switchMap(matchdayData => this.convertMatchdayJson(matchdayData))
+      switchMap(matchdayData => this.convertMatchdayJson$(matchdayData))
     );
   }
 
-  private convertMatchdayJson(matchdayJson: any): Observable<MatchImportData> {
+  private convertMatchdayJson$(matchdayJson: any): Observable<MatchImportData> {
     // converts the openligadb structure to MatchImportData structure
 
     let matchArray: MatchImportData[] = [];

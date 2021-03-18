@@ -17,7 +17,7 @@ export class SynchronizeDataService {
     // performs synchronization of Match and Result data of the app data
     // with the match data
 
-    this.matchDataAccess.importMatchdata(season, matchday).subscribe(
+    this.matchDataAccess.importMatchdata$(season, matchday).subscribe(
       (importedData: MatchImportData) => {
 
         this.syncMatch(season, importedData);
@@ -29,7 +29,7 @@ export class SynchronizeDataService {
   private syncMatch(season: number, importedData: MatchImportData): void {
     // performs synchronization of Match data
 
-    this.appDataAccess.getMatch(importedData.matchId).pipe(take(1)).subscribe(
+    this.appDataAccess.getMatch$(importedData.matchId).pipe(take(1)).subscribe(
       (appdataMatch: MatchExtended) => {
 
         let importedMatch: Match = this.createMatch(season, importedData, appdataMatch.isTopMatch);
@@ -48,7 +48,7 @@ export class SynchronizeDataService {
   private syncResult(importedData: MatchImportData): void {
     // performs synchronization of Result data
 
-    this.appDataAccess.getResult(importedData.matchId).pipe(take(1)).subscribe(
+    this.appDataAccess.getResult$(importedData.matchId).pipe(take(1)).subscribe(
       (appdataResult: ResultExtended) => {
 
         let importedResult: Result = this.createResult(importedData);

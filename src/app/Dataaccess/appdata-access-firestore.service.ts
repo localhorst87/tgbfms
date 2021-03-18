@@ -18,7 +18,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
   constructor(private firestore: AngularFirestore) { }
 
-  getBet(matchId: number, userId: number): Observable<BetExtended> {
+  getBet$(matchId: number, userId: number): Observable<BetExtended> {
     // queries the bet with the given matchId and userId
     // and returns the corresponding Observable
 
@@ -39,7 +39,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return bet$;
   }
 
-  getResult(matchId: number): Observable<ResultExtended> {
+  getResult$(matchId: number): Observable<ResultExtended> {
     // queries the result with the given matchId
     // and returns the corresponding Observable
 
@@ -60,7 +60,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return result$;
   }
 
-  getMatch(matchId: number): Observable<MatchExtended> {
+  getMatch$(matchId: number): Observable<MatchExtended> {
     // queries the match with the given matchId
     // and returns the corresponding Observable
 
@@ -81,11 +81,11 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return match$;
   }
 
-  getMatchesByMatchday(matchday: number): Observable<MatchExtended> {
+  getMatchesByMatchday$(season: number, matchday: number): Observable<MatchExtended> {
     // returns all matches of the given matchday as Obervable
 
     let matchQuery$: Observable<MatchExtended[]> = this.firestore.collection<MatchExtended>(COLLECTION_NAME_MATCHES, ref =>
-      ref.where("day", "==", matchday)
+      ref.where("day", "==", matchday).where("season", "==", season)
         .orderBy("time"))
       .valueChanges({ idField: 'documentId' }); // requires additional index in firestore
 
@@ -97,7 +97,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return matches$;
   }
 
-  getNextMatchesByTime(nextDays: number): Observable<MatchExtended> {
+  getNextMatchesByTime$(nextDays: number): Observable<MatchExtended> {
     // returns all matches within the nextDays days
     let timestampNow: Timestamp = firebase.firestore.Timestamp.fromDate(new Date());
     let timestampFuture = new Date(Date.now() + nextDays * SECONDS_PER_DAY * 1000);
@@ -116,7 +116,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return matches$;
   }
 
-  getMatchdayByMatchId(matchId: number): Observable<number> {
+  getMatchdayByMatchId$(matchId: number): Observable<number> {
     // returns the corresponding matchday of the given matchId as Obervable
 
     let matchQuery$: Observable<MatchExtended[]> = this.firestore.collection<MatchExtended>(COLLECTION_NAME_MATCHES, ref =>
@@ -138,7 +138,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return matchday$;
   }
 
-  getNextMatch(): Observable<MatchExtended> {
+  getNextMatch$(): Observable<MatchExtended> {
     // returns the next match that will take place. If no matches are left,
     // the function returns null
 
@@ -165,7 +165,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return match$;
   }
 
-  getLastMatch(): Observable<MatchExtended> {
+  getLastMatch$(): Observable<MatchExtended> {
     // returns the last match that took place. If no match has been played yet,
     // the function returns null
 
@@ -192,7 +192,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return match$;
   }
 
-  getTeamNameByTeamId(teamId: number, shortName: boolean = false): Observable<string> {
+  getTeamNameByTeamId$(teamId: number, shortName: boolean = false): Observable<string> {
     // returns the name of the team with the given teamId. If the shortName flag is set
     // to true, the abbreviation of the team name will be returned
 

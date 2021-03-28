@@ -57,11 +57,9 @@ export class SynchronizeDataService {
 
           if (appdataResult.documentId == "") { // result not yet exported to database
             this.appDataAccess.addResult(importedResult);
-            console.log("added result");
           }
           else if (!this.isResultEqual(importedResult, appdataResult)) { // available, but not up to date
             this.appDataAccess.updateResult(appdataResult.documentId, importedResult);
-            console.log("updated result");
           }
 
         }

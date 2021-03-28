@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
 import { AppdataAccessService } from './appdata-access.service';
 import { Observable, from } from 'rxjs';
-import { map, switchMap, distinct } from 'rxjs/operators';
+import { map, switchMap, distinct, take, pluck } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import firebase from 'firebase/app';
 import Timestamp = firebase.firestore.Timestamp;
-import { Bet, Match, Result, Team, BetExtended, MatchExtended, ResultExtended, TeamExtended } from './database_datastructures';
+import { Bet, Match, Result, Team, User } from './database_datastructures';
+import { BetExtended, MatchExtended, ResultExtended, TeamExtended, UserExtended } from './database_datastructures';
 
 const COLLECTION_NAME_BETS: string = 'bets';
 const COLLECTION_NAME_MATCHES: string = 'matches';
 const COLLECTION_NAME_RESULTS: string = 'results';
 const COLLECTION_NAME_TEAMS: string = 'teams';
+const COLLECTION_NAME_USERS: string = 'users';
 const SECONDS_PER_DAY: number = 86400;
 
 @Injectable()
@@ -18,7 +20,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
   constructor(private firestore: AngularFirestore) { }
 
-  getBet$(matchId: number, userId: number): Observable<BetExtended> {
+  getBet$(matchId: number, userId: string): Observable<BetExtended> {
     // queries the bet with the given matchId and userId
     // and returns the corresponding Observable
 
@@ -27,7 +29,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       .valueChanges({ idField: 'documentId' });
 
     let bet$: Observable<BetExtended> = betQuery$.pipe(
-      distinct(),
+      take(1),
       map(betArray => {
         if (betArray.length == 0) {
           betArray.push(this.makeUnknownBet(matchId, userId));
@@ -48,7 +50,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       .valueChanges({ idField: 'documentId' });
 
     let result$: Observable<ResultExtended> = resultQuery$.pipe(
-      distinct(),
+      take(1),
       map(resultArray => {
         if (resultArray.length == 0) {
           resultArray.push(this.makeUnknownResult(matchId));
@@ -69,7 +71,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       .valueChanges({ idField: 'documentId' });
 
     let match$: Observable<MatchExtended> = matchQuery$.pipe(
-      distinct(),
+      take(1),
       map(matchArray => {
         if (matchArray.length == 0) {
           matchArray.push(this.makeUnknownMatch(matchId));
@@ -85,12 +87,12 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     // returns all matches of the given matchday as Obervable
 
     let matchQuery$: Observable<MatchExtended[]> = this.firestore.collection<MatchExtended>(COLLECTION_NAME_MATCHES, ref =>
-      ref.where("day", "==", matchday).where("season", "==", season)
-        .orderBy("time"))
+      ref.where("matchday", "==", matchday).where("season", "==", season)
+        .orderBy("timestamp"))
       .valueChanges({ idField: 'documentId' }); // requires additional index in firestore
 
     let matches$: Observable<MatchExtended> = matchQuery$.pipe(
-      distinct(),
+      take(1),
       switchMap(matchArray => from(matchArray))
     );
 
@@ -104,8 +106,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     let timeStampNextDays = new Date(timestampFuture.getFullYear(), timestampFuture.getMonth(), timestampFuture.getDate(), 23, 59, 59); // ceil to end of day
 
     let matchQuery$: Observable<MatchExtended[]> = this.firestore.collection<MatchExtended>(COLLECTION_NAME_MATCHES, ref =>
-      ref.where("time", ">", timestampNow).where("time", "<", timeStampNextDays)
-        .orderBy("time"))
+      ref.where("timestamp", ">", timestampNow).where("timestamp", "<", timeStampNextDays)
+        .orderBy("timestamp"))
       .valueChanges({ idField: 'documentId' });
 
     let matches$: Observable<MatchExtended> = matchQuery$.pipe(
@@ -196,12 +198,12 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     // returns the name of the team with the given teamId. If the shortName flag is set
     // to true, the abbreviation of the team name will be returned
 
-    let teamQuery$: Observable<Team[]> = this.firestore.collection<Team>(COLLECTION_NAME_TEAMS, ref =>
+    let teamQuery$: Observable<TeamExtended[]> = this.firestore.collection<Team>(COLLECTION_NAME_TEAMS, ref =>
       ref.where("id", "==", teamId))
       .valueChanges({ idField: 'documentId' });
 
     let team$: Observable<string> = teamQuery$.pipe(
-      distinct(),
+      take(1),
       map(teamArray => {
         if (teamArray.length == 0) {
           return "unknown team";
@@ -218,6 +220,42 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
 
     return team$;
+  }
+
+  getActiveUserIds$(): Observable<string> {
+    // returns the user IDs of all active users
+
+    let userQuery$: Observable<UserExtended[]> = this.firestore.collection<User>(COLLECTION_NAME_USERS, ref =>
+      ref.where("isActive", "==", true)
+        .orderBy("displayName"))
+      .valueChanges({ idField: 'documentId' });
+
+    return userQuery$.pipe(
+      take(1),
+      switchMap((userArray: UserExtended[]) => from(userArray)),
+      pluck("id")
+    );
+  }
+
+  getUserDataById$(userId: string): Observable<UserExtended> {
+    // returns the user data according to the given ID
+
+    let userQuery$: Observable<UserExtended[]> = this.firestore.collection<UserExtended>(COLLECTION_NAME_USERS, ref =>
+      ref.where("id", "==", userId)
+        .orderBy("displayName"))
+      .valueChanges({ idField: 'documentId' });
+
+    return userQuery$.pipe(
+      take(1),
+      map((userArray: UserExtended[]) => {
+        if (userArray.length == 0) {
+          return this.makeUnknownUser(userId);
+        }
+        else {
+          return userArray[0];
+        }
+      })
+    );
   }
 
   addMatch(match: Match): void {
@@ -263,7 +301,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     };
   }
 
-  private makeUnknownBet(matchId: number, userId: number): BetExtended {
+  private makeUnknownBet(matchId: number, userId: string): BetExtended {
     // returns an unknown dummy Bet
 
     return {
@@ -284,6 +322,19 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       matchId: matchId,
       goalsHome: -1,
       goalsAway: -1
+    };
+  }
+
+  private makeUnknownUser(userId: string): UserExtended {
+    // returns an unknown dummy User
+
+    return {
+      documentId: "",
+      id: userId,
+      email: "",
+      displayName: "unknown user",
+      isAdmin: false,
+      isActive: false
     };
   }
 

@@ -12,21 +12,27 @@ export class FetchBetWriteDataService {
 
   constructor(private appData: AppdataAccessService) { }
 
-  public fetchDataByMatchday$(season: number, matchday: number, userId: number): Observable<BetWriteData> {
+  public fetchDataByMatchday$(season: number, matchday: number, userId: string): Observable<BetWriteData> {
+    // returns the required BetWriteData of the given matchday as Observable
+
     return this.appData.getMatchesByMatchday$(season, matchday).pipe(
       mergeMap(match => this.makeBetWriteData$(match, userId)),
-      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet
+      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet if real-time reading is activatet
     );
   }
 
-  public fetchDataByTime$(nextDays: number, userId: number): Observable<BetWriteData> {
+  public fetchDataByTime$(nextDays: number, userId: string): Observable<BetWriteData> {
+    // returns the required BetWriteData of the given timespan as Observable
+
     return this.appData.getNextMatchesByTime$(nextDays).pipe(
       mergeMap(match => this.makeBetWriteData$(match, userId)),
-      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet
+      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet if real-time reading is activatet
     );
   }
 
-  private makeBetWriteData$(match: Match, userId: number): Observable<BetWriteData> {
+  private makeBetWriteData$(match: Match, userId: string): Observable<BetWriteData> {
+    // converts the BetWriteData request for the required match into a data structure
+
     return combineLatest(
       this.appData.getTeamNameByTeamId$(match.teamIdHome),
       this.appData.getTeamNameByTeamId$(match.teamIdAway),

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Bet, Match, Result, Team, BetExtended, MatchExtended, ResultExtended, TeamExtended } from './database_datastructures';
+import { Bet, Match, Result, Team, BetExtended, MatchExtended, ResultExtended, TeamExtended, UserExtended } from './database_datastructures';
 
 @Injectable()
 export abstract class AppdataAccessService {
-  public abstract getBet$(matchId: number, userId: number): Observable<BetExtended>;
+  public abstract getBet$(matchId: number, userId: string): Observable<BetExtended>;
   public abstract getResult$(matchId: number): Observable<ResultExtended>
   public abstract getMatch$(matchId: number): Observable<MatchExtended>;
   public abstract getMatchesByMatchday$(season: number, matchday: number): Observable<MatchExtended>;
@@ -13,6 +13,8 @@ export abstract class AppdataAccessService {
   public abstract getNextMatch$(): Observable<MatchExtended>;
   public abstract getLastMatch$(): Observable<MatchExtended>;
   public abstract getTeamNameByTeamId$(teamId: number, shortName?: boolean): Observable<string>;
+  public abstract getActiveUserIds$(): Observable<string>;
+  public abstract getUserDataById$(userId: string): Observable<UserExtended>;
   public abstract addBet(bet: Bet): void;
   public abstract addMatch(match: Match): void;
   public abstract addResult(result: Result): void;

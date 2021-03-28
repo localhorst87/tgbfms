@@ -15,7 +15,7 @@ export interface MatchExtended extends Match {
 
 export interface Bet {
   matchId: number;
-  userId: number;
+  userId: string;
   isFixed: boolean;
   goalsHome: number;
   goalsAway: number;
@@ -42,5 +42,17 @@ export interface Team {
 }
 
 export interface TeamExtended extends Team {
+  documentId: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  displayName: string;
+  isAdmin: boolean;
+  isActive: boolean;
+}
+
+export interface UserExtended extends User {
   documentId: string;
 }

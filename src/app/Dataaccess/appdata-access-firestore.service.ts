@@ -8,11 +8,11 @@ import Timestamp = firebase.firestore.Timestamp;
 import { Bet, Match, Result, Team, User } from './database_datastructures';
 import { BetExtended, MatchExtended, ResultExtended, TeamExtended, UserExtended } from './database_datastructures';
 
-const COLLECTION_NAME_BETS: string = 'bets';
-const COLLECTION_NAME_MATCHES: string = 'matches';
-const COLLECTION_NAME_RESULTS: string = 'results';
-const COLLECTION_NAME_TEAMS: string = 'teams';
-const COLLECTION_NAME_USERS: string = 'users';
+export const COLLECTION_NAME_BETS: string = 'bets';
+export const COLLECTION_NAME_MATCHES: string = 'matches';
+export const COLLECTION_NAME_RESULTS: string = 'results';
+export const COLLECTION_NAME_TEAMS: string = 'teams';
+export const COLLECTION_NAME_USERS: string = 'users';
 const SECONDS_PER_DAY: number = 86400;
 
 @Injectable()
@@ -93,7 +93,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let matches$: Observable<MatchExtended> = matchQuery$.pipe(
       take(1),
-      switchMap(matchArray => from(matchArray))
+      switchMap(matchArray => from(matchArray)),
+      distinct()
     );
 
     return matches$;
@@ -111,8 +112,9 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       .valueChanges({ idField: 'documentId' });
 
     let matches$: Observable<MatchExtended> = matchQuery$.pipe(
-      distinct(),
-      switchMap(matchArray => from(matchArray))
+      take(1),
+      switchMap(matchArray => from(matchArray)),
+      distinct()
     );
 
     return matches$;
@@ -126,7 +128,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       .valueChanges({ idField: 'documentId' });
 
     let matchday$: Observable<number> = matchQuery$.pipe(
-      distinct(),
+      take(1),
       map(matchArray => {
         if (matchArray.length == 0) {
           return -1;
@@ -134,7 +136,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
         else {
           return matchArray[0].matchday;
         }
-      })
+      }),
+      distinct()
     );
 
     return matchday$;
@@ -153,7 +156,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       .valueChanges({ idField: 'documentId' });
 
     let match$: Observable<MatchExtended> = matchQuery$.pipe(
-      distinct(),
+      take(1),
       map(matchArray => {
         if (matchArray.length == 0) {
           return this.makeUnknownMatch(-1);
@@ -161,7 +164,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
         else {
           return matchArray[0];
         }
-      })
+      }),
+      distinct()
     );
 
     return match$;
@@ -180,7 +184,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       .valueChanges({ idField: 'documentId' });
 
     let match$: Observable<MatchExtended> = matchQuery$.pipe(
-      distinct(),
+      take(1),
       map(matchArray => {
         if (matchArray.length == 0) {
           return this.makeUnknownMatch(-1);
@@ -188,7 +192,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
         else {
           return matchArray[0];
         }
-      })
+      }),
+      distinct()
     );
 
     return match$;
@@ -216,7 +221,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
             return teamArray[0].nameLong;
           }
         }
-      })
+      }),
+      distinct()
     );
 
     return team$;
@@ -233,7 +239,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return userQuery$.pipe(
       take(1),
       switchMap((userArray: UserExtended[]) => from(userArray)),
-      pluck("id")
+      pluck("id"),
+      distinct()
     );
   }
 
@@ -254,7 +261,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
         else {
           return userArray[0];
         }
-      })
+      }),
+      distinct()
     );
   }
 

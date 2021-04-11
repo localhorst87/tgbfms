@@ -25,20 +25,28 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     // converts the openligadb structure to MatchImportData structure
 
     let matchArray: MatchImportData[] = [];
-    for (let match of matchdayJson) { // no conversion if no match available
-      let goals: number[] = this.extractResult(match);
-      let matchImport: MatchImportData = {
-        matchday: match.Group.GroupOrderID,
-        matchId: match.MatchID,
-        datetime: match.MatchDateTime,
-        isFinished: match.MatchIsFinished,
-        teamIdHome: match.Team1.TeamId,
-        teamIdAway: match.Team2.TeamId,
-        goalsHome: goals[0],
-        goalsAway: goals[1]
+
+    if (!("error" in matchdayJson)) {
+      // http error throws object with error property
+      // error response will result in empty matchArray
+
+      for (let match of matchdayJson) { // no conversion if no match available
+        let goals: number[] = this.extractResult(match);
+        let matchImport: MatchImportData = {
+          matchday: match.Group.GroupOrderID,
+          matchId: match.MatchID,
+          datetime: match.MatchDateTime,
+          isFinished: match.MatchIsFinished,
+          teamIdHome: match.Team1.TeamId,
+          teamIdAway: match.Team2.TeamId,
+          goalsHome: goals[0],
+          goalsAway: goals[1]
+        }
+        matchArray.push(matchImport);
       }
-      matchArray.push(matchImport);
+
     }
+
     return from(matchArray);
   }
 
@@ -71,7 +79,13 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
 
   private isMatchStarted(matchJson: any): boolean {
     let matchTimestamp: number = new Date(matchJson.MatchDateTime).getTime();
-    let currentTimestamp: number = Date.now();
-    return currentTimestamp >= matchTimestamp;
+
+    if (matchTimestamp == null) { // corrupt format
+      return false;
+    }
+    else {
+      let currentTimestamp: number = Date.now();
+      return currentTimestamp >= matchTimestamp;
+    }
   }
 }

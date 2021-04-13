@@ -17,20 +17,22 @@ export class FetchBetWriteDataService {
 
     return this.appData.getMatchesByMatchday$(season, matchday).pipe(
       mergeMap(match => this.makeBetWriteData$(match, userId)),
-      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet if real-time reading is activatet
+      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet if real-time reading is active
     );
   }
 
   public fetchDataByTime$(nextDays: number, userId: string): Observable<BetWriteData> {
     // returns the required BetWriteData of the given timespan as Observable
 
+    nextDays = Math.max(0, nextDays); // only future days allowed
+
     return this.appData.getNextMatchesByTime$(nextDays).pipe(
       mergeMap(match => this.makeBetWriteData$(match, userId)),
-      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet if real-time reading is activatet
+      distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet if real-time reading is active
     );
   }
 
-  private makeBetWriteData$(match: Match, userId: string): Observable<BetWriteData> {
+  private makeBetWriteData$(match: MatchExtended, userId: string): Observable<BetWriteData> {
     // converts the BetWriteData request for the required match into a data structure
 
     return combineLatest(

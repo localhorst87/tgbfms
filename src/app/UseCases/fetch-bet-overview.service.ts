@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, combineLatest, of } from 'rxjs';
-import { map, mergeMap, concatMap, distinct, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { map, mergeMap, concatMap, distinct } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { BetExtended, MatchExtended, ResultExtended, UserExtended } from '../Dataaccess/database_datastructures';
+import { BetExtended, MatchExtended, UserExtended } from '../Dataaccess/database_datastructures';
 import { BetOverviewFrameData, BetOverviewUserData } from './output_datastructures';
 
 @Injectable({
@@ -17,6 +17,7 @@ export class FetchBetOverviewService {
 
     return this.appData.getMatchesByMatchday$(season, matchday).pipe(
       mergeMap((match: MatchExtended) => this.makeFrameData$(match, userId)),
+      distinct()
     );
   }
 
@@ -24,7 +25,8 @@ export class FetchBetOverviewService {
     // returns the requested bet data of all users as Observable
 
     return this.getAllUserBets$(matchId).pipe(
-      mergeMap((bet: BetExtended) => this.makeBetData$(bet))
+      mergeMap((bet: BetExtended) => this.makeBetData$(bet)),
+      distinct()
     );
   }
 
@@ -54,7 +56,8 @@ export class FetchBetOverviewService {
     // returns the bet of all active users
 
     return this.appData.getActiveUserIds$().pipe(
-      concatMap((userId: string) => this.appData.getBet$(matchId, userId))
+      concatMap((userId: string) => this.appData.getBet$(matchId, userId)),
+      distinct()
     );
   }
 

@@ -25,6 +25,18 @@ export interface BetExtended extends Bet {
   documentId: string;
 }
 
+export interface SeasonBet {
+  season: number;
+  userId: string;
+  isFixed: boolean;
+  place: number;
+  teamId: number;
+}
+
+export interface SeasonBetExtended extends SeasonBet {
+  documentId: string;
+}
+
 export interface Result {
   matchId: number;
   goalsHome: number;
@@ -32,6 +44,16 @@ export interface Result {
 }
 
 export interface ResultExtended extends Result {
+  documentId: string;
+}
+
+export interface SeasonResult {
+  season: number;
+  place: number;
+  teamId: number;
+}
+
+export interface SeasonResultExtended extends SeasonResult {
   documentId: string;
 }
 

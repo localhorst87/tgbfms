@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatchPointCalculatorService } from './match-point-calculator.service';
+import { PointCalculatorService } from './point-calculator.service';
 import { BetExtended, ResultExtended } from '../Dataaccess/database_datastructures';
 
 export const POINTS_TENDENCY: number = 1; // points if the tendency is correct
@@ -9,7 +9,7 @@ export const POINTS_ADDED_OUTSIDER_TWO: number = 1; // points added if only two 
 export const POINTS_ADDED_OUTSIDER_ONE: number = 2; // points added if only one user bet on a specific tendency
 
 @Injectable()
-export class MatchPointCalculatorTrendbasedService implements MatchPointCalculatorService {
+export class PointCalculatorTrendbasedService implements PointCalculatorService {
 
   constructor() { }
 

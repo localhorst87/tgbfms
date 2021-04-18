@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MatchPointCalculatorTrendbasedService } from './match-point-calculator-trendbased.service';
-import { POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE } from './match-point-calculator-trendbased.service';
+import { PointCalculatorTrendbasedService } from './point-calculator-trendbased.service';
+import { POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE } from './point-calculator-trendbased.service';
 import { BetExtended, ResultExtended } from '../Dataaccess/database_datastructures';
 
 
-describe("MatchPointCalculatorTrendbasedService", () => {
-  let service: MatchPointCalculatorTrendbasedService;
+describe("PointCalculatorTrendbasedService", () => {
+  let service: PointCalculatorTrendbasedService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [MatchPointCalculatorTrendbasedService] });
-    service = TestBed.inject(MatchPointCalculatorTrendbasedService);
+    TestBed.configureTestingModule({ providers: [PointCalculatorTrendbasedService] });
+    service = TestBed.inject(PointCalculatorTrendbasedService);
   });
 
   it('should be created', () => {

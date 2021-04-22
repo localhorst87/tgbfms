@@ -1,8 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 
 import { PointCalculatorTrendbasedService } from './point-calculator-trendbased.service';
-import { POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE } from './point-calculator-trendbased.service';
-import { BetExtended, ResultExtended } from '../Dataaccess/database_datastructures';
+import {
+  POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE,
+  POINTS_SEASON_FIRST_EXACT, POINTS_SEASON_SECOND_EXACT, POINTS_SEASON_LOSER_EXACT, POINTS_SEASON_LOSER_CORRECT
+} from './point-calculator-trendbased.service';
+import { BetExtended, ResultExtended, SeasonBetExtended, SeasonResultExtended } from '../Dataaccess/database_datastructures';
 
 
 describe("PointCalculatorTrendbasedService", () => {
@@ -1088,4 +1091,1191 @@ describe("PointCalculatorTrendbasedService", () => {
     const expectedValue: number = 0;
     expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
   });
+
+  // ---------------------------------------------------------------------------
+  // getSeasonPoints
+  // ---------------------------------------------------------------------------
+
+  it("getSeasonPoints, only champion correct", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: seasonBets[0].teamId
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 20
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 12
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 65
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 7
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = POINTS_SEASON_FIRST_EXACT;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, only second correct", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 8
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: seasonBets[1].teamId
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 12
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 65
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 7
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = POINTS_SEASON_SECOND_EXACT;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, champ and second correct", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: seasonBets[0].teamId
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: seasonBets[1].teamId
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 12
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 65
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 7
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = POINTS_SEASON_FIRST_EXACT + POINTS_SEASON_SECOND_EXACT;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, one relegator exactly correct", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 2
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 4
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: seasonBets[2].teamId
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 65
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 7
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = POINTS_SEASON_LOSER_EXACT;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, one relegator exactly correct, another one correct", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 2
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 4
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: seasonBets[2].teamId
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: seasonBets[3].teamId
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 7
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = POINTS_SEASON_LOSER_EXACT + POINTS_SEASON_LOSER_CORRECT;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, all places correct", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: seasonBets[4].teamId
+      },
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: seasonBets[0].teamId
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: seasonBets[1].teamId
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: seasonBets[2].teamId
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: seasonBets[3].teamId
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[0], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[4])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[0]);
+
+    const expectedValue: number = POINTS_SEASON_FIRST_EXACT + POINTS_SEASON_SECOND_EXACT + 3 * POINTS_SEASON_LOSER_EXACT;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, all places wrong", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 4
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 5
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 7
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 8
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 9
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = 0;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, bets not filled", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: 1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: 2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: -1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: -2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: -3,
+        teamId: -1
+      }
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 4
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 5
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 7
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 8
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 9
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = 0;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, results not filled", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: -1
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = 0;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, bets and results not filled", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: 2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: true,
+        place: -3,
+        teamId: -1
+      }
+    ];
+
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: -1
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = 0;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, bet array empty", () => {
+    const seasonBets: SeasonBetExtended[] = [];
+    const seasonResults: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 4
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 5
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 7
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 8
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 9
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([seasonResults[2], seasonResults[3], seasonResults[4]]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(seasonResults[0])
+      .withArgs(2, seasonResults).and.returnValue(seasonResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(seasonResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
+
+    const expectedValue: number = 0;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  it("getSeasonPoints, season results empty", () => {
+    const seasonBets: SeasonBetExtended[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: 1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: 2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: -1,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: -2,
+        teamId: -1
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id",
+        isFixed: false,
+        place: -3,
+        teamId: -1
+      }
+    ];
+    const seasonResults: SeasonResultExtended[] = [];
+
+    const dummyResults: SeasonResultExtended[] = [
+      {
+        documentId: "",
+        season: -1,
+        place: 1,
+        teamId: -1
+      },
+      {
+        documentId: "",
+        season: -1,
+        place: 2,
+        teamId: -1
+      },
+      {
+        documentId: "",
+        season: -1,
+        place: -1,
+        teamId: -1
+      },
+      {
+        documentId: "",
+        season: -1,
+        place: -2,
+        teamId: -1
+      },
+      {
+        documentId: "",
+        season: -1,
+        place: -3,
+        teamId: -1
+      }
+    ];
+
+    spyOn<any>(service, "getRelegatorResults").and.returnValue([]);
+    spyOn<any>(service, "getSeasonResultFromArray")
+      .withArgs(1, seasonResults).and.returnValue(dummyResults[0])
+      .withArgs(2, seasonResults).and.returnValue(dummyResults[1])
+      .withArgs(-1, seasonResults).and.returnValue(dummyResults[2])
+      .withArgs(-2, seasonResults).and.returnValue(dummyResults[3])
+      .withArgs(-3, seasonResults).and.returnValue(dummyResults[4]);
+
+    const expectedValue: number = 0;
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+  });
+
+  // ---------------------------------------------------------------------------
+  // getSeasonResultFromArray
+  // ---------------------------------------------------------------------------
+
+  it("getSeasonResultFromArray, result available", () => {
+    const argument1: number = -1;
+
+    const argument2: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 25
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 46
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 6
+      }
+    ];
+
+    const expectedValue: SeasonResultExtended = argument2[1];
+    expect(service["getSeasonResultFromArray"](argument1, argument2)).toEqual(expectedValue);
+  });
+
+  it("getSeasonResultFromArray, result not available", () => {
+    const argument1: number = 2;
+
+    const argument2: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 25
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 46
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 6
+      }
+    ];
+
+    const dummyResult: SeasonResultExtended = { // dummy, if target not available
+      documentId: "",
+      season: -1,
+      place: argument1,
+      teamId: -1
+    };
+
+    const expectedValue: SeasonResultExtended = dummyResult;
+    expect(service["getSeasonResultFromArray"](argument1, argument2)).toEqual(expectedValue);
+  });
+
+  it("getSeasonResultFromArray, result array completely empty", () => {
+    const argument1: number = 2;
+
+    const argument2: SeasonResultExtended[] = [];
+
+    const dummyResult: SeasonResultExtended = { // dummy, if target not available
+      documentId: "",
+      season: -1,
+      place: argument1,
+      teamId: -1
+    };
+
+    const expectedValue: SeasonResultExtended = dummyResult;
+    expect(service["getSeasonResultFromArray"](argument1, argument2)).toEqual(expectedValue);
+  });
+
+  // ---------------------------------------------------------------------------
+  // getRelegatorResults
+  // ---------------------------------------------------------------------------
+
+  it("getRelegatorResults, relegators available", () => {
+    const argument: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 25
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 46
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 6
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 89
+      }
+    ];
+
+    const expectedValue: SeasonResultExtended[] = [
+      argument[1],
+      argument[2],
+      argument[3],
+    ];
+    expect(service["getRelegatorResults"](argument)).toEqual(expectedValue);
+  });
+
+  it("getRelegatorResults, relegators not available", () => {
+    const argument: SeasonResultExtended[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 25
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: 2,
+        teamId: 46
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: 3,
+        teamId: 6
+      }
+    ];
+
+    const expectedValue: SeasonResultExtended[] = [];
+    expect(service["getRelegatorResults"](argument)).toEqual(expectedValue);
+  });
+
+  it("getRelegatorResults, result array empty", () => {
+    const argument: SeasonResultExtended[] = [];
+    const expectedValue: SeasonResultExtended[] = [];
+    expect(service["getRelegatorResults"](argument)).toEqual(expectedValue);
+  });
+
 });

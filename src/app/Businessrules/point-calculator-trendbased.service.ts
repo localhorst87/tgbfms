@@ -1,25 +1,29 @@
 import { Injectable } from '@angular/core';
 import { PointCalculatorService } from './point-calculator.service';
-import { BetExtended, ResultExtended } from '../Dataaccess/database_datastructures';
+import { BetExtended, ResultExtended, SeasonBetExtended, SeasonResultExtended } from '../Dataaccess/database_datastructures';
 
 export const POINTS_TENDENCY: number = 1; // points if the tendency is correct
 export const POINTS_ADDED_RESULT: number = 1; // added points if the result is correct
 export const FACTOR_TOP_MATCH: number = 2; // raw points are multiplicated in case of top match
 export const POINTS_ADDED_OUTSIDER_TWO: number = 1; // points added if only two users bet on a specific tendency
 export const POINTS_ADDED_OUTSIDER_ONE: number = 2; // points added if only one user bet on a specific tendency
+export const POINTS_SEASON_FIRST_EXACT: number = 3; // points if the 1st place bet is correct
+export const POINTS_SEASON_SECOND_EXACT: number = 2; // points if the 2nd place bet is correct
+export const POINTS_SEASON_LOSER_EXACT: number = 2; // points if a relegator bet is exactly correct
+export const POINTS_SEASON_LOSER_CORRECT: number = 1; // points if the relegator bet is among results, but not exactly
 
 @Injectable()
 export class PointCalculatorTrendbasedService implements PointCalculatorService {
 
   constructor() { }
 
-  getMatchPoints(userId: string, betArray: BetExtended[], result: ResultExtended, isTopMatch: boolean): number {
+  getMatchPoints(userId: string, betsAllUsers: BetExtended[], result: ResultExtended, isTopMatch: boolean): number {
     // calculates the points of the user with the given user id for the specific match
 
     let points: number = 0;
     let betUser: BetExtended = { documentId: "", matchId: -1, userId: "", isFixed: false, goalsHome: -1, goalsAway: -1 };
 
-    for (let bet of betArray) {
+    for (let bet of betsAllUsers) {
       if (userId == bet.userId) {
         betUser = bet;
         break;
@@ -29,7 +33,61 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     points += this.getTendencyPoints(betUser, result);
     points += this.getAddedResultPoints(betUser, result);
     if (isTopMatch) { points *= FACTOR_TOP_MATCH; }
-    if (points > 0) { points += this.getAddedOutsiderPoints(betArray, betUser); }
+    if (points > 0) { points += this.getAddedOutsiderPoints(betsAllUsers, betUser); }
+
+    return points;
+  }
+
+  countTendencies(betArray: BetExtended[]): number[] {
+    // counts the tendencies by examining all bets, given in betArray
+    // return an array with the following convention [nDraw, nHome, nAway]
+
+    let tendencyCount: number[] = [0, 0, 0]; // [draw, home, away]
+
+    for (let bet of betArray) {
+      let tendency: number = this.getTendency(bet);
+      if (tendency != -1) {
+        tendencyCount[tendency]++;
+      }
+    }
+
+    return tendencyCount;
+  }
+
+  getSeasonPoints(seasonBets: SeasonBetExtended[], seasonResults: SeasonResultExtended[]): number {
+    // calculates the season points according to the given bets and results
+
+    let points: number = 0;
+    let relegatorResults: SeasonResultExtended[] = this.getRelegatorResults(seasonResults);
+
+    for (let bet of seasonBets) {
+
+      if (bet.teamId == -1) {
+        continue;
+      }
+
+      let assocResult: SeasonResultExtended = this.getSeasonResultFromArray(bet.place, seasonResults);
+
+      if (bet.teamId == assocResult.teamId) {
+        if (bet.place == 1) {
+          points += POINTS_SEASON_FIRST_EXACT;
+        }
+        else if (bet.place == 2) {
+          points += POINTS_SEASON_SECOND_EXACT;
+        }
+        else { // bet.place < 0 (-> relegators)
+          points += POINTS_SEASON_LOSER_EXACT;
+        }
+      }
+      else if (bet.place < 0) { // implicitly bet.teamId != assocResult.teamId (!)
+        for (let res of relegatorResults) {
+          if (bet.teamId == res.teamId) {
+            points += POINTS_SEASON_LOSER_CORRECT;
+          }
+        }
+      }
+
+    }
 
     return points;
   }
@@ -86,22 +144,6 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     }
   }
 
-  public countTendencies(betArray: BetExtended[]): number[] {
-    // counts the tendencies by examining all bets, given in betArray
-    // return an array with the following convention [nDraw, nHome, nAway]
-
-    let tendencyCount: number[] = [0, 0, 0]; // [away, draw, home]
-
-    for (let bet of betArray) {
-      let tendency: number = this.getTendency(bet);
-      if (tendency != -1) {
-        tendencyCount[tendency]++;
-      }
-    }
-
-    return tendencyCount;
-  }
-
   private getTendency(betOrResult: any): number {
     // returns the tendeny of the bet or result:
     // 1 in case of home wins, 0 in case of draw, 2 in case of away wins.
@@ -134,4 +176,40 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
       return false;
     }
   }
+
+  private getSeasonResultFromArray(place: number, seasonResults: SeasonResultExtended[]): SeasonResultExtended {
+    // returns the result from the array with the given place.
+    // If the result is not available in the array, a dummy value will be returned.
+
+    let resultToReturn: SeasonResultExtended = { // dummy, if target not available
+      documentId: "",
+      season: -1,
+      place: place,
+      teamId: -1
+    };
+
+    for (let result of seasonResults) {
+      if (result.place == place) {
+        resultToReturn = result;
+        break;
+      }
+    }
+
+    return resultToReturn;
+  }
+
+  private getRelegatorResults(results: SeasonResultExtended[]): SeasonResultExtended[] {
+    // returns all the places of available season results as array
+
+    let relegators: SeasonResultExtended[] = [];
+
+    for (let res of results) {
+      if (res.place < 0) {
+        relegators.push(res);
+      }
+    }
+
+    return relegators;
+  }
+
 }

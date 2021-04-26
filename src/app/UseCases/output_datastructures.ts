@@ -1,5 +1,4 @@
 import { Observable } from 'rxjs';
-import { BetExtended } from '../Dataaccess/database_datastructures';
 
 export interface BetWriteData {
   matchId: number;

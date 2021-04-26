@@ -30,12 +30,42 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
       }
     }
 
-    points += this.getTendencyPoints(betUser, result);
-    points += this.getAddedResultPoints(betUser, result);
-    if (isTopMatch) { points *= FACTOR_TOP_MATCH; }
-    if (points > 0) { points += this.getAddedOutsiderPoints(betsAllUsers, betUser); }
+    if (this.isTendencyCorrect(betUser, result)) {
+      points += POINTS_TENDENCY;
+    }
+    if (this.isResultCorrect(betUser, result)) {
+      points += POINTS_ADDED_RESULT;
+    }
+    if (isTopMatch) {
+      points *= FACTOR_TOP_MATCH;
+    }
+    if (points > 0) {
+      points += this.getPotentialOutsiderPoints(betsAllUsers, betUser);
+    }
 
     return points;
+  }
+
+  isTendencyCorrect(bet: BetExtended, result: ResultExtended): boolean {
+    // returns true if the tendency of bet and result are the same
+
+    if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
+      return false;
+    }
+    else {
+      return this.getTendency(bet) == this.getTendency(result);
+    }
+  }
+
+  isResultCorrect(bet: BetExtended, result: ResultExtended): boolean {
+    // returns true if the results of bet and result are the same
+
+    if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
+      return false;
+    }
+    else {
+      return bet.goalsHome == result.goalsHome && bet.goalsAway == result.goalsAway;
+    }
   }
 
   countTendencies(betArray: BetExtended[]): number[] {
@@ -92,38 +122,8 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     return points;
   }
 
-  private getTendencyPoints(bet: BetExtended, result: ResultExtended): number {
-    // returns the raw tendency points if bet and result tendency are equal, else 0
-
-    if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
-      return 0;
-    }
-
-    if (this.getTendency(bet) == this.getTendency(result)) {
-      return POINTS_TENDENCY;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  private getAddedResultPoints(bet: BetExtended, result: ResultExtended): number {
-    // returns the added result points if the bet and result are totally equal
-
-    if (!this.isAvailable(bet) || !this.isAvailable(result)) {
-      return 0;
-    }
-
-    if (bet.goalsHome == result.goalsHome && bet.goalsAway == result.goalsAway) {
-      return POINTS_ADDED_RESULT;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  private getAddedOutsiderPoints(betArray: BetExtended[], betUser: BetExtended): number {
-    // returns the potential added points for outsider bets (two or only one
+  private getPotentialOutsiderPoints(betArray: BetExtended[], betUser: BetExtended): number {
+    // returns the potentially (!) added points for outsider bets (two or only one
     // user per tendency) for the given bet of the user
 
     let nTendency: number[] = this.countTendencies(betArray);

@@ -5,8 +5,8 @@ import { map, switchMap, distinct, take, pluck } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import firebase from 'firebase/app';
 import Timestamp = firebase.firestore.Timestamp;
-import { Bet, Match, Result, Team, User } from './database_datastructures';
-import { BetExtended, MatchExtended, ResultExtended, TeamExtended, UserExtended } from './database_datastructures';
+import { Bet, Match, Result, Team, User } from '../Businessrules/basic_datastructures';
+import { BetExtended, MatchExtended, ResultExtended, TeamExtended, UserExtended } from '../Businessrules/basic_datastructures';
 
 export const COLLECTION_NAME_BETS: string = 'bets';
 export const COLLECTION_NAME_MATCHES: string = 'matches';

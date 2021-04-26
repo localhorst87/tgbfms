@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { FetchBetOverviewService } from './fetch-bet-overview.service';
 import { BetOverviewFrameData, BetOverviewUserData } from './output_datastructures';
-import { BetExtended, MatchExtended, ResultExtended, UserExtended } from '../Dataaccess/database_datastructures';
+import { BetExtended, MatchExtended, ResultExtended, UserExtended } from '../Businessrules/basic_datastructures';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 

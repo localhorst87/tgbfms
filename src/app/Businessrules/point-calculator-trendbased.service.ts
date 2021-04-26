@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PointCalculatorService } from './point-calculator.service';
-import { BetExtended, ResultExtended, SeasonBetExtended, SeasonResultExtended } from '../Dataaccess/database_datastructures';
+import { BetExtended, ResultExtended, SeasonBetExtended, SeasonResultExtended } from './basic_datastructures';
 
 export const POINTS_TENDENCY: number = 1; // points if the tendency is correct
 export const POINTS_ADDED_RESULT: number = 1; // added points if the result is correct

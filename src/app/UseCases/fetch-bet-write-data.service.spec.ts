@@ -4,7 +4,7 @@ import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { FetchBetWriteDataService } from './fetch-bet-write-data.service';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { Bet, Match, Result, BetExtended, MatchExtended, ResultExtended } from '../Dataaccess/database_datastructures';
+import { Bet, Match, Result, BetExtended, MatchExtended, ResultExtended } from '../Businessrules/basic_datastructures';
 import { BetWriteData } from './output_datastructures';
 
 describe('FetchBetWriteDataService', () => {

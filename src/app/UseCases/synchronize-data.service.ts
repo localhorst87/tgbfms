@@ -3,8 +3,8 @@ import { take } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { MatchImportData } from '../Dataaccess/matchdata_datastructures';
-import { Bet, Match, Result, Team } from '../Dataaccess/database_datastructures';
-import { BetExtended, MatchExtended, ResultExtended, TeamExtended } from '../Dataaccess/database_datastructures';
+import { Bet, Match, Result, Team } from '../Businessrules/basic_datastructures';
+import { BetExtended, MatchExtended, ResultExtended, TeamExtended } from '../Businessrules/basic_datastructures';
 
 @Injectable({
   providedIn: 'root'

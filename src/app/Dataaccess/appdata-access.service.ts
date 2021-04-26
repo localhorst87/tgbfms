@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Bet, Match, Result, Team, BetExtended, MatchExtended, ResultExtended, TeamExtended, UserExtended } from './database_datastructures';
+import { Bet, Match, Result, Team, BetExtended, MatchExtended, ResultExtended, TeamExtended, UserExtended } from '../Businessrules/basic_datastructures';
 
 @Injectable()
 export abstract class AppdataAccessService {

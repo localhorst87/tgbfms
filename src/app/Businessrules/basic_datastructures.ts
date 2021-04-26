@@ -78,3 +78,12 @@ export interface User {
 export interface UserExtended extends User {
   documentId: string;
 }
+
+export interface TableData {
+  place: number;
+  name: string;
+  points: number;
+  matches: number;
+  results: number;
+  extra: number;
+}

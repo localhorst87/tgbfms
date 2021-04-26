@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, combineLatest } from 'rxjs';
 import { map, mergeMap, concatMap, distinct } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { BetExtended, MatchExtended, UserExtended } from '../Dataaccess/database_datastructures';
+import { BetExtended, MatchExtended, UserExtended } from '../Businessrules/basic_datastructures';
 import { BetOverviewFrameData, BetOverviewUserData } from './output_datastructures';
 
 @Injectable({

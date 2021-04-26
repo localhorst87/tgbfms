@@ -6,7 +6,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { of } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { COLLECTION_NAME_BETS, COLLECTION_NAME_MATCHES, COLLECTION_NAME_RESULTS, COLLECTION_NAME_TEAMS, COLLECTION_NAME_USERS } from './appdata-access-firestore.service';
-import { BetExtended, ResultExtended, MatchExtended, UserExtended, TeamExtended } from '../Dataaccess/database_datastructures';
+import { BetExtended, ResultExtended, MatchExtended, UserExtended, TeamExtended } from '../Businessrules/basic_datastructures';
 
 describe('AppdataAccessFirestoreService', () => {
   let service: AppdataAccessFirestoreService;

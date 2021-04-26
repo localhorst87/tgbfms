@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BetExtended, ResultExtended, SeasonBetExtended, SeasonResultExtended } from '../Dataaccess/database_datastructures';
+import { BetExtended, ResultExtended, SeasonBetExtended, SeasonResultExtended } from './basic_datastructures';
 
 @Injectable()
 export abstract class PointCalculatorService {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PointCalculatorService } from './point-calculator.service';
-import { BetExtended, ResultExtended, SeasonBetExtended, SeasonResultExtended } from './basic_datastructures';
+import { BetExtended, ResultExtended, MatchExtended, Score, SeasonBetExtended, SeasonResultExtended } from './basic_datastructures';
 
 export const POINTS_TENDENCY: number = 1; // points if the tendency is correct
 export const POINTS_ADDED_RESULT: number = 1; // added points if the result is correct
@@ -17,10 +17,10 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
 
   constructor() { }
 
-  getMatchPoints(userId: string, betsAllUsers: BetExtended[], result: ResultExtended, isTopMatch: boolean): number {
+  getMatchPoints(userId: string, betsAllUsers: BetExtended[], result: ResultExtended, match: MatchExtended): Score {
     // calculates the points of the user with the given user id for the specific match
 
-    let points: number = 0;
+    let score: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
     let betUser: BetExtended = { documentId: "", matchId: -1, userId: "", isFixed: false, goalsHome: -1, goalsAway: -1 };
 
     for (let bet of betsAllUsers) {
@@ -30,20 +30,29 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
       }
     }
 
-    if (this.isTendencyCorrect(betUser, result)) {
-      points += POINTS_TENDENCY;
-    }
-    if (this.isResultCorrect(betUser, result)) {
-      points += POINTS_ADDED_RESULT;
-    }
-    if (isTopMatch) {
-      points *= FACTOR_TOP_MATCH;
-    }
-    if (points > 0) {
-      points += this.getPotentialOutsiderPoints(betsAllUsers, betUser);
+    if (betUser.matchId != result.matchId || betUser.matchId != match.matchId || result.matchId != match.matchId) {
+      return score;
     }
 
-    return points;
+    if (this.isTendencyCorrect(betUser, result)) {
+      score.matches += 1;
+      score.points += POINTS_TENDENCY;
+    }
+    if (this.isResultCorrect(betUser, result)) {
+      score.results += 1;
+      score.points += POINTS_ADDED_RESULT;
+    }
+    if (match.isTopMatch) {
+      score.extraTop += score.points * FACTOR_TOP_MATCH;
+      score.points *= FACTOR_TOP_MATCH;
+    }
+    if (score.points > 0) {
+      let extraOutsider: number = this.getPotentialOutsiderPoints(betsAllUsers, betUser);
+      score.extraOutsider += extraOutsider;
+      score.points += extraOutsider;
+    }
+
+    return score;
   }
 
   isTendencyCorrect(bet: BetExtended, result: ResultExtended): boolean {

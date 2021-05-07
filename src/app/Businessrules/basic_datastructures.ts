@@ -79,9 +79,16 @@ export interface UserExtended extends User {
   documentId: string;
 }
 
+export interface Score {
+  points: number;
+  matches: number;
+  results: number;
+  extraTop: number;
+  extraOutsider: number;
+}
+
 export interface TableData {
-  place: number;
-  name: string;
+  userId: string;
   points: number;
   matches: number;
   results: number;

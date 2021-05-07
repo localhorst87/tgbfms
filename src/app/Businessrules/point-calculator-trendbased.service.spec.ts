@@ -5,7 +5,7 @@ import {
   POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE,
   POINTS_SEASON_FIRST_EXACT, POINTS_SEASON_SECOND_EXACT, POINTS_SEASON_LOSER_EXACT, POINTS_SEASON_LOSER_CORRECT
 } from './point-calculator-trendbased.service';
-import { BetExtended, ResultExtended, SeasonBetExtended, SeasonResultExtended } from './basic_datastructures';
+import { BetExtended, ResultExtended, MatchExtended, Score, SeasonBetExtended, SeasonResultExtended } from './basic_datastructures';
 
 
 describe("PointCalculatorTrendbasedService", () => {
@@ -518,7 +518,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = false;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -554,11 +553,22 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: false,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(0);
-    const expectedValue: number = 0;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, bet tendency right, no top, no outsider", () => {
@@ -569,7 +579,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = false;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -605,11 +614,22 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: false,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(0);
-    const expectedValue: number = POINTS_TENDENCY;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = { points: POINTS_TENDENCY, matches: 1, results: 0, extraTop: 0, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, bet tendency right, top, no outsider", () => {
@@ -620,7 +640,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = true;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -656,12 +675,22 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: true,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(0);
-    const expectedValue: number = FACTOR_TOP_MATCH * POINTS_TENDENCY;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = { points: FACTOR_TOP_MATCH * POINTS_TENDENCY, matches: 1, results: 0, extraTop: FACTOR_TOP_MATCH * POINTS_TENDENCY, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, bet tendency right, no top, two outsider", () => {
@@ -672,7 +701,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = false;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -708,12 +736,22 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: false,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_TWO);
-    const expectedValue: number = POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_TWO;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = { points: POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_TWO, matches: 1, results: 0, extraTop: 0, extraOutsider: POINTS_ADDED_OUTSIDER_TWO };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, bet tendency right, no top, single outsider", () => {
@@ -724,7 +762,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = false;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -760,11 +797,22 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: false,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: number = POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_ONE;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = { points: POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_ONE, matches: 1, results: 0, extraTop: 0, extraOutsider: POINTS_ADDED_OUTSIDER_ONE };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, bet tendency right, top, single outsider", () => {
@@ -775,7 +823,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = true;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -811,12 +858,23 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: true,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
 
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: number = FACTOR_TOP_MATCH * POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_ONE;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = { points: FACTOR_TOP_MATCH * POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_ONE, matches: 1, results: 0, extraTop: FACTOR_TOP_MATCH * POINTS_TENDENCY, extraOutsider: POINTS_ADDED_OUTSIDER_ONE };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, bet result right, top, single outsider", () => {
@@ -827,7 +885,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = true;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -863,11 +920,29 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: true,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
+
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: number = FACTOR_TOP_MATCH * (POINTS_TENDENCY + POINTS_ADDED_RESULT) + POINTS_ADDED_OUTSIDER_ONE;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = {
+      points: FACTOR_TOP_MATCH * (POINTS_TENDENCY + POINTS_ADDED_RESULT) + POINTS_ADDED_OUTSIDER_ONE,
+      matches: 1,
+      results: 1,
+      extraTop: FACTOR_TOP_MATCH * (POINTS_TENDENCY + POINTS_ADDED_RESULT),
+      extraOutsider: POINTS_ADDED_OUTSIDER_ONE
+    };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, bet wrong, top, single outsider", () => {
@@ -878,7 +953,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = true;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -914,12 +988,23 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: true,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
 
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: number = 0;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, no goals set in target bet, top", () => {
@@ -930,7 +1015,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = true;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -966,9 +1050,20 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: true,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
 
-    const expectedValue: number = 0;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, no goals set in result, top, single outsider", () => {
@@ -979,7 +1074,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: -1,
       goalsAway: -1
     };
-    const isTop: boolean = true;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -1015,10 +1109,22 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: true,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
 
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: number = 0;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+
+    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, no goals set in target bet, no goals set in result", () => {
@@ -1029,7 +1135,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: -1,
       goalsAway: -1
     };
-    const isTop: boolean = false;
     const betUser: BetExtended = {
       documentId: "test_id",
       matchId: 1,
@@ -1065,9 +1170,20 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: false,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
 
-    const expectedValue: number = 0;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   it("getMatchPoints, user bet not in array, top, single outsider", () => {
@@ -1078,7 +1194,6 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const isTop: boolean = true;
     let betArray: BetExtended[] = [
       {
         documentId: "test_id",
@@ -1113,8 +1228,144 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
-    const expectedValue: number = 0;
-    expect(service["getMatchPoints"](userId, betArray, result, isTop)).toBe(expectedValue);
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: true,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
+
+    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
+  });
+
+  it("getMatchPoints, matchIds of match and others do not correspond", () => {
+    const userId: string = "target_user";
+    const result: ResultExtended = {
+      documentId: "test_id",
+      matchId: 1,
+      goalsHome: 3,
+      goalsAway: 1
+    };
+    const betUser: BetExtended = {
+      documentId: "test_id",
+      matchId: 1,
+      userId: "target_user",
+      isFixed: true,
+      goalsHome: 2,
+      goalsAway: 1
+    };
+    const betArray: BetExtended[] = [
+      betUser,
+      {
+        documentId: "test_id",
+        matchId: 1,
+        userId: "test_user_id_2",
+        isFixed: true,
+        goalsHome: 2,
+        goalsAway: 3
+      },
+      {
+        documentId: "test_id",
+        matchId: 1,
+        userId: "test_user_id_3",
+        isFixed: true,
+        goalsHome: 2,
+        goalsAway: 2
+      },
+      {
+        documentId: "test_id",
+        matchId: 1,
+        userId: "test_user_id_4",
+        isFixed: true,
+        goalsHome: 0,
+        goalsAway: 2
+      }
+    ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 99,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: true,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
+
+    spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
+    spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
+    spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
+    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
+  });
+
+  it("getMatchPoints, matchIds of bet and result do not correspond", () => {
+    const userId: string = "target_user";
+    const result: ResultExtended = {
+      documentId: "test_id",
+      matchId: 99,
+      goalsHome: 3,
+      goalsAway: 1
+    };
+    const betUser: BetExtended = {
+      documentId: "test_id",
+      matchId: 1,
+      userId: "target_user",
+      isFixed: true,
+      goalsHome: 2,
+      goalsAway: 1
+    };
+    const betArray: BetExtended[] = [
+      betUser,
+      {
+        documentId: "test_id",
+        matchId: 1,
+        userId: "test_user_id_2",
+        isFixed: true,
+        goalsHome: 2,
+        goalsAway: 3
+      },
+      {
+        documentId: "test_id",
+        matchId: 1,
+        userId: "test_user_id_3",
+        isFixed: true,
+        goalsHome: 2,
+        goalsAway: 2
+      },
+      {
+        documentId: "test_id",
+        matchId: 1,
+        userId: "test_user_id_4",
+        isFixed: true,
+        goalsHome: 0,
+        goalsAway: 2
+      }
+    ];
+    const match: MatchExtended = {
+      documentId: "test_id",
+      season: 2020,
+      matchday: 4,
+      matchId: 1,
+      timestamp: 1234567890,
+      isFinished: true,
+      isTopMatch: true,
+      teamIdHome: 12,
+      teamIdAway: 123
+    };
+
+    spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
+    spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
+    spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
+    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
   // ---------------------------------------------------------------------------

@@ -1,0 +1,129 @@
+import { Injectable } from '@angular/core';
+import { StatisticsCalculatorService } from './statistics-calculator.service';
+import { TableData, BetExtended, ResultExtended, MatchExtended, Score } from './basic_datastructures';
+import { PointCalculatorService } from './point-calculator.service';
+
+
+@Injectable()
+export class StatisticsCalculatorTrendbasedService implements StatisticsCalculatorService {
+  constructor(private pointCalculator: PointCalculatorService) { }
+
+  getBetTable(matchArray: MatchExtended[], betArray: BetExtended[], resultArray: ResultExtended[], offset: TableData[] = []): TableData[] {
+    // calculates the classification from the given bet, results and offsets
+    // for the matches given in the matchArray
+
+    let betTable: TableData[] = [];
+
+    let availableUsers: string[] = this.identifyUsers(betArray, offset);
+
+    for (let userId of availableUsers) {
+      let tableDataUser: TableData = this.initTableData(userId, offset);
+
+      for (let match of matchArray) {
+        let betUser: BetExtended = this.extractBet(betArray, match.matchId, userId);
+        let allMatchBets: BetExtended[] = betArray.filter(bet => bet.matchId == match.matchId);
+        let result: ResultExtended = this.extractResult(resultArray, match.matchId);
+
+        let matchScore: Score = this.pointCalculator.getMatchPoints(userId, allMatchBets, result, match);
+        tableDataUser.points += matchScore.points;
+        tableDataUser.matches += matchScore.matches;
+        tableDataUser.results += matchScore.results;
+        tableDataUser.extra += matchScore.extraTop + matchScore.extraOutsider;
+      }
+
+      betTable.push(tableDataUser);
+    }
+
+    return betTable.sort(this.compareTableData);
+  }
+
+  compareTableData(firstEl: TableData, secondEl: TableData): number {
+    // used as sorting function to sort table according to business rules
+
+    if (firstEl.points != secondEl.points) {
+      return secondEl.points - firstEl.points;
+    }
+    else if (firstEl.matches != secondEl.matches) {
+      return secondEl.matches - firstEl.matches;
+    }
+    else if (firstEl.results != secondEl.results) {
+      return secondEl.results - firstEl.results;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  private identifyUsers(betArray: BetExtended[], offset: TableData[]): string[] {
+    // identifies all the users whose bets are present in betArray and returns
+    // an array of unique user IDs
+
+    let usersBet: string[] = betArray.map(bet => bet.userId); // filters user IDs
+    let usersTable: string[] = offset.map(tableData => tableData.userId);
+    let usersUnion: string[] = usersBet.concat(usersTable); // combines both userId arrays
+    let uniqueUsers: string[] = usersUnion.filter((val, idx, arr) => arr.indexOf(val) === idx); // makes IDs unique
+
+    return uniqueUsers.sort();
+  }
+
+  private initTableData(userId: string, offset: TableData[]): TableData {
+    // returns the TableData from the offset table. If the userId is not
+    // available in the offset, or the offset table is empty, a zero point
+    // TableData will be emitted
+
+    let idx: number = offset.findIndex(tableData => tableData.userId == userId);
+
+    if (idx >= 0) {
+      return offset[idx];
+    }
+    else {
+      return {
+        userId: userId,
+        points: 0,
+        matches: 0,
+        results: 0,
+        extra: 0
+      };
+    }
+  }
+
+  private extractBet(betArray: BetExtended[], matchId: number, userId: string): BetExtended {
+    // extracts the Bet with the given matchId and userId from betArray.
+    // If the conditions are not met, a default value will be returned
+
+    let idx: number = betArray.findIndex(bet => bet.matchId == matchId && bet.userId == userId);
+
+    if (idx >= 0) {
+      return betArray[idx];
+    }
+    else {
+      return {
+        documentId: "",
+        matchId: matchId,
+        userId: userId,
+        isFixed: false,
+        goalsHome: -1,
+        goalsAway: -1
+      };
+    }
+  }
+
+  private extractResult(resultArray: ResultExtended[], matchId: number): ResultExtended {
+    // extracts the Result with the given matchId from resultArray.
+    // If the conditions are not met, a default value will be returned
+
+    let idx: number = resultArray.findIndex(result => result.matchId == matchId);
+
+    if (idx >= 0) {
+      return resultArray[idx];
+    }
+    else {
+      return {
+        documentId: "",
+        matchId: matchId,
+        goalsHome: -1,
+        goalsAway: -1
+      };
+    }
+  }
+}

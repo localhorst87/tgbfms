@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StatisticsCalculatorService } from './statistics-calculator.service';
-import { TableData, BetExtended, ResultExtended, MatchExtended, Score } from './basic_datastructures';
+import { BetExtended, ResultExtended, MatchExtended, Score } from './basic_datastructures';
 import { PointCalculatorService } from './point-calculator.service';
 
 
@@ -8,36 +8,38 @@ import { PointCalculatorService } from './point-calculator.service';
 export class StatisticsCalculatorTrendbasedService implements StatisticsCalculatorService {
   constructor(private pointCalculator: PointCalculatorService) { }
 
-  getBetTable(matchArray: MatchExtended[], betArray: BetExtended[], resultArray: ResultExtended[], offset: TableData[] = []): TableData[] {
-    // calculates the classification from the given bet, results and offsets
+  getBetTable(matchArray: MatchExtended[], betArray: BetExtended[], resultArray: ResultExtended[], offset: Score[] = []): Score[] {
+    // calculates all scores from the given bets, results and score offsets
     // for the matches given in the matchArray
 
-    let betTable: TableData[] = [];
+    let scores: Score[] = [];
 
     let availableUsers: string[] = this.identifyUsers(betArray, offset);
 
     for (let userId of availableUsers) {
-      let tableDataUser: TableData = this.initTableData(userId, offset);
+      let scoreUser: Score = this.initTableData(userId, offset);
 
       for (let match of matchArray) {
         let betUser: BetExtended = this.extractBet(betArray, match.matchId, userId);
         let allMatchBets: BetExtended[] = betArray.filter(bet => bet.matchId == match.matchId);
         let result: ResultExtended = this.extractResult(resultArray, match.matchId);
-
         let matchScore: Score = this.pointCalculator.getMatchPoints(userId, allMatchBets, result, match);
-        tableDataUser.points += matchScore.points;
-        tableDataUser.matches += matchScore.matches;
-        tableDataUser.results += matchScore.results;
-        tableDataUser.extra += matchScore.extraTop + matchScore.extraOutsider;
+
+        scoreUser.points += matchScore.points;
+        scoreUser.matches += matchScore.matches;
+        scoreUser.results += matchScore.results;
+        scoreUser.extraTop += matchScore.extraTop;
+        scoreUser.extraOutsider += matchScore.extraOutsider;
+        scoreUser.extraSeason += matchScore.extraSeason;
       }
 
-      betTable.push(tableDataUser);
+      scores.push(scoreUser);
     }
 
-    return betTable.sort(this.compareTableData);
+    return scores.sort(this.compareScores);
   }
 
-  compareTableData(firstEl: TableData, secondEl: TableData): number {
+  compareScores(firstEl: Score, secondEl: Score): number {
     // used as sorting function to sort table according to business rules
 
     if (firstEl.points != secondEl.points) {
@@ -54,24 +56,24 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     }
   }
 
-  private identifyUsers(betArray: BetExtended[], offset: TableData[]): string[] {
+  private identifyUsers(betArray: BetExtended[], offset: Score[]): string[] {
     // identifies all the users whose bets are present in betArray and returns
     // an array of unique user IDs
 
     let usersBet: string[] = betArray.map(bet => bet.userId); // filters user IDs
-    let usersTable: string[] = offset.map(tableData => tableData.userId);
+    let usersTable: string[] = offset.map(score => score.userId);
     let usersUnion: string[] = usersBet.concat(usersTable); // combines both userId arrays
     let uniqueUsers: string[] = usersUnion.filter((val, idx, arr) => arr.indexOf(val) === idx); // makes IDs unique
 
     return uniqueUsers.sort();
   }
 
-  private initTableData(userId: string, offset: TableData[]): TableData {
-    // returns the TableData from the offset table. If the userId is not
+  private initTableData(userId: string, offset: Score[]): Score {
+    // returns the Score from the offset table. If the userId is not
     // available in the offset, or the offset table is empty, a zero point
-    // TableData will be emitted
+    // Score will be emitted
 
-    let idx: number = offset.findIndex(tableData => tableData.userId == userId);
+    let idx: number = offset.findIndex(score => score.userId == userId);
 
     if (idx >= 0) {
       return offset[idx];
@@ -82,7 +84,9 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
         points: 0,
         matches: 0,
         results: 0,
-        extra: 0
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
       };
     }
   }

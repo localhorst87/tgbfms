@@ -20,7 +20,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
   getMatchPoints(userId: string, betsAllUsers: BetExtended[], result: ResultExtended, match: MatchExtended): Score {
     // calculates the points of the user with the given user id for the specific match
 
-    let score: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    let score: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     let betUser: BetExtended = { documentId: "", matchId: -1, userId: "", isFixed: false, goalsHome: -1, goalsAway: -1 };
 
     for (let bet of betsAllUsers) {
@@ -55,28 +55,6 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     return score;
   }
 
-  isTendencyCorrect(bet: BetExtended, result: ResultExtended): boolean {
-    // returns true if the tendency of bet and result are the same
-
-    if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
-      return false;
-    }
-    else {
-      return this.getTendency(bet) == this.getTendency(result);
-    }
-  }
-
-  isResultCorrect(bet: BetExtended, result: ResultExtended): boolean {
-    // returns true if the results of bet and result are the same
-
-    if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
-      return false;
-    }
-    else {
-      return bet.goalsHome == result.goalsHome && bet.goalsAway == result.goalsAway;
-    }
-  }
-
   countTendencies(betArray: BetExtended[]): number[] {
     // counts the tendencies by examining all bets, given in betArray
     // return an array with the following convention [nDraw, nHome, nAway]
@@ -93,10 +71,12 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     return tendencyCount;
   }
 
-  getSeasonPoints(seasonBets: SeasonBetExtended[], seasonResults: SeasonResultExtended[]): number {
+  getSeasonPoints(seasonBets: SeasonBetExtended[], seasonResults: SeasonResultExtended[]): Score {
     // calculates the season points according to the given bets and results
 
-    let points: number = 0;
+    let userId: string = seasonBets.length > 0 ? seasonBets[0].userId : "";
+    let score: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
+
     let relegatorResults: SeasonResultExtended[] = this.getRelegatorResults(seasonResults);
 
     for (let bet of seasonBets) {
@@ -109,26 +89,50 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
 
       if (bet.teamId == assocResult.teamId) {
         if (bet.place == 1) {
-          points += POINTS_SEASON_FIRST_EXACT;
+          score.points += POINTS_SEASON_FIRST_EXACT;
         }
         else if (bet.place == 2) {
-          points += POINTS_SEASON_SECOND_EXACT;
+          score.points += POINTS_SEASON_SECOND_EXACT;
         }
         else { // bet.place < 0 (-> relegators)
-          points += POINTS_SEASON_LOSER_EXACT;
+          score.points += POINTS_SEASON_LOSER_EXACT;
         }
       }
       else if (bet.place < 0) { // implicitly bet.teamId != assocResult.teamId (!)
         for (let res of relegatorResults) {
           if (bet.teamId == res.teamId) {
-            points += POINTS_SEASON_LOSER_CORRECT;
+            score.points += POINTS_SEASON_LOSER_CORRECT;
           }
         }
       }
 
     }
 
-    return points;
+    score.extraSeason = score.points;
+
+    return score;
+  }
+
+  private isTendencyCorrect(bet: BetExtended, result: ResultExtended): boolean {
+    // returns true if the tendency of bet and result are the same
+
+    if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
+      return false;
+    }
+    else {
+      return this.getTendency(bet) == this.getTendency(result);
+    }
+  }
+
+  private isResultCorrect(bet: BetExtended, result: ResultExtended): boolean {
+    // returns true if the results of bet and result are the same
+
+    if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
+      return false;
+    }
+    else {
+      return bet.goalsHome == result.goalsHome && bet.goalsAway == result.goalsAway;
+    }
   }
 
   private getPotentialOutsiderPoints(betArray: BetExtended[], betUser: BetExtended): number {

@@ -567,7 +567,7 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(0);
-    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    const expectedValue: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -628,7 +628,7 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(0);
-    const expectedValue: Score = { points: POINTS_TENDENCY, matches: 1, results: 0, extraTop: 0, extraOutsider: 0 };
+    const expectedValue: Score = { userId: userId, points: POINTS_TENDENCY, matches: 1, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -689,7 +689,15 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(0);
-    const expectedValue: Score = { points: FACTOR_TOP_MATCH * POINTS_TENDENCY, matches: 1, results: 0, extraTop: FACTOR_TOP_MATCH * POINTS_TENDENCY, extraOutsider: 0 };
+    const expectedValue: Score = {
+      userId: userId,
+      points: FACTOR_TOP_MATCH * POINTS_TENDENCY,
+      matches: 1,
+      results: 0,
+      extraTop: FACTOR_TOP_MATCH * POINTS_TENDENCY,
+      extraOutsider: 0,
+      extraSeason: 0
+    };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -750,7 +758,15 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_TWO);
-    const expectedValue: Score = { points: POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_TWO, matches: 1, results: 0, extraTop: 0, extraOutsider: POINTS_ADDED_OUTSIDER_TWO };
+    const expectedValue: Score = {
+      userId: userId,
+      points: POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_TWO,
+      matches: 1,
+      results: 0,
+      extraTop: 0,
+      extraOutsider: POINTS_ADDED_OUTSIDER_TWO,
+      extraSeason: 0
+    };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -811,7 +827,15 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: Score = { points: POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_ONE, matches: 1, results: 0, extraTop: 0, extraOutsider: POINTS_ADDED_OUTSIDER_ONE };
+    const expectedValue: Score = {
+      userId: userId,
+      points: POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_ONE,
+      matches: 1,
+      results: 0,
+      extraTop: 0,
+      extraOutsider: POINTS_ADDED_OUTSIDER_ONE,
+      extraSeason: 0
+    };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -873,7 +897,15 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: Score = { points: FACTOR_TOP_MATCH * POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_ONE, matches: 1, results: 0, extraTop: FACTOR_TOP_MATCH * POINTS_TENDENCY, extraOutsider: POINTS_ADDED_OUTSIDER_ONE };
+    const expectedValue: Score = {
+      userId: userId,
+      points: FACTOR_TOP_MATCH * POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_ONE,
+      matches: 1,
+      results: 0,
+      extraTop: FACTOR_TOP_MATCH * POINTS_TENDENCY,
+      extraOutsider: POINTS_ADDED_OUTSIDER_ONE,
+      extraSeason: 0
+    };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -936,11 +968,13 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
     const expectedValue: Score = {
+      userId: userId,
       points: FACTOR_TOP_MATCH * (POINTS_TENDENCY + POINTS_ADDED_RESULT) + POINTS_ADDED_OUTSIDER_ONE,
       matches: 1,
       results: 1,
       extraTop: FACTOR_TOP_MATCH * (POINTS_TENDENCY + POINTS_ADDED_RESULT),
-      extraOutsider: POINTS_ADDED_OUTSIDER_ONE
+      extraOutsider: POINTS_ADDED_OUTSIDER_ONE,
+      extraSeason: 0
     };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
@@ -1003,7 +1037,7 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    const expectedValue: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -1062,7 +1096,7 @@ describe("PointCalculatorTrendbasedService", () => {
       teamIdAway: 123
     };
 
-    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    const expectedValue: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -1123,7 +1157,7 @@ describe("PointCalculatorTrendbasedService", () => {
 
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
 
-    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    const expectedValue: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -1182,7 +1216,7 @@ describe("PointCalculatorTrendbasedService", () => {
       teamIdAway: 123
     };
 
-    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    const expectedValue: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -1240,7 +1274,7 @@ describe("PointCalculatorTrendbasedService", () => {
       teamIdAway: 123
     };
 
-    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    const expectedValue: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -1302,7 +1336,7 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    const expectedValue: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -1364,7 +1398,7 @@ describe("PointCalculatorTrendbasedService", () => {
     spyOn<any>(service, "isTendencyCorrect").withArgs(betUser, result).and.returnValue(true);
     spyOn<any>(service, "isResultCorrect").withArgs(betUser, result).and.returnValue(false);
     spyOn<any>(service, "getPotentialOutsiderPoints").withArgs(betArray, betUser).and.returnValue(POINTS_ADDED_OUTSIDER_ONE);
-    const expectedValue: Score = { points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0 };
+    const expectedValue: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
     expect(service["getMatchPoints"](userId, betArray, result, match)).toEqual(expectedValue);
   });
 
@@ -1457,8 +1491,8 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = POINTS_SEASON_FIRST_EXACT;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: seasonBets[0].userId, points: POINTS_SEASON_FIRST_EXACT, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: POINTS_SEASON_FIRST_EXACT };
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, only second correct", () => {
@@ -1546,8 +1580,9 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = POINTS_SEASON_SECOND_EXACT;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: seasonBets[0].userId, points: POINTS_SEASON_SECOND_EXACT, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: POINTS_SEASON_SECOND_EXACT };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, champ and second correct", () => {
@@ -1635,8 +1670,9 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = POINTS_SEASON_FIRST_EXACT + POINTS_SEASON_SECOND_EXACT;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: seasonBets[0].userId, points: POINTS_SEASON_FIRST_EXACT + POINTS_SEASON_SECOND_EXACT, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: POINTS_SEASON_FIRST_EXACT + POINTS_SEASON_SECOND_EXACT };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, one relegator exactly correct", () => {
@@ -1724,8 +1760,9 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = POINTS_SEASON_LOSER_EXACT;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: seasonBets[0].userId, points: POINTS_SEASON_LOSER_EXACT, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: POINTS_SEASON_LOSER_EXACT };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, one relegator exactly correct, another one correct", () => {
@@ -1813,8 +1850,17 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[2])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = POINTS_SEASON_LOSER_EXACT + POINTS_SEASON_LOSER_CORRECT;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = {
+      userId: seasonBets[0].userId,
+      points: POINTS_SEASON_LOSER_EXACT + POINTS_SEASON_LOSER_CORRECT,
+      matches: 0,
+      results: 0,
+      extraTop: 0,
+      extraOutsider: 0,
+      extraSeason: POINTS_SEASON_LOSER_EXACT + POINTS_SEASON_LOSER_CORRECT
+    };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, all places correct", () => {
@@ -1902,8 +1948,17 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[4])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[0]);
 
-    const expectedValue: number = POINTS_SEASON_FIRST_EXACT + POINTS_SEASON_SECOND_EXACT + 3 * POINTS_SEASON_LOSER_EXACT;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = {
+      userId: seasonBets[0].userId,
+      points: POINTS_SEASON_FIRST_EXACT + POINTS_SEASON_SECOND_EXACT + 3 * POINTS_SEASON_LOSER_EXACT,
+      matches: 0,
+      results: 0,
+      extraTop: 0,
+      extraOutsider: 0,
+      extraSeason: POINTS_SEASON_FIRST_EXACT + POINTS_SEASON_SECOND_EXACT + 3 * POINTS_SEASON_LOSER_EXACT
+    };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, all places wrong", () => {
@@ -1991,8 +2046,9 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = 0;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: seasonBets[0].userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, bets not filled", () => {
@@ -2080,8 +2136,9 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = 0;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: seasonBets[0].userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, results not filled", () => {
@@ -2169,8 +2226,9 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = 0;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: seasonBets[0].userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, bets and results not filled", () => {
@@ -2258,8 +2316,9 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = 0;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: seasonBets[0].userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, bet array empty", () => {
@@ -2305,8 +2364,9 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(seasonResults[3])
       .withArgs(-3, seasonResults).and.returnValue(seasonResults[4]);
 
-    const expectedValue: number = 0;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: "", points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   it("getSeasonPoints, season results empty", () => {
@@ -2395,8 +2455,9 @@ describe("PointCalculatorTrendbasedService", () => {
       .withArgs(-2, seasonResults).and.returnValue(dummyResults[3])
       .withArgs(-3, seasonResults).and.returnValue(dummyResults[4]);
 
-    const expectedValue: number = 0;
-    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toBe(expectedValue);
+    const expectedValue: Score = { userId: seasonBets[0].userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
+
+    expect(service["getSeasonPoints"](seasonBets, seasonResults)).toEqual(expectedValue);
   });
 
   // ---------------------------------------------------------------------------

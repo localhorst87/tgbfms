@@ -8,7 +8,7 @@ import { PointCalculatorService } from './point-calculator.service';
 export class StatisticsCalculatorTrendbasedService implements StatisticsCalculatorService {
   constructor(private pointCalculator: PointCalculatorService) { }
 
-  getBetTable(matchArray: MatchExtended[], betArray: BetExtended[], resultArray: ResultExtended[], offset: Score[] = []): Score[] {
+  getScoreArray(matchArray: MatchExtended[], betArray: BetExtended[], resultArray: ResultExtended[], offset: Score[] = []): Score[] {
     // calculates all scores from the given bets, results and score offsets
     // for the matches given in the matchArray
 
@@ -17,13 +17,13 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     let availableUsers: string[] = this.identifyUsers(betArray, offset);
 
     for (let userId of availableUsers) {
-      let scoreUser: Score = this.initTableData(userId, offset);
+      let scoreUser: Score = this.initScore(userId, offset);
 
       for (let match of matchArray) {
         let betUser: BetExtended = this.extractBet(betArray, match.matchId, userId);
         let allMatchBets: BetExtended[] = betArray.filter(bet => bet.matchId == match.matchId);
         let result: ResultExtended = this.extractResult(resultArray, match.matchId);
-        let matchScore: Score = this.pointCalculator.getMatchPoints(userId, allMatchBets, result, match);
+        let matchScore: Score = this.pointCalculator.calcSingleMatchScore(userId, allMatchBets, result, match);
 
         scoreUser.points += matchScore.points;
         scoreUser.matches += matchScore.matches;
@@ -68,7 +68,7 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     return uniqueUsers.sort();
   }
 
-  private initTableData(userId: string, offset: Score[]): Score {
+  private initScore(userId: string, offset: Score[]): Score {
     // returns the Score from the offset table. If the userId is not
     // available in the offset, or the offset table is empty, a zero point
     // Score will be emitted

@@ -3,6 +3,6 @@ import { BetExtended, ResultExtended, MatchExtended, Score } from './basic_datas
 
 @Injectable()
 export abstract class StatisticsCalculatorService {
-  public abstract getBetTable(matchArray: MatchExtended[], betArray: BetExtended[], resultArray: ResultExtended[], offset?: Score[]): Score[];
+  public abstract getScoreArray(matchArray: MatchExtended[], betArray: BetExtended[], resultArray: ResultExtended[], offset?: Score[]): Score[];
   public abstract compareScores(firstEl: Score, secondEl: Score): number;
 }

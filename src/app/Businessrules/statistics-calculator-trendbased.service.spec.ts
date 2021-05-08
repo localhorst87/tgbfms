@@ -9,7 +9,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   let pointCalculatorSpy: jasmine.SpyObj<PointCalculatorService>;
 
   beforeEach(() => {
-    pointCalculatorSpy = jasmine.createSpyObj(["getMatchPoints", "countTendencies", "getSeasonPoints"]);
+    pointCalculatorSpy = jasmine.createSpyObj(["calcSingleMatchScore", "countTendencies", "calcSingleSeasonScore"]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -454,10 +454,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // initTableData
+  // initScore
   // ---------------------------------------------------------------------------
 
-  it("initTableData, user available in offset data", () => {
+  it("initScore, user available in offset data", () => {
     const argument1: string = "test_user_id_3";
     const argument2: Score[] = [
       {
@@ -498,10 +498,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
     const expectedValue: Score = argument2[2];
-    expect(service["initTableData"](argument1, argument2)).toEqual(expectedValue);
+    expect(service["initScore"](argument1, argument2)).toEqual(expectedValue);
   });
 
-  it("initTableData, user not available in offset data", () => {
+  it("initScore, user not available in offset data", () => {
     const argument1: string = "test_user_id_12";
     const argument2: Score[] = [
       {
@@ -552,10 +552,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       extraSeason: 0
     };
 
-    expect(service["initTableData"](argument1, argument2)).toEqual(expectedValue);
+    expect(service["initScore"](argument1, argument2)).toEqual(expectedValue);
   });
 
-  it("initTableData, offset empty", () => {
+  it("initScore, offset empty", () => {
     const argument1: string = "test_user_id_1";
     const argument2: Score[] = [];
 
@@ -569,7 +569,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       extraSeason: 0
     };
 
-    expect(service["initTableData"](argument1, argument2)).toEqual(expectedValue);
+    expect(service["initScore"](argument1, argument2)).toEqual(expectedValue);
   });
 
   // ---------------------------------------------------------------------------
@@ -765,10 +765,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // getBetTable
+  // getScoreArray
   // ---------------------------------------------------------------------------
 
-  it("getBetTable, optimal conditions, no offset argument", () => {
+  it("getScoreArray, optimal conditions, no offset argument", () => {
     const argument1: MatchExtended[] = [
       {
         documentId: "test_id",
@@ -916,7 +916,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    pointCalculatorSpy.getMatchPoints
+    pointCalculatorSpy.calcSingleMatchScore
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 1), argument3[0], argument1[0])
       .and.returnValue({ userId: "test_user_id_1", points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 })
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 2), argument3[1], argument1[1])
@@ -937,7 +937,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     spyOn<any>(service, "identifyUsers")
       .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3", "test_user_id_4"]);
 
-    spyOn<any>(service, "initTableData")
+    spyOn<any>(service, "initScore")
       .withArgs("test_user_id_1", []).and.returnValue(initialTableData[0])
       .withArgs("test_user_id_2", []).and.returnValue(initialTableData[1])
       .withArgs("test_user_id_3", []).and.returnValue(initialTableData[2])
@@ -996,10 +996,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    expect(service["getBetTable"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+    expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });
 
-  it("getBetTable, optimal conditions, offset argument given", () => {
+  it("getScoreArray, optimal conditions, offset argument given", () => {
     const argument1: MatchExtended[] = [
       {
         documentId: "test_id",
@@ -1144,7 +1144,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraSeason: 0
       }];
 
-    pointCalculatorSpy.getMatchPoints
+    pointCalculatorSpy.calcSingleMatchScore
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 1), argument3[0], argument1[0])
       .and.returnValue({ userId: "test_user_id_1", points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 })
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 2), argument3[1], argument1[1])
@@ -1165,7 +1165,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     spyOn<any>(service, "identifyUsers")
       .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3", "test_user_id_4"]);
 
-    spyOn<any>(service, "initTableData")
+    spyOn<any>(service, "initScore")
       .withArgs("test_user_id_1", argument4).and.returnValue(argument4[0])
       .withArgs("test_user_id_2", argument4).and.returnValue(argument4[1])
       .withArgs("test_user_id_3", argument4).and.returnValue(argument4[2])
@@ -1224,10 +1224,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    expect(service["getBetTable"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+    expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });
 
-  it("getBetTable, one user missing in offset", () => {
+  it("getScoreArray, one user missing in offset", () => {
     const argument1: MatchExtended[] = [
       {
         documentId: "test_id",
@@ -1374,7 +1374,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       extraSeason: 0
     };
 
-    pointCalculatorSpy.getMatchPoints
+    pointCalculatorSpy.calcSingleMatchScore
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 1), argument3[0], argument1[0])
       .and.returnValue({ userId: "test_user_id_1", points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 })
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 2), argument3[1], argument1[1])
@@ -1395,7 +1395,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     spyOn<any>(service, "identifyUsers")
       .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3", "test_user_id_4"]);
 
-    spyOn<any>(service, "initTableData")
+    spyOn<any>(service, "initScore")
       .withArgs("test_user_id_1", argument4).and.returnValue(argument4[0])
       .withArgs("test_user_id_2", argument4).and.returnValue(defaultTableData)
       .withArgs("test_user_id_3", argument4).and.returnValue(argument4[1])
@@ -1454,10 +1454,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    expect(service["getBetTable"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+    expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });
 
-  it("getBetTable, one user missing in bets", () => {
+  it("getScoreArray, one user missing in bets", () => {
     const argument1: MatchExtended[] = [
       {
         documentId: "test_id",
@@ -1605,7 +1605,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    pointCalculatorSpy.getMatchPoints
+    pointCalculatorSpy.calcSingleMatchScore
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 1), argument3[0], argument1[0])
       .and.returnValue({ userId: "test_user_id_1", points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 })
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 2), argument3[1], argument1[1])
@@ -1626,7 +1626,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     spyOn<any>(service, "identifyUsers")
       .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3", "test_user_id_4"]);
 
-    spyOn<any>(service, "initTableData")
+    spyOn<any>(service, "initScore")
       .withArgs("test_user_id_1", argument4).and.returnValue(argument4[0])
       .withArgs("test_user_id_2", argument4).and.returnValue(argument4[1])
       .withArgs("test_user_id_3", argument4).and.returnValue(argument4[2])
@@ -1685,10 +1685,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    expect(service["getBetTable"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+    expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });
 
-  it("getBetTable, one result missing", () => {
+  it("getScoreArray, one result missing", () => {
     const argument1: MatchExtended[] = [
       {
         documentId: "test_id",
@@ -1811,7 +1811,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       goalsAway: -1
     };
 
-    pointCalculatorSpy.getMatchPoints
+    pointCalculatorSpy.calcSingleMatchScore
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 1), defaultResult, argument1[0])
       .and.returnValue({ userId: "test_user_id_1", points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 })
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 2), argument3[0], argument1[1])
@@ -1828,7 +1828,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     spyOn<any>(service, "identifyUsers")
       .and.returnValue(["test_user_id_1", "test_user_id_3", "test_user_id_4"]);
 
-    spyOn<any>(service, "initTableData")
+    spyOn<any>(service, "initScore")
       .withArgs("test_user_id_1", []).and.returnValue(initialTableData[0])
       .withArgs("test_user_id_3", []).and.returnValue(initialTableData[1])
       .withArgs("test_user_id_4", []).and.returnValue(initialTableData[2]);
@@ -1875,10 +1875,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    expect(service["getBetTable"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+    expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });
 
-  it("getBetTable, one result empty", () => {
+  it("getScoreArray, one result empty", () => {
     const argument1: MatchExtended[] = [
       {
         documentId: "test_id",
@@ -2000,7 +2000,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraSeason: 0
       }];
 
-    pointCalculatorSpy.getMatchPoints
+    pointCalculatorSpy.calcSingleMatchScore
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 1), argument3[0], argument1[0])
       .and.returnValue({ userId: "test_user_id_1", points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 })
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 2), argument3[1], argument1[1])
@@ -2017,7 +2017,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     spyOn<any>(service, "identifyUsers")
       .and.returnValue(["test_user_id_1", "test_user_id_3", "test_user_id_4"]);
 
-    spyOn<any>(service, "initTableData")
+    spyOn<any>(service, "initScore")
       .withArgs("test_user_id_1", []).and.returnValue(initialTableData[0])
       .withArgs("test_user_id_3", []).and.returnValue(initialTableData[1])
       .withArgs("test_user_id_4", []).and.returnValue(initialTableData[2]);
@@ -2064,10 +2064,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    expect(service["getBetTable"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+    expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });
 
-  it("getBetTable, bets of one user empty", () => {
+  it("getScoreArray, bets of one user empty", () => {
     const argument1: MatchExtended[] = [
       {
         documentId: "test_id",
@@ -2214,7 +2214,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraSeason: 0
       }];
 
-    pointCalculatorSpy.getMatchPoints
+    pointCalculatorSpy.calcSingleMatchScore
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 1), argument3[0], argument1[0])
       .and.returnValue({ userId: "test_user_id_1", points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 })
       .withArgs("test_user_id_1", argument2.filter(bet => bet.matchId == 2), argument3[1], argument1[1])
@@ -2235,7 +2235,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     spyOn<any>(service, "identifyUsers")
       .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3", "test_user_id_4"]);
 
-    spyOn<any>(service, "initTableData")
+    spyOn<any>(service, "initScore")
       .withArgs("test_user_id_1", []).and.returnValue(initialTableData[0])
       .withArgs("test_user_id_2", []).and.returnValue(initialTableData[1])
       .withArgs("test_user_id_3", []).and.returnValue(initialTableData[2])
@@ -2294,10 +2294,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    expect(service["getBetTable"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+    expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });
 
-  it("getBetTable, match array empty", () => {
+  it("getScoreArray, match array empty", () => {
     const argument1: MatchExtended[] = [];
 
     const argument2: BetExtended[] = [
@@ -2422,7 +2422,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     spyOn<any>(service, "identifyUsers")
       .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3", "test_user_id_4"]);
 
-    spyOn<any>(service, "initTableData")
+    spyOn<any>(service, "initScore")
       .withArgs("test_user_id_1", argument4).and.returnValue(argument4[0])
       .withArgs("test_user_id_2", argument4).and.returnValue(argument4[1])
       .withArgs("test_user_id_3", argument4).and.returnValue(argument4[2])
@@ -2435,10 +2435,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       argument4[3]
     ];
 
-    expect(service["getBetTable"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+    expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });
 
-  it("getBetTable, all input arrays empty", () => {
+  it("getScoreArray, all input arrays empty", () => {
     const argument1: MatchExtended[] = [];
     const argument2: BetExtended[] = [];
     const argument3: ResultExtended[] = [];
@@ -2449,6 +2449,6 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const expectedValue: Score[] = []
 
-    expect(service["getBetTable"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+    expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });
 });

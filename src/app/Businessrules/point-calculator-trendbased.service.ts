@@ -17,7 +17,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
 
   constructor() { }
 
-  getMatchPoints(userId: string, betsAllUsers: BetExtended[], result: ResultExtended, match: MatchExtended): Score {
+  calcSingleMatchScore(userId: string, betsAllUsers: BetExtended[], result: ResultExtended, match: MatchExtended): Score {
     // calculates the points of the user with the given user id for the specific match
 
     let score: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
@@ -71,7 +71,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     return tendencyCount;
   }
 
-  getSeasonPoints(seasonBets: SeasonBetExtended[], seasonResults: SeasonResultExtended[]): Score {
+  calcSingleSeasonScore(seasonBets: SeasonBetExtended[], seasonResults: SeasonResultExtended[]): Score {
     // calculates the season points according to the given bets and results
 
     let userId: string = seasonBets.length > 0 ? seasonBets[0].userId : "";

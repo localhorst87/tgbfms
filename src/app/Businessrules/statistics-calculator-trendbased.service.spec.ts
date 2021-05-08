@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { StatisticsCalculatorTrendbasedService } from './statistics-calculator-trendbased.service';
 import { PointCalculatorService } from './point-calculator.service';
-import { BetExtended, ResultExtended, MatchExtended, Score } from './basic_datastructures';
+import { Bet, Result, Match, Score } from './basic_datastructures';
 
 describe('StatisticsCalculatorTrendbasedService', () => {
   let service: StatisticsCalculatorTrendbasedService;
@@ -188,7 +188,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   // ---------------------------------------------------------------------------
 
   it("identifyUsers, 2 matches, 3 users, offset not given", () => {
-    const argument1: BetExtended[] = [
+    const argument1: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -246,7 +246,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("identifyUsers, 2 matches, 3 users, one user without bets set, offset not given", () => {
-    const argument1: BetExtended[] = [
+    const argument1: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -303,7 +303,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("identifyUsers, bet array empty, no offset given", () => {
-    const argument1: BetExtended[] = [];
+    const argument1: Bet[] = [];
     const argument2: Score[] = [];
 
     const expectedValue: string[] = [];
@@ -311,7 +311,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("identifyUsers, bet array empty, offset given", () => {
-    const argument1: BetExtended[] = [];
+    const argument1: Bet[] = [];
     const argument2: Score[] = [
       {
         userId: "test_user_id_1",
@@ -347,7 +347,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("identifyUsers, bet array and offset given, same users present", () => {
-    const argument1: BetExtended[] = [
+    const argument1: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -409,7 +409,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("identifyUsers, bet array and offset given, minimal intersection", () => {
-    const argument1: BetExtended[] = [
+    const argument1: Bet[] = [
       {
         documentId: "test_id",
         matchId: 2,
@@ -577,7 +577,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   // ---------------------------------------------------------------------------
 
   it("extractBet, bet available", () => {
-    const argument1: BetExtended[] = [
+    const argument1: Bet[] = [
       {
         documentId: "test_id",
         matchId: 31,
@@ -614,13 +614,13 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     const argument2: number = 1642;
     const argument3: string = "test_user_id_1";
 
-    const expectedValue: BetExtended = argument1[2];
+    const expectedValue: Bet = argument1[2];
 
     expect(service["extractBet"](argument1, argument2, argument3)).toEqual(expectedValue);
   });
 
   it("extractBet, bet not available", () => {
-    const argument1: BetExtended[] = [
+    const argument1: Bet[] = [
       {
         documentId: "test_id",
         matchId: 31,
@@ -657,7 +657,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     const argument2: number = 1642;
     const argument3: string = "test_user_id_1";
 
-    const expectedValue: BetExtended = {
+    const expectedValue: Bet = {
       documentId: "",
       matchId: argument2,
       userId: argument3,
@@ -670,11 +670,11 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("extractBet, bet array empty", () => {
-    const argument1: BetExtended[] = [];
+    const argument1: Bet[] = [];
     const argument2: number = 12;
     const argument3: string = "test_user_id_1";
 
-    const expectedValue: BetExtended = {
+    const expectedValue: Bet = {
       documentId: "",
       matchId: argument2,
       userId: argument3,
@@ -691,7 +691,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   // ---------------------------------------------------------------------------
 
   it("extractResult, result available", () => {
-    const argument1: ResultExtended[] = [
+    const argument1: Result[] = [
       {
         documentId: "test_id",
         matchId: 16,
@@ -713,12 +713,12 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     ];
     const argument2: number = 113;
 
-    const expectedValue: ResultExtended = argument1[1];
+    const expectedValue: Result = argument1[1];
     expect(service["extractResult"](argument1, argument2)).toEqual(expectedValue);
   });
 
   it("extractResult, result not available", () => {
-    const argument1: ResultExtended[] = [
+    const argument1: Result[] = [
       {
         documentId: "test_id",
         matchId: 16,
@@ -740,7 +740,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     ];
     const argument2: number = 113;
 
-    const expectedValue: ResultExtended = {
+    const expectedValue: Result = {
       documentId: "",
       matchId: argument2,
       goalsHome: -1,
@@ -751,10 +751,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("extractResult, result array empty", () => {
-    const argument1: ResultExtended[] = [];
+    const argument1: Result[] = [];
     const argument2: number = 113;
 
-    const expectedValue: ResultExtended = {
+    const expectedValue: Result = {
       documentId: "",
       matchId: argument2,
       goalsHome: -1,
@@ -769,7 +769,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   // ---------------------------------------------------------------------------
 
   it("getScoreArray, optimal conditions, no offset argument", () => {
-    const argument1: MatchExtended[] = [
+    const argument1: Match[] = [
       {
         documentId: "test_id",
         season: 2020,
@@ -794,7 +794,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    const argument2: BetExtended[] = [
+    const argument2: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -860,7 +860,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         goalsAway: 1
       },
     ];
-    const argument3: ResultExtended[] = [
+    const argument3: Result[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1000,7 +1000,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("getScoreArray, optimal conditions, offset argument given", () => {
-    const argument1: MatchExtended[] = [
+    const argument1: Match[] = [
       {
         documentId: "test_id",
         season: 2020,
@@ -1025,7 +1025,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    const argument2: BetExtended[] = [
+    const argument2: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1091,7 +1091,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         goalsAway: 1
       },
     ];
-    const argument3: ResultExtended[] = [
+    const argument3: Result[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1228,7 +1228,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("getScoreArray, one user missing in offset", () => {
-    const argument1: MatchExtended[] = [
+    const argument1: Match[] = [
       {
         documentId: "test_id",
         season: 2020,
@@ -1253,7 +1253,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    const argument2: BetExtended[] = [
+    const argument2: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1319,7 +1319,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         goalsAway: 1
       },
     ];
-    const argument3: ResultExtended[] = [
+    const argument3: Result[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1458,7 +1458,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("getScoreArray, one user missing in bets", () => {
-    const argument1: MatchExtended[] = [
+    const argument1: Match[] = [
       {
         documentId: "test_id",
         season: 2020,
@@ -1483,7 +1483,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    const argument2: BetExtended[] = [
+    const argument2: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1533,7 +1533,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         goalsAway: 1
       },
     ];
-    const argument3: ResultExtended[] = [
+    const argument3: Result[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1586,7 +1586,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraSeason: 1
       }];
 
-    const defaultBets: BetExtended[] = [
+    const defaultBets: Bet[] = [
       {
         documentId: "",
         matchId: 1,
@@ -1689,7 +1689,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("getScoreArray, one result missing", () => {
-    const argument1: MatchExtended[] = [
+    const argument1: Match[] = [
       {
         documentId: "test_id",
         season: 2020,
@@ -1714,7 +1714,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    const argument2: BetExtended[] = [
+    const argument2: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1764,7 +1764,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         goalsAway: 1
       },
     ];
-    const argument3: ResultExtended[] = [
+    const argument3: Result[] = [
       {
         documentId: "test_id",
         matchId: 2,
@@ -1804,7 +1804,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraSeason: 0
       }];
 
-    const defaultResult: ResultExtended = {
+    const defaultResult: Result = {
       documentId: "",
       matchId: 1,
       goalsHome: -1,
@@ -1879,7 +1879,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("getScoreArray, one result empty", () => {
-    const argument1: MatchExtended[] = [
+    const argument1: Match[] = [
       {
         documentId: "test_id",
         season: 2020,
@@ -1904,7 +1904,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    const argument2: BetExtended[] = [
+    const argument2: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1954,7 +1954,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         goalsAway: 1
       },
     ];
-    const argument3: ResultExtended[] = [
+    const argument3: Result[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -2068,7 +2068,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("getScoreArray, bets of one user empty", () => {
-    const argument1: MatchExtended[] = [
+    const argument1: Match[] = [
       {
         documentId: "test_id",
         season: 2020,
@@ -2093,7 +2093,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    const argument2: BetExtended[] = [
+    const argument2: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -2159,7 +2159,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         goalsAway: 1
       },
     ];
-    const argument3: ResultExtended[] = [
+    const argument3: Result[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -2298,9 +2298,9 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("getScoreArray, match array empty", () => {
-    const argument1: MatchExtended[] = [];
+    const argument1: Match[] = [];
 
-    const argument2: BetExtended[] = [
+    const argument2: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -2366,7 +2366,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         goalsAway: 1
       },
     ];
-    const argument3: ResultExtended[] = [
+    const argument3: Result[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -2439,9 +2439,9 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   });
 
   it("getScoreArray, all input arrays empty", () => {
-    const argument1: MatchExtended[] = [];
-    const argument2: BetExtended[] = [];
-    const argument3: ResultExtended[] = [];
+    const argument1: Match[] = [];
+    const argument2: Bet[] = [];
+    const argument3: Result[] = [];
     const argument4: Score[] = [];
 
     spyOn<any>(service, "identifyUsers")

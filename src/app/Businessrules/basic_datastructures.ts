@@ -1,4 +1,5 @@
 export interface Match {
+  documentId: string;
   season: number;
   matchday: number;
   matchId: number;
@@ -9,23 +10,17 @@ export interface Match {
   teamIdAway: number;
 }
 
-export interface MatchExtended extends Match {
-  documentId: string;
-}
-
 export interface Bet {
+  documentId: string;
   matchId: number;
   userId: string;
   isFixed: boolean;
   goalsHome: number;
   goalsAway: number;
-}
-
-export interface BetExtended extends Bet {
-  documentId: string;
 }
 
 export interface SeasonBet {
+  documentId: string;
   season: number;
   userId: string;
   isFixed: boolean;
@@ -33,50 +28,34 @@ export interface SeasonBet {
   teamId: number;
 }
 
-export interface SeasonBetExtended extends SeasonBet {
-  documentId: string;
-}
-
 export interface Result {
+  documentId: string;
   matchId: number;
   goalsHome: number;
   goalsAway: number;
 }
 
-export interface ResultExtended extends Result {
-  documentId: string;
-}
-
 export interface SeasonResult {
+  documentId: string;
   season: number;
   place: number;
   teamId: number;
 }
 
-export interface SeasonResultExtended extends SeasonResult {
-  documentId: string;
-}
-
 export interface Team {
+  documentId: string;
   id: number;
   nameLong: string;
   nameShort: string;
 }
 
-export interface TeamExtended extends Team {
-  documentId: string;
-}
-
 export interface User {
+  documentId: string;
   id: string;
   email: string;
   displayName: string;
   isAdmin: boolean;
   isActive: boolean;
-}
-
-export interface UserExtended extends User {
-  documentId: string;
 }
 
 export interface Score {

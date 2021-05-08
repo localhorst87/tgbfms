@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { FetchBetOverviewService } from './fetch-bet-overview.service';
 import { BetOverviewFrameData, BetOverviewUserData } from './output_datastructures';
-import { BetExtended, MatchExtended, ResultExtended, UserExtended } from '../Businessrules/basic_datastructures';
+import { Bet, Match, Result, User } from '../Businessrules/basic_datastructures';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 
@@ -11,10 +11,10 @@ describe('FetchBetOverviewService', () => {
   let service: FetchBetOverviewService;
   let appDataSpy: jasmine.SpyObj<AppdataAccessService>;
 
-  let userData: UserExtended[];
-  let bets: BetExtended[];
-  let results: ResultExtended[];
-  let matches: MatchExtended[];
+  let userData: User[];
+  let bets: Bet[];
+  let results: Result[];
+  let matches: Match[];
   let expectedFrameValues: BetOverviewFrameData[];
   let expectedUserValues: BetOverviewUserData[]
   let defaultFrameValue: BetOverviewFrameData;
@@ -315,7 +315,7 @@ describe('FetchBetOverviewService', () => {
   // ---------------------------------------------------------------------------
 
   it('makeFrameData$, bets available', (done: DoneFn) => {
-    const argument1: MatchExtended = matches[0]; // match 58815
+    const argument1: Match = matches[0]; // match 58815
     const argument2: string = bets[1].userId; // user 2
 
     appDataSpy.getTeamNameByTeamId$
@@ -343,7 +343,7 @@ describe('FetchBetOverviewService', () => {
   });
 
   it('makeFrameData$, observables emitting more than one value', (done: DoneFn) => {
-    const argument1: MatchExtended = matches[0]; // match 58815
+    const argument1: Match = matches[0]; // match 58815
     const argument2: string = bets[1].userId; // user 2
 
     appDataSpy.getTeamNameByTeamId$
@@ -371,7 +371,7 @@ describe('FetchBetOverviewService', () => {
   });
 
   it('makeFrameData$, at least one observable not emitting', (done: DoneFn) => {
-    const argument1: MatchExtended = matches[0]; // match 58815
+    const argument1: Match = matches[0]; // match 58815
     const argument2: string = bets[1].userId; // user 2
 
     appDataSpy.getTeamNameByTeamId$
@@ -413,7 +413,7 @@ describe('FetchBetOverviewService', () => {
       .withArgs(matches[1].matchId, userData[0].id).and.returnValue(of(bets[2]))
       .withArgs(matches[1].matchId, userData[1].id).and.returnValue(of(bets[3]));
 
-    const expectedValues: BetExtended[] = [bets[0], bets[1]];
+    const expectedValues: Bet[] = [bets[0], bets[1]];
 
     let i: number = 0;
     service["getAllUserBets$"](argument).subscribe(
@@ -434,7 +434,7 @@ describe('FetchBetOverviewService', () => {
       .withArgs(matches[1].matchId, userData[0].id).and.returnValue(of(bets[2], bets[2]))
       .withArgs(matches[1].matchId, userData[1].id).and.returnValue(of(bets[3], bets[3]));
 
-    const expectedValues: BetExtended[] = [bets[0], bets[1]];
+    const expectedValues: Bet[] = [bets[0], bets[1]];
 
     let i: number = 0;
     service["getAllUserBets$"](argument).subscribe(
@@ -455,7 +455,7 @@ describe('FetchBetOverviewService', () => {
       .withArgs(matches[1].matchId, userData[0].id).and.returnValue(of())
       .withArgs(matches[1].matchId, userData[1].id).and.returnValue(of());
 
-    const defaultBet: BetExtended = {
+    const defaultBet: Bet = {
       documentId: "",
       matchId: -1,
       userId: "",
@@ -478,7 +478,7 @@ describe('FetchBetOverviewService', () => {
   // ---------------------------------------------------------------------------
 
   it('makeBetData$, data available', (done: DoneFn) => {
-    const argument: BetExtended = bets[3];
+    const argument: Bet = bets[3];
 
     appDataSpy.getUserDataById$
       .withArgs(userData[0].id).and.returnValue(of(userData[0]))
@@ -493,7 +493,7 @@ describe('FetchBetOverviewService', () => {
   });
 
   it('makeBetData$, data not available', (done: DoneFn) => {
-    const argument: BetExtended = bets[3];
+    const argument: Bet = bets[3];
 
     appDataSpy.getUserDataById$
       .withArgs(userData[0].id).and.returnValue(of())

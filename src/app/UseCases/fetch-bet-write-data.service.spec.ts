@@ -4,14 +4,14 @@ import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { FetchBetWriteDataService } from './fetch-bet-write-data.service';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { Bet, Match, Result, BetExtended, MatchExtended, ResultExtended } from '../Businessrules/basic_datastructures';
+import { Bet, Match, Result } from '../Businessrules/basic_datastructures';
 import { BetWriteData } from './output_datastructures';
 
 describe('FetchBetWriteDataService', () => {
   let service: FetchBetWriteDataService;
   let appDataSpy: jasmine.SpyObj<AppdataAccessService>;
-  let bets: BetExtended[];
-  let matches: MatchExtended[];
+  let bets: Bet[];
+  let matches: Match[];
   let expectedValues: BetWriteData[];
   let defaultValue: BetWriteData;
 
@@ -246,7 +246,7 @@ describe('FetchBetWriteDataService', () => {
   // ---------------------------------------------------------------------------
 
   it('makeBetWriteData$, all services emitting', (done: DoneFn) => {
-    const argument1: MatchExtended = matches[0];
+    const argument1: Match = matches[0];
     const argument2: string = "test_user_id";
 
     appDataSpy.getTeamNameByTeamId$
@@ -264,7 +264,7 @@ describe('FetchBetWriteDataService', () => {
   });
 
   it('makeBetWriteData$, one data service not emitting', (done: DoneFn) => {
-    const argument1: MatchExtended = matches[0];
+    const argument1: Match = matches[0];
     const argument2: string = "test_user_id";
 
     appDataSpy.getTeamNameByTeamId$
@@ -283,7 +283,7 @@ describe('FetchBetWriteDataService', () => {
   });
 
   it('makeBetWriteData$, one service emitting multiple values', (done: DoneFn) => {
-    const argument1: MatchExtended = matches[0];
+    const argument1: Match = matches[0];
     const argument2: string = "test_user_id";
 
     appDataSpy.getTeamNameByTeamId$

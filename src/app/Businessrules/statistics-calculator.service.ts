@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BetExtended, ResultExtended, MatchExtended, Score } from './basic_datastructures';
+import { Bet, Result, Match, Score } from './basic_datastructures';
 
 @Injectable()
 export abstract class StatisticsCalculatorService {
-  public abstract getScoreArray(matchArray: MatchExtended[], betArray: BetExtended[], resultArray: ResultExtended[], offset?: Score[]): Score[];
+  public abstract getScoreArray(matchArray: Match[], betArray: Bet[], resultArray: Result[], offset?: Score[]): Score[];
   public abstract compareScores(firstEl: Score, secondEl: Score): number;
 }

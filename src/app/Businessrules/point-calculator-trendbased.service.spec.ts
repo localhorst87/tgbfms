@@ -5,7 +5,7 @@ import {
   POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE,
   POINTS_SEASON_FIRST_EXACT, POINTS_SEASON_SECOND_EXACT, POINTS_SEASON_LOSER_EXACT, POINTS_SEASON_LOSER_CORRECT
 } from './point-calculator-trendbased.service';
-import { BetExtended, ResultExtended, MatchExtended, Score, SeasonBetExtended, SeasonResultExtended } from './basic_datastructures';
+import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
 
 
 describe("PointCalculatorTrendbasedService", () => {
@@ -25,7 +25,7 @@ describe("PointCalculatorTrendbasedService", () => {
   // ---------------------------------------------------------------------------
 
   it("isAvailable goals set, Bet", () => {
-    const argument: BetExtended = {
+    const argument: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -37,7 +37,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("isAvailable goals set, Result", () => {
-    const argument: ResultExtended = {
+    const argument: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 1,
@@ -47,7 +47,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("isAvailable one goal not set, Bet", () => {
-    const argument: BetExtended = {
+    const argument: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -59,7 +59,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("isAvailable no goals set, Result", () => {
-    const argument: ResultExtended = {
+    const argument: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: -1,
@@ -73,7 +73,7 @@ describe("PointCalculatorTrendbasedService", () => {
   // ---------------------------------------------------------------------------
 
   it("getTendency home win, Bet", () => {
-    const argument: BetExtended = {
+    const argument: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -87,7 +87,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getTendency away win bet", () => {
-    const argument: BetExtended = {
+    const argument: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -101,7 +101,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getTendency draw, Bet", () => {
-    const argument: BetExtended = {
+    const argument: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -115,7 +115,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getTendency goals not set, Bet", () => {
-    const argument: BetExtended = {
+    const argument: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -129,7 +129,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getTendency home win, Result", () => {
-    const argument: ResultExtended = {
+    const argument: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 1,
@@ -141,7 +141,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getTendency away win, Result", () => {
-    const argument: ResultExtended = {
+    const argument: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 1,
@@ -153,7 +153,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getTendency draw, Result", () => {
-    const argument: ResultExtended = {
+    const argument: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 2,
@@ -165,7 +165,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getTendency no goals set, Result", () => {
-    const argument: ResultExtended = {
+    const argument: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: -1,
@@ -181,7 +181,7 @@ describe("PointCalculatorTrendbasedService", () => {
   // ---------------------------------------------------------------------------
 
   it("isTendencyCorrect, expect true", () => {
-    const argument1: BetExtended = {
+    const argument1: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -189,7 +189,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const argument2: ResultExtended = {
+    const argument2: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 1,
@@ -205,7 +205,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("isTendencyCorrect, expect false", () => {
-    const argument1: BetExtended = {
+    const argument1: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -213,7 +213,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 1,
       goalsAway: 1
     };
-    const argument2: ResultExtended = {
+    const argument2: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 1,
@@ -229,7 +229,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("isTendencyCorrect, Bet not set", () => {
-    const argument1: BetExtended = {
+    const argument1: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -237,7 +237,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: -1,
       goalsAway: -1
     };
-    const argument2: ResultExtended = {
+    const argument2: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 1,
@@ -256,7 +256,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("isTendencyCorrect, Bet and Result not set", () => {
-    const argument1: BetExtended = {
+    const argument1: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -264,7 +264,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: -1,
       goalsAway: -1
     };
-    const argument2: ResultExtended = {
+    const argument2: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: -1,
@@ -287,7 +287,7 @@ describe("PointCalculatorTrendbasedService", () => {
   // ---------------------------------------------------------------------------
 
   it("isResultCorrect bet and result equal", () => {
-    const argument1: BetExtended = {
+    const argument1: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -295,7 +295,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 1,
       goalsAway: 0
     };
-    const argument2: ResultExtended = {
+    const argument2: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 1,
@@ -307,7 +307,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("isResultCorrect bet and result not equal", () => {
-    const argument1: BetExtended = {
+    const argument1: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -315,7 +315,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 2,
       goalsAway: 0
     };
-    const argument2: ResultExtended = {
+    const argument2: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 1,
@@ -327,7 +327,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("isResultCorrect Bet not set", () => {
-    const argument1: BetExtended = {
+    const argument1: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -335,7 +335,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: -1,
       goalsAway: -1
     };
-    const argument2: ResultExtended = {
+    const argument2: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 1,
@@ -349,7 +349,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("isResultCorrect Result not set", () => {
-    const argument1: BetExtended = {
+    const argument1: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -357,7 +357,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 0,
       goalsAway: 0
     };
-    const argument2: ResultExtended = {
+    const argument2: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: -1,
@@ -375,7 +375,7 @@ describe("PointCalculatorTrendbasedService", () => {
   // ---------------------------------------------------------------------------
 
   it("countTendencies, only valid Bets", () => {
-    let argument: BetExtended[] = [];
+    let argument: Bet[] = [];
     argument.push({
       documentId: "test_id_1",
       matchId: 1,
@@ -418,7 +418,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("countTendencies, one empty Bet", () => {
-    let argument: BetExtended[] = [];
+    let argument: Bet[] = [];
     argument.push({
       documentId: "test_id_1",
       matchId: 1,
@@ -452,7 +452,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("countTendencies, empty Array", () => {
-    const argument: BetExtended[] = [];
+    const argument: Bet[] = [];
     const expectedValue: number[] = [0, 0, 0];
     expect(service["countTendencies"](argument)).toEqual(expectedValue);
   });
@@ -462,7 +462,7 @@ describe("PointCalculatorTrendbasedService", () => {
   // ---------------------------------------------------------------------------
 
   it("getPotentialOutsiderPoints, no extra points", () => {
-    const argument: BetExtended = {
+    const argument: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -477,7 +477,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getPotentialOutsiderPoints, no extra points", () => {
-    const argument: BetExtended = {
+    const argument: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -492,7 +492,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getPotentialOutsiderPoints, no extra points", () => {
-    const argument: BetExtended = {
+    const argument: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "test_user_id",
@@ -512,13 +512,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, bet wrong, no top, no outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -526,7 +526,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 0,
       goalsAway: 1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -553,7 +553,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -573,13 +573,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, bet tendency right, no top, no outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -587,7 +587,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 1,
       goalsAway: 0
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -614,7 +614,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -634,13 +634,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, bet tendency right, top, no outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -648,7 +648,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 2,
       goalsAway: 1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -675,7 +675,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -703,13 +703,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, bet tendency right, no top, two outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -717,7 +717,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 2,
       goalsAway: 1
     };
-    let betArray: BetExtended[] = [
+    let betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -744,7 +744,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -772,13 +772,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, bet tendency right, no top, single outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -786,7 +786,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 2,
       goalsAway: 1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -813,7 +813,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -841,13 +841,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, bet tendency right, top, single outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -855,7 +855,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 2,
       goalsAway: 1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -882,7 +882,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -911,13 +911,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, bet result right, top, single outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -925,7 +925,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 3,
       goalsAway: 1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -952,7 +952,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -981,13 +981,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, bet wrong, top, single outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -995,7 +995,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 0,
       goalsAway: 1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -1022,7 +1022,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -1043,13 +1043,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, no goals set in target bet, top", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -1057,7 +1057,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: -1,
       goalsAway: -1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -1084,7 +1084,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -1102,13 +1102,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, no goals set in result, top, single outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: -1,
       goalsAway: -1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -1116,7 +1116,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 0,
       goalsAway: 0
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -1143,7 +1143,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -1163,13 +1163,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, no goals set in target bet, no goals set in result", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: -1,
       goalsAway: -1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -1177,7 +1177,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: -1,
       goalsAway: -1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -1204,7 +1204,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -1222,13 +1222,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, user bet not in array, top, single outsider", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    let betArray: BetExtended[] = [
+    let betArray: Bet[] = [
       {
         documentId: "test_id",
         matchId: 1,
@@ -1262,7 +1262,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 0
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -1280,13 +1280,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, matchIds of match and others do not correspond", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 1,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -1294,7 +1294,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 2,
       goalsAway: 1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -1321,7 +1321,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -1342,13 +1342,13 @@ describe("PointCalculatorTrendbasedService", () => {
 
   it("calcSingleMatchScore, matchIds of bet and result do not correspond", () => {
     const userId: string = "target_user";
-    const result: ResultExtended = {
+    const result: Result = {
       documentId: "test_id",
       matchId: 99,
       goalsHome: 3,
       goalsAway: 1
     };
-    const betUser: BetExtended = {
+    const betUser: Bet = {
       documentId: "test_id",
       matchId: 1,
       userId: "target_user",
@@ -1356,7 +1356,7 @@ describe("PointCalculatorTrendbasedService", () => {
       goalsHome: 2,
       goalsAway: 1
     };
-    const betArray: BetExtended[] = [
+    const betArray: Bet[] = [
       betUser,
       {
         documentId: "test_id",
@@ -1383,7 +1383,7 @@ describe("PointCalculatorTrendbasedService", () => {
         goalsAway: 2
       }
     ];
-    const match: MatchExtended = {
+    const match: Match = {
       documentId: "test_id",
       season: 2020,
       matchday: 4,
@@ -1407,7 +1407,7 @@ describe("PointCalculatorTrendbasedService", () => {
   // ---------------------------------------------------------------------------
 
   it("calcSingleSeasonScore, only champion correct", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -1450,7 +1450,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -1496,7 +1496,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, only second correct", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -1539,7 +1539,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -1586,7 +1586,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, champ and second correct", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -1629,7 +1629,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -1676,7 +1676,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, one relegator exactly correct", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -1719,7 +1719,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -1766,7 +1766,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, one relegator exactly correct, another one correct", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -1809,7 +1809,7 @@ describe("PointCalculatorTrendbasedService", () => {
       },
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -1864,7 +1864,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, all places correct", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -1907,7 +1907,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_14",
         season: 2020,
@@ -1962,7 +1962,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, all places wrong", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -2005,7 +2005,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -2052,7 +2052,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, bets not filled", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -2095,7 +2095,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -2142,7 +2142,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, results not filled", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -2185,7 +2185,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -2232,7 +2232,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, bets and results not filled", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -2275,7 +2275,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -2322,8 +2322,8 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, bet array empty", () => {
-    const seasonBets: SeasonBetExtended[] = [];
-    const seasonResults: SeasonResultExtended[] = [
+    const seasonBets: SeasonBet[] = [];
+    const seasonResults: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -2370,7 +2370,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("calcSingleSeasonScore, season results empty", () => {
-    const seasonBets: SeasonBetExtended[] = [
+    const seasonBets: SeasonBet[] = [
       {
         documentId: "test_doc_id_0",
         season: 2020,
@@ -2412,9 +2412,9 @@ describe("PointCalculatorTrendbasedService", () => {
         teamId: -1
       }
     ];
-    const seasonResults: SeasonResultExtended[] = [];
+    const seasonResults: SeasonResult[] = [];
 
-    const dummyResults: SeasonResultExtended[] = [
+    const dummyResults: SeasonResult[] = [
       {
         documentId: "",
         season: -1,
@@ -2467,7 +2467,7 @@ describe("PointCalculatorTrendbasedService", () => {
   it("getSeasonResultFromArray, result available", () => {
     const argument1: number = -1;
 
-    const argument2: SeasonResultExtended[] = [
+    const argument2: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -2488,14 +2488,14 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const expectedValue: SeasonResultExtended = argument2[1];
+    const expectedValue: SeasonResult = argument2[1];
     expect(service["getSeasonResultFromArray"](argument1, argument2)).toEqual(expectedValue);
   });
 
   it("getSeasonResultFromArray, result not available", () => {
     const argument1: number = 2;
 
-    const argument2: SeasonResultExtended[] = [
+    const argument2: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -2516,30 +2516,30 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const dummyResult: SeasonResultExtended = { // dummy, if target not available
+    const dummyResult: SeasonResult = { // dummy, if target not available
       documentId: "",
       season: -1,
       place: argument1,
       teamId: -1
     };
 
-    const expectedValue: SeasonResultExtended = dummyResult;
+    const expectedValue: SeasonResult = dummyResult;
     expect(service["getSeasonResultFromArray"](argument1, argument2)).toEqual(expectedValue);
   });
 
   it("getSeasonResultFromArray, result array completely empty", () => {
     const argument1: number = 2;
 
-    const argument2: SeasonResultExtended[] = [];
+    const argument2: SeasonResult[] = [];
 
-    const dummyResult: SeasonResultExtended = { // dummy, if target not available
+    const dummyResult: SeasonResult = { // dummy, if target not available
       documentId: "",
       season: -1,
       place: argument1,
       teamId: -1
     };
 
-    const expectedValue: SeasonResultExtended = dummyResult;
+    const expectedValue: SeasonResult = dummyResult;
     expect(service["getSeasonResultFromArray"](argument1, argument2)).toEqual(expectedValue);
   });
 
@@ -2548,7 +2548,7 @@ describe("PointCalculatorTrendbasedService", () => {
   // ---------------------------------------------------------------------------
 
   it("getRelegatorResults, relegators available", () => {
-    const argument: SeasonResultExtended[] = [
+    const argument: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -2575,7 +2575,7 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const expectedValue: SeasonResultExtended[] = [
+    const expectedValue: SeasonResult[] = [
       argument[1],
       argument[2],
       argument[3],
@@ -2584,7 +2584,7 @@ describe("PointCalculatorTrendbasedService", () => {
   });
 
   it("getRelegatorResults, relegators not available", () => {
-    const argument: SeasonResultExtended[] = [
+    const argument: SeasonResult[] = [
       {
         documentId: "test_doc_id_10",
         season: 2020,
@@ -2605,13 +2605,13 @@ describe("PointCalculatorTrendbasedService", () => {
       }
     ];
 
-    const expectedValue: SeasonResultExtended[] = [];
+    const expectedValue: SeasonResult[] = [];
     expect(service["getRelegatorResults"](argument)).toEqual(expectedValue);
   });
 
   it("getRelegatorResults, result array empty", () => {
-    const argument: SeasonResultExtended[] = [];
-    const expectedValue: SeasonResultExtended[] = [];
+    const argument: SeasonResult[] = [];
+    const expectedValue: SeasonResult[] = [];
     expect(service["getRelegatorResults"](argument)).toEqual(expectedValue);
   });
 

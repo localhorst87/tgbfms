@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PointCalculatorService } from './point-calculator.service';
-import { BetExtended, ResultExtended, MatchExtended, Score, SeasonBetExtended, SeasonResultExtended } from './basic_datastructures';
+import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
 
 export const POINTS_TENDENCY: number = 1; // points if the tendency is correct
 export const POINTS_ADDED_RESULT: number = 1; // added points if the result is correct
@@ -17,11 +17,11 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
 
   constructor() { }
 
-  calcSingleMatchScore(userId: string, betsAllUsers: BetExtended[], result: ResultExtended, match: MatchExtended): Score {
+  calcSingleMatchScore(userId: string, betsAllUsers: Bet[], result: Result, match: Match): Score {
     // calculates the points of the user with the given user id for the specific match
 
     let score: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
-    let betUser: BetExtended = { documentId: "", matchId: -1, userId: "", isFixed: false, goalsHome: -1, goalsAway: -1 };
+    let betUser: Bet = { documentId: "", matchId: -1, userId: "", isFixed: false, goalsHome: -1, goalsAway: -1 };
 
     for (let bet of betsAllUsers) {
       if (userId == bet.userId) {
@@ -55,7 +55,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     return score;
   }
 
-  countTendencies(betArray: BetExtended[]): number[] {
+  countTendencies(betArray: Bet[]): number[] {
     // counts the tendencies by examining all bets, given in betArray
     // return an array with the following convention [nDraw, nHome, nAway]
 
@@ -71,13 +71,13 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     return tendencyCount;
   }
 
-  calcSingleSeasonScore(seasonBets: SeasonBetExtended[], seasonResults: SeasonResultExtended[]): Score {
+  calcSingleSeasonScore(seasonBets: SeasonBet[], seasonResults: SeasonResult[]): Score {
     // calculates the season points according to the given bets and results
 
     let userId: string = seasonBets.length > 0 ? seasonBets[0].userId : "";
     let score: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
 
-    let relegatorResults: SeasonResultExtended[] = this.getRelegatorResults(seasonResults);
+    let relegatorResults: SeasonResult[] = this.getRelegatorResults(seasonResults);
 
     for (let bet of seasonBets) {
 
@@ -85,7 +85,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
         continue;
       }
 
-      let assocResult: SeasonResultExtended = this.getSeasonResultFromArray(bet.place, seasonResults);
+      let assocResult: SeasonResult = this.getSeasonResultFromArray(bet.place, seasonResults);
 
       if (bet.teamId == assocResult.teamId) {
         if (bet.place == 1) {
@@ -113,7 +113,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     return score;
   }
 
-  private isTendencyCorrect(bet: BetExtended, result: ResultExtended): boolean {
+  private isTendencyCorrect(bet: Bet, result: Result): boolean {
     // returns true if the tendency of bet and result are the same
 
     if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
@@ -124,7 +124,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     }
   }
 
-  private isResultCorrect(bet: BetExtended, result: ResultExtended): boolean {
+  private isResultCorrect(bet: Bet, result: Result): boolean {
     // returns true if the results of bet and result are the same
 
     if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
@@ -135,7 +135,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     }
   }
 
-  private getPotentialOutsiderPoints(betArray: BetExtended[], betUser: BetExtended): number {
+  private getPotentialOutsiderPoints(betArray: Bet[], betUser: Bet): number {
     // returns the potentially (!) added points for outsider bets (two or only one
     // user per tendency) for the given bet of the user
 
@@ -190,11 +190,11 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     }
   }
 
-  private getSeasonResultFromArray(place: number, seasonResults: SeasonResultExtended[]): SeasonResultExtended {
+  private getSeasonResultFromArray(place: number, seasonResults: SeasonResult[]): SeasonResult {
     // returns the result from the array with the given place.
     // If the result is not available in the array, a dummy value will be returned.
 
-    let resultToReturn: SeasonResultExtended = { // dummy, if target not available
+    let resultToReturn: SeasonResult = { // dummy, if target not available
       documentId: "",
       season: -1,
       place: place,
@@ -211,10 +211,10 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     return resultToReturn;
   }
 
-  private getRelegatorResults(results: SeasonResultExtended[]): SeasonResultExtended[] {
+  private getRelegatorResults(results: SeasonResult[]): SeasonResult[] {
     // returns all the places of available season results as array
 
-    let relegators: SeasonResultExtended[] = [];
+    let relegators: SeasonResult[] = [];
 
     for (let res of results) {
       if (res.place < 0) {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StatisticsCalculatorService } from './statistics-calculator.service';
-import { BetExtended, ResultExtended, MatchExtended, Score } from './basic_datastructures';
+import { Bet, Result, Match, Score } from './basic_datastructures';
 import { PointCalculatorService } from './point-calculator.service';
 
 
@@ -8,7 +8,7 @@ import { PointCalculatorService } from './point-calculator.service';
 export class StatisticsCalculatorTrendbasedService implements StatisticsCalculatorService {
   constructor(private pointCalculator: PointCalculatorService) { }
 
-  getScoreArray(matchArray: MatchExtended[], betArray: BetExtended[], resultArray: ResultExtended[], offset: Score[] = []): Score[] {
+  getScoreArray(matchArray: Match[], betArray: Bet[], resultArray: Result[], offset: Score[] = []): Score[] {
     // calculates all scores from the given bets, results and score offsets
     // for the matches given in the matchArray
 
@@ -20,9 +20,9 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
       let scoreUser: Score = this.initScore(userId, offset);
 
       for (let match of matchArray) {
-        let betUser: BetExtended = this.extractBet(betArray, match.matchId, userId);
-        let allMatchBets: BetExtended[] = betArray.filter(bet => bet.matchId == match.matchId);
-        let result: ResultExtended = this.extractResult(resultArray, match.matchId);
+        let betUser: Bet = this.extractBet(betArray, match.matchId, userId);
+        let allMatchBets: Bet[] = betArray.filter(bet => bet.matchId == match.matchId);
+        let result: Result = this.extractResult(resultArray, match.matchId);
         let matchScore: Score = this.pointCalculator.calcSingleMatchScore(userId, allMatchBets, result, match);
 
         scoreUser.points += matchScore.points;
@@ -56,7 +56,7 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     }
   }
 
-  private identifyUsers(betArray: BetExtended[], offset: Score[]): string[] {
+  private identifyUsers(betArray: Bet[], offset: Score[]): string[] {
     // identifies all the users whose bets are present in betArray and returns
     // an array of unique user IDs
 
@@ -91,7 +91,7 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     }
   }
 
-  private extractBet(betArray: BetExtended[], matchId: number, userId: string): BetExtended {
+  private extractBet(betArray: Bet[], matchId: number, userId: string): Bet {
     // extracts the Bet with the given matchId and userId from betArray.
     // If the conditions are not met, a default value will be returned
 
@@ -112,7 +112,7 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     }
   }
 
-  private extractResult(resultArray: ResultExtended[], matchId: number): ResultExtended {
+  private extractResult(resultArray: Result[], matchId: number): Result {
     // extracts the Result with the given matchId from resultArray.
     // If the conditions are not met, a default value will be returned
 

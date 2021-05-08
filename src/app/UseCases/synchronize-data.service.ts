@@ -4,7 +4,6 @@ import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { MatchImportData } from '../Dataaccess/matchdata_datastructures';
 import { Bet, Match, Result, Team } from '../Businessrules/basic_datastructures';
-import { BetExtended, MatchExtended, ResultExtended, TeamExtended } from '../Businessrules/basic_datastructures';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +29,7 @@ export class SynchronizeDataService {
     // performs synchronization of Match data
 
     this.appDataAccess.getMatch$(importedData.matchId).pipe(take(1)).subscribe(
-      (appdataMatch: MatchExtended) => {
+      (appdataMatch: Match) => {
 
         let importedMatch: Match = this.createMatch(season, importedData, appdataMatch.isTopMatch);
 
@@ -49,7 +48,7 @@ export class SynchronizeDataService {
     // performs synchronization of Result data
 
     this.appDataAccess.getResult$(importedData.matchId).pipe(take(1)).subscribe(
-      (appdataResult: ResultExtended) => {
+      (appdataResult: Result) => {
 
         let importedResult: Result = this.createResult(importedData);
 
@@ -72,6 +71,7 @@ export class SynchronizeDataService {
     // creates a new Match structure for writing to the app database
 
     return {
+      documentId: "",
       season: season,
       matchday: importedData.matchday,
       matchId: importedData.matchId,
@@ -87,13 +87,14 @@ export class SynchronizeDataService {
     // creates a new Result structure for writing to the app database
 
     return {
+      documentId: "",
       matchId: importedData.matchId,
       goalsHome: importedData.goalsHome,
       goalsAway: importedData.goalsAway
     };
   }
 
-  private isMatchEqual(match: Match, matchExt: MatchExtended): boolean {
+  private isMatchEqual(match: Match, matchExt: Match): boolean {
     // checks if all properties are equal and leaves out the document ID !
 
     return (match.season == matchExt.season &&
@@ -106,7 +107,7 @@ export class SynchronizeDataService {
       match.teamIdAway == matchExt.teamIdAway);
   }
 
-  private isResultEqual(result: Result, resultExt: ResultExtended): boolean {
+  private isResultEqual(result: Result, resultExt: Result): boolean {
     // checks if all properties are equal and leaves out the document ID !
 
     return (result.matchId == resultExt.matchId &&

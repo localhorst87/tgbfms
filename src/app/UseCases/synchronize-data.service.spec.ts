@@ -4,7 +4,6 @@ import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { MatchImportData } from '../Dataaccess/matchdata_datastructures';
 import { Bet, Match, Result, Team } from '../Businessrules/basic_datastructures';
-import { BetExtended, MatchExtended, ResultExtended, TeamExtended } from '../Businessrules/basic_datastructures';
 import { SynchronizeDataService } from './synchronize-data.service';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
@@ -109,7 +108,7 @@ describe('SynchronizeDataService', () => {
     const argument1: number = 2020;
     const argument2: MatchImportData = matchImportData[0];
 
-    const appDataMatch: MatchExtended = {
+    const appDataMatch: Match = {
       documentId: "",
       season: -1,
       matchday: -1,
@@ -122,6 +121,7 @@ describe('SynchronizeDataService', () => {
     };
 
     const transformedMatch: Match = {
+      documentId: "",
       season: argument1,
       matchday: argument2.matchday,
       matchId: argument2.matchId,
@@ -149,7 +149,7 @@ describe('SynchronizeDataService', () => {
     const argument1: number = 2020;
     const argument2: MatchImportData = matchImportData[0];
 
-    const appDataMatch: MatchExtended = {
+    const appDataMatch: Match = {
       documentId: "test_doc_id",
       season: argument1,
       matchday: argument2.matchday,
@@ -162,6 +162,7 @@ describe('SynchronizeDataService', () => {
     };
 
     const transformedMatch: Match = {
+      documentId: "",
       season: appDataMatch.season,
       matchday: appDataMatch.matchday,
       matchId: appDataMatch.matchId,
@@ -189,7 +190,7 @@ describe('SynchronizeDataService', () => {
     const argument1: number = 2020;
     const argument2: MatchImportData = matchImportData[0];
 
-    const appDataMatch: MatchExtended = {
+    const appDataMatch: Match = {
       documentId: "test_doc_id",
       season: argument1,
       matchday: argument2.matchday,
@@ -202,6 +203,7 @@ describe('SynchronizeDataService', () => {
     };
 
     const transformedMatch: Match = {
+      documentId: "",
       season: appDataMatch.season,
       matchday: appDataMatch.matchday,
       matchId: appDataMatch.matchId,
@@ -247,7 +249,7 @@ describe('SynchronizeDataService', () => {
   it('syncResult, result available and new to app data', () => {
     const argument: MatchImportData = matchImportData[1];
 
-    const appdataResult: ResultExtended = {
+    const appdataResult: Result = {
       documentId: "",
       matchId: argument.matchId,
       goalsHome: -1,
@@ -255,6 +257,7 @@ describe('SynchronizeDataService', () => {
     };
 
     const transformedResult: Result = {
+      documentId: "",
       matchId: argument.matchId,
       goalsHome: argument.goalsHome,
       goalsAway: argument.goalsAway
@@ -274,7 +277,7 @@ describe('SynchronizeDataService', () => {
   it('syncResult, result available and different than in app data', () => {
     const argument: MatchImportData = matchImportData[1];
 
-    const appdataResult: ResultExtended = {
+    const appdataResult: Result = {
       documentId: "test_doc_id",
       matchId: argument.matchId,
       goalsHome: argument.goalsHome,
@@ -282,6 +285,7 @@ describe('SynchronizeDataService', () => {
     };
 
     const transformedResult: Result = {
+      documentId: "",
       matchId: appdataResult.matchId,
       goalsHome: appdataResult.goalsHome + 1,
       goalsAway: appdataResult.goalsAway
@@ -301,7 +305,7 @@ describe('SynchronizeDataService', () => {
   it('syncResult, result available and equal to app data', () => {
     const argument: MatchImportData = matchImportData[1];
 
-    const appdataResult: ResultExtended = {
+    const appdataResult: Result = {
       documentId: "test_doc_id",
       matchId: argument.matchId,
       goalsHome: argument.goalsHome,
@@ -309,6 +313,7 @@ describe('SynchronizeDataService', () => {
     };
 
     const transformedResult: Result = {
+      documentId: "",
       matchId: appdataResult.matchId,
       goalsHome: appdataResult.goalsHome,
       goalsAway: appdataResult.goalsAway
@@ -328,7 +333,7 @@ describe('SynchronizeDataService', () => {
   it('syncResult, result not available', () => {
     const argument: MatchImportData = matchImportData[2]; // goalsHome == goalsAway == -1
 
-    const appdataResult: ResultExtended = {
+    const appdataResult: Result = {
       documentId: "test_doc_id",
       matchId: argument.matchId,
       goalsHome: argument.goalsHome,
@@ -336,6 +341,7 @@ describe('SynchronizeDataService', () => {
     };
 
     const transformedResult: Result = {
+      documentId: "",
       matchId: appdataResult.matchId,
       goalsHome: appdataResult.goalsHome,
       goalsAway: appdataResult.goalsAway

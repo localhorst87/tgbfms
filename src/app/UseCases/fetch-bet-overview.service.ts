@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, combineLatest } from 'rxjs';
 import { map, mergeMap, concatMap, distinct } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { BetExtended, MatchExtended, UserExtended } from '../Businessrules/basic_datastructures';
+import { Bet, Match, User } from '../Businessrules/basic_datastructures';
 import { BetOverviewFrameData, BetOverviewUserData } from './output_datastructures';
 
 @Injectable({
@@ -16,7 +16,7 @@ export class FetchBetOverviewService {
     // returns the requested frame data (data without user bets) as Observable
 
     return this.appData.getMatchesByMatchday$(season, matchday).pipe(
-      mergeMap((match: MatchExtended) => this.makeFrameData$(match, userId)),
+      mergeMap((match: Match) => this.makeFrameData$(match, userId)),
       distinct()
     );
   }
@@ -25,12 +25,12 @@ export class FetchBetOverviewService {
     // returns the requested bet data of all users as Observable
 
     return this.getAllUserBets$(matchId).pipe(
-      mergeMap((bet: BetExtended) => this.makeBetData$(bet)),
+      mergeMap((bet: Bet) => this.makeBetData$(bet)),
       distinct()
     );
   }
 
-  private makeFrameData$(match: MatchExtended, userId: string): Observable<BetOverviewFrameData> {
+  private makeFrameData$(match: Match, userId: string): Observable<BetOverviewFrameData> {
     // converts the BetOverviewFrameData request for the required match into a data structure
 
     return combineLatest(
@@ -52,7 +52,7 @@ export class FetchBetOverviewService {
       });
   }
 
-  private getAllUserBets$(matchId: number): Observable<BetExtended> {
+  private getAllUserBets$(matchId: number): Observable<Bet> {
     // returns the bet of all active users
 
     return this.appData.getActiveUserIds$().pipe(
@@ -61,11 +61,11 @@ export class FetchBetOverviewService {
     );
   }
 
-  private makeBetData$(bet: BetExtended): Observable<BetOverviewUserData> {
+  private makeBetData$(bet: Bet): Observable<BetOverviewUserData> {
     // creates BetOverviewUserData from a user bet
 
     return this.appData.getUserDataById$(bet.userId).pipe(
-      map((userData: UserExtended) => {
+      map((userData: User) => {
         return {
           matchId: bet.matchId,
           userName: userData.displayName,

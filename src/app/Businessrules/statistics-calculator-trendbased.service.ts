@@ -10,7 +10,7 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
 
   getScoreArray(matchArray: Match[], betArray: Bet[], resultArray: Result[], offset: Score[] = []): Score[] {
     // calculates all scores from the given bets, results and score offsets
-    // for the matches given in the matchArray
+    // for the matches given in the matchArray, sorted by user name
 
     let scores: Score[] = [];
 
@@ -36,7 +36,7 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
       scores.push(scoreUser);
     }
 
-    return scores.sort(this.compareScores);
+    return scores;
   }
 
   compareScores(firstEl: Score, secondEl: Score): number {
@@ -54,6 +54,28 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     else {
       return 0;
     }
+  }
+
+  makePositions(scores: Score[], compareFcn: (arg0: Score, arg1: Score) => number): number[] {
+    // returns the position array of the sorted scores array according to the
+    // given compare function compareFcn
+    let places: number[] = [1];
+    let scoresSorted: Score[] = scores.sort(compareFcn);
+
+    for (let i = 0; i < scores.length - 1; i++) {
+      let newPlace: number;
+
+      if (compareFcn(scores[i], scores[i + 1]) == 0) {
+        newPlace = places[i];
+      }
+      else {
+        newPlace = i + 1 + places[0];
+      }
+
+      places.push(newPlace);
+    }
+
+    return places;
   }
 
   private identifyUsers(betArray: Bet[], offset: Score[]): string[] {

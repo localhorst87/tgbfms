@@ -7,9 +7,11 @@ import { Bet, Result, Match, Score } from './basic_datastructures';
 describe('StatisticsCalculatorTrendbasedService', () => {
   let service: StatisticsCalculatorTrendbasedService;
   let pointCalculatorSpy: jasmine.SpyObj<PointCalculatorService>;
+  let compareFcnSpy: jasmine.Spy;
 
   beforeEach(() => {
     pointCalculatorSpy = jasmine.createSpyObj(["calcSingleMatchScore", "countTendencies", "calcSingleSeasonScore"]);
+    compareFcnSpy = jasmine.createSpy();
 
     TestBed.configureTestingModule({
       providers: [
@@ -22,6 +24,161 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+  });
+
+
+  // ---------------------------------------------------------------------------
+  // makePositions
+  // ---------------------------------------------------------------------------
+
+  it("straight forward", () => {
+
+    const argument: Score[] = [
+      {
+        userId: "test_user_id_3",
+        points: 31,
+        matches: 18,
+        results: 6,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 2
+      },
+      {
+        userId: "test_user_id_1",
+        points: 32,
+        matches: 20,
+        results: 5,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 2
+      },
+      {
+        userId: "test_user_id_2",
+        points: 31,
+        matches: 19,
+        results: 5,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 2
+      }
+    ];
+
+    compareFcnSpy
+      .withArgs(argument[0], argument[1]).and.returnValue(1)
+      .withArgs(argument[1], argument[0]).and.returnValue(-1)
+      .withArgs(argument[0], argument[2]).and.returnValue(1)
+      .withArgs(argument[2], argument[0]).and.returnValue(-1)
+      .withArgs(argument[1], argument[2]).and.returnValue(-1)
+      .withArgs(argument[2], argument[1]).and.returnValue(1);
+
+    const expectedValue: number[] = [1, 2, 3]
+
+    expect(service["makePositions"](argument, compareFcnSpy)).toEqual(expectedValue);
+  });
+
+  it("all equal", () => {
+
+    const argument: Score[] = [
+      {
+        userId: "test_user_id_3",
+        points: 31,
+        matches: 18,
+        results: 6,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 2
+      },
+      {
+        userId: "test_user_id_2",
+        points: 31,
+        matches: 18,
+        results: 6,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 2
+      },
+      {
+        userId: "test_user_id_1",
+        points: 31,
+        matches: 18,
+        results: 6,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 2
+      }
+    ];
+
+    compareFcnSpy
+      .withArgs(argument[0], argument[1]).and.returnValue(0)
+      .withArgs(argument[1], argument[0]).and.returnValue(0)
+      .withArgs(argument[0], argument[2]).and.returnValue(0)
+      .withArgs(argument[2], argument[0]).and.returnValue(0)
+      .withArgs(argument[1], argument[2]).and.returnValue(0)
+      .withArgs(argument[2], argument[1]).and.returnValue(0);
+
+    const expectedValue: number[] = [1, 1, 1]
+
+    expect(service["makePositions"](argument, compareFcnSpy)).toEqual(expectedValue);
+  });
+
+  it("two arguments with same valuation", () => {
+
+    const argument: Score[] = [
+      {
+        userId: "test_user_id_3",
+        points: 35,
+        matches: 22,
+        results: 6,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 2
+      },
+      {
+        userId: "test_user_id_1",
+        points: 32,
+        matches: 20,
+        results: 5,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 2
+      },
+      {
+        userId: "test_user_id_2",
+        points: 31,
+        matches: 19,
+        results: 5,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 2
+      },
+      {
+        userId: "test_user_id_4",
+        points: 32,
+        matches: 20,
+        results: 5,
+        extraTop: 1,
+        extraOutsider: 2,
+        extraSeason: 4
+      }
+    ];
+
+    compareFcnSpy
+      .withArgs(argument[0], argument[1]).and.returnValue(-1)
+      .withArgs(argument[0], argument[2]).and.returnValue(-1)
+      .withArgs(argument[0], argument[3]).and.returnValue(-1)
+      .withArgs(argument[1], argument[0]).and.returnValue(1)
+      .withArgs(argument[1], argument[2]).and.returnValue(-1)
+      .withArgs(argument[1], argument[3]).and.returnValue(0)
+      .withArgs(argument[2], argument[0]).and.returnValue(1)
+      .withArgs(argument[2], argument[1]).and.returnValue(1)
+      .withArgs(argument[2], argument[3]).and.returnValue(1)
+      .withArgs(argument[3], argument[0]).and.returnValue(1)
+      .withArgs(argument[3], argument[1]).and.returnValue(0)
+      .withArgs(argument[3], argument[2]).and.returnValue(-1);
+
+    const expectedValue: number[] = [1, 2, 2, 4]
+
+    expect(service["makePositions"](argument, compareFcnSpy)).toEqual(expectedValue);
   });
 
   // ---------------------------------------------------------------------------
@@ -959,19 +1116,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const expectedValue: Score[] = [
       {
-        userId: "test_user_id_4",
-        points: 7,
-        matches: 2,
-        results: 1,
-        extraTop: 2,
-        extraOutsider: 2,
-        extraSeason: 0
-      },
-      {
-        userId: "test_user_id_3",
-        points: 2,
-        matches: 1,
-        results: 1,
+        userId: "test_user_id_1",
+        points: 0,
+        matches: 0,
+        results: 0,
         extraTop: 0,
         extraOutsider: 0,
         extraSeason: 0
@@ -986,12 +1134,21 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraSeason: 0
       },
       {
-        userId: "test_user_id_1",
-        points: 0,
-        matches: 0,
-        results: 0,
+        userId: "test_user_id_3",
+        points: 2,
+        matches: 1,
+        results: 1,
         extraTop: 0,
         extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_4",
+        points: 7,
+        matches: 2,
+        results: 1,
+        extraTop: 2,
+        extraOutsider: 2,
         extraSeason: 0
       }
     ];
@@ -1187,6 +1344,15 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const expectedValue: Score[] = [
       {
+        userId: "test_user_id_1",
+        points: 35,
+        matches: 23,
+        results: 5,
+        extraTop: 5,
+        extraOutsider: 2,
+        extraSeason: 0
+      },
+      {
         userId: "test_user_id_2",
         points: 42,
         matches: 28,
@@ -1211,15 +1377,6 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         results: 4,
         extraTop: 6,
         extraOutsider: 4,
-        extraSeason: 0
-      },
-      {
-        userId: "test_user_id_1",
-        points: 35,
-        matches: 23,
-        results: 5,
-        extraTop: 5,
-        extraOutsider: 2,
         extraSeason: 0
       }
     ];
@@ -1417,24 +1574,6 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const expectedValue: Score[] = [
       {
-        userId: "test_user_id_3",
-        points: 42,
-        matches: 26,
-        results: 6,
-        extraTop: 5,
-        extraOutsider: 5,
-        extraSeason: 0
-      },
-      {
-        userId: "test_user_id_4",
-        points: 39,
-        matches: 25,
-        results: 4,
-        extraTop: 7,
-        extraOutsider: 2,
-        extraSeason: 1
-      },
-      {
         userId: "test_user_id_1",
         points: 35,
         matches: 23,
@@ -1451,6 +1590,24 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraTop: 0,
         extraOutsider: 0,
         extraSeason: 0
+      },
+      {
+        userId: "test_user_id_3",
+        points: 42,
+        matches: 26,
+        results: 6,
+        extraTop: 5,
+        extraOutsider: 5,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_4",
+        points: 39,
+        matches: 25,
+        results: 4,
+        extraTop: 7,
+        extraOutsider: 2,
+        extraSeason: 1
       }
     ];
 
@@ -1648,13 +1805,13 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const expectedValue: Score[] = [
       {
-        userId: "test_user_id_3",
-        points: 42,
-        matches: 26,
-        results: 6,
-        extraTop: 6,
-        extraOutsider: 2,
-        extraSeason: 2
+        userId: "test_user_id_1",
+        points: 35,
+        matches: 23,
+        results: 5,
+        extraTop: 5,
+        extraOutsider: 1,
+        extraSeason: 1
       },
       {
         userId: "test_user_id_2",
@@ -1666,21 +1823,21 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraSeason: 0
       },
       {
+        userId: "test_user_id_3",
+        points: 42,
+        matches: 26,
+        results: 6,
+        extraTop: 6,
+        extraOutsider: 2,
+        extraSeason: 2
+      },
+      {
         userId: "test_user_id_4",
         points: 39,
         matches: 25,
         results: 4,
         extraTop: 5,
         extraOutsider: 4,
-        extraSeason: 1
-      },
-      {
-        userId: "test_user_id_1",
-        points: 35,
-        matches: 23,
-        results: 5,
-        extraTop: 5,
-        extraOutsider: 1,
         extraSeason: 1
       }
     ];
@@ -1847,15 +2004,6 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const expectedValue: Score[] = [
       {
-        userId: "test_user_id_4",
-        points: 5,
-        matches: 1,
-        results: 1,
-        extraTop: 2,
-        extraOutsider: 1,
-        extraSeason: 0
-      },
-      {
         userId: "test_user_id_1",
         points: 3,
         matches: 1,
@@ -1871,6 +2019,15 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         results: 0,
         extraTop: 0,
         extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_4",
+        points: 5,
+        matches: 1,
+        results: 1,
+        extraTop: 2,
+        extraOutsider: 1,
         extraSeason: 0
       }
     ];
@@ -2036,15 +2193,6 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const expectedValue: Score[] = [
       {
-        userId: "test_user_id_4",
-        points: 5,
-        matches: 1,
-        results: 1,
-        extraTop: 2,
-        extraOutsider: 1,
-        extraSeason: 0
-      },
-      {
         userId: "test_user_id_1",
         points: 3,
         matches: 1,
@@ -2060,6 +2208,15 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         results: 0,
         extraTop: 0,
         extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_4",
+        points: 5,
+        matches: 1,
+        results: 1,
+        extraTop: 2,
+        extraOutsider: 1,
         extraSeason: 0
       }
     ];
@@ -2257,19 +2414,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const expectedValue: Score[] = [
       {
-        userId: "test_user_id_4",
-        points: 7,
-        matches: 2,
-        results: 1,
-        extraTop: 2,
-        extraOutsider: 2,
-        extraSeason: 0
-      },
-      {
-        userId: "test_user_id_3",
-        points: 2,
-        matches: 1,
-        results: 1,
+        userId: "test_user_id_1",
+        points: 0,
+        matches: 0,
+        results: 0,
         extraTop: 0,
         extraOutsider: 0,
         extraSeason: 0
@@ -2284,12 +2432,21 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraSeason: 0
       },
       {
-        userId: "test_user_id_1",
-        points: 0,
-        matches: 0,
-        results: 0,
+        userId: "test_user_id_3",
+        points: 2,
+        matches: 1,
+        results: 1,
         extraTop: 0,
         extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_4",
+        points: 7,
+        matches: 2,
+        results: 1,
+        extraTop: 2,
+        extraOutsider: 2,
         extraSeason: 0
       }
     ];
@@ -2428,12 +2585,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       .withArgs("test_user_id_3", argument4).and.returnValue(argument4[2])
       .withArgs("test_user_id_4", argument4).and.returnValue(argument4[3]);
 
-    const expectedValue: Score[] = [
-      argument4[1],
-      argument4[2],
-      argument4[0],
-      argument4[3]
-    ];
+    const expectedValue: Score[] = argument4;
 
     expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
   });

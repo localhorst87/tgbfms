@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StatisticsCalculatorService } from './statistics-calculator.service';
-import { Bet, Result, Match, Score } from './basic_datastructures';
+import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
 import { PointCalculatorService } from './point-calculator.service';
 
 
@@ -10,7 +10,7 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
 
   getScoreArray(matchArray: Match[], betArray: Bet[], resultArray: Result[], offset: Score[] = []): Score[] {
     // calculates all scores from the given bets, results and score offsets
-    // for the matches given in the matchArray, sorted by user name
+    // for the matches given in the matchArray, sorted by user id
 
     let scores: Score[] = [];
 
@@ -24,15 +24,28 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
         let allMatchBets: Bet[] = betArray.filter(bet => bet.matchId == match.matchId);
         let result: Result = this.extractResult(resultArray, match.matchId);
         let matchScore: Score = this.pointCalculator.calcSingleMatchScore(userId, allMatchBets, result, match);
-
-        scoreUser.points += matchScore.points;
-        scoreUser.matches += matchScore.matches;
-        scoreUser.results += matchScore.results;
-        scoreUser.extraTop += matchScore.extraTop;
-        scoreUser.extraOutsider += matchScore.extraOutsider;
-        scoreUser.extraSeason += matchScore.extraSeason;
+        scoreUser = this.addScores(scoreUser, matchScore);
       }
 
+      scores.push(scoreUser);
+    }
+
+    return scores;
+  }
+
+  getSeasonScoreArray(betArray: SeasonBet[], resultArray: SeasonResult[], offset: Score[] = []): Score[] {
+    // calculates all scores of the given bets and results, sorted by user id
+
+    let scores: Score[] = [];
+
+    let availableUsers: string[] = this.identifyUsers(betArray, offset);
+
+    for (let userId of availableUsers) {
+      let scoreUser: Score = this.initScore(userId, offset);
+      let betArrayUser: SeasonBet[] = betArray.filter(bet => bet.userId == userId);
+      let seasonScore = this.pointCalculator.calcSingleSeasonScore(betArrayUser, resultArray);
+
+      scoreUser = this.addScores(scoreUser, seasonScore);
       scores.push(scoreUser);
     }
 
@@ -78,9 +91,25 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     return places;
   }
 
-  private identifyUsers(betArray: Bet[], offset: Score[]): string[] {
+  addScores(score1: Score, score2: Score): Score {
+    // adds two score structures
+    // if the source are from different users, the user name will be taken
+    // from the first score structure
+
+    score1.points += score2.points;
+    score1.matches += score2.matches;
+    score1.results += score2.results;
+    score1.extraTop += score2.extraTop;
+    score1.extraOutsider += score2.extraOutsider;
+    score1.extraSeason += score2.extraSeason;
+
+    return score1;
+  }
+
+  private identifyUsers(betArray: any[], offset: Score[]): string[] {
     // identifies all the users whose bets are present in betArray and returns
-    // an array of unique user IDs
+    // an array of unique user IDs. betArray must satisfy the userId property,
+    // thus it can be either a Bet oder SeasonBet
 
     let usersBet: string[] = betArray.map(bet => bet.userId); // filters user IDs
     let usersTable: string[] = offset.map(score => score.userId);

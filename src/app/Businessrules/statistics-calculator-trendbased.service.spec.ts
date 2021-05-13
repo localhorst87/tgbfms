@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { StatisticsCalculatorTrendbasedService } from './statistics-calculator-trendbased.service';
 import { PointCalculatorService } from './point-calculator.service';
-import { Bet, Result, Match, Score } from './basic_datastructures';
+import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
 
 describe('StatisticsCalculatorTrendbasedService', () => {
   let service: StatisticsCalculatorTrendbasedService;
@@ -1034,7 +1034,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const argument4: Score[] = [];
 
-    const initialTableData: Score[] = [
+    const initialScore: Score[] = [
       {
         userId: "test_user_id_1",
         points: 0,
@@ -1095,10 +1095,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3", "test_user_id_4"]);
 
     spyOn<any>(service, "initScore")
-      .withArgs("test_user_id_1", []).and.returnValue(initialTableData[0])
-      .withArgs("test_user_id_2", []).and.returnValue(initialTableData[1])
-      .withArgs("test_user_id_3", []).and.returnValue(initialTableData[2])
-      .withArgs("test_user_id_4", []).and.returnValue(initialTableData[3]);
+      .withArgs("test_user_id_1", []).and.returnValue(initialScore[0])
+      .withArgs("test_user_id_2", []).and.returnValue(initialScore[1])
+      .withArgs("test_user_id_3", []).and.returnValue(initialScore[2])
+      .withArgs("test_user_id_4", []).and.returnValue(initialScore[3]);
 
     spyOn<any>(service, "extractBet")
       .withArgs(argument2, 1, "test_user_id_1").and.returnValue(argument2[0])
@@ -1932,7 +1932,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const argument4: Score[] = [];
 
-    const initialTableData: Score[] = [
+    const initialScore: Score[] = [
       {
         userId: "test_user_id_1",
         points: 0,
@@ -1986,9 +1986,9 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       .and.returnValue(["test_user_id_1", "test_user_id_3", "test_user_id_4"]);
 
     spyOn<any>(service, "initScore")
-      .withArgs("test_user_id_1", []).and.returnValue(initialTableData[0])
-      .withArgs("test_user_id_3", []).and.returnValue(initialTableData[1])
-      .withArgs("test_user_id_4", []).and.returnValue(initialTableData[2]);
+      .withArgs("test_user_id_1", []).and.returnValue(initialScore[0])
+      .withArgs("test_user_id_3", []).and.returnValue(initialScore[1])
+      .withArgs("test_user_id_4", []).and.returnValue(initialScore[2]);
 
     spyOn<any>(service, "extractBet")
       .withArgs(argument2, 1, "test_user_id_1").and.returnValue(argument2[0])
@@ -2128,7 +2128,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const argument4: Score[] = [];
 
-    const initialTableData: Score[] = [
+    const initialScore: Score[] = [
       {
         userId: "test_user_id_1",
         points: 0,
@@ -2175,9 +2175,9 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       .and.returnValue(["test_user_id_1", "test_user_id_3", "test_user_id_4"]);
 
     spyOn<any>(service, "initScore")
-      .withArgs("test_user_id_1", []).and.returnValue(initialTableData[0])
-      .withArgs("test_user_id_3", []).and.returnValue(initialTableData[1])
-      .withArgs("test_user_id_4", []).and.returnValue(initialTableData[2]);
+      .withArgs("test_user_id_1", []).and.returnValue(initialScore[0])
+      .withArgs("test_user_id_3", []).and.returnValue(initialScore[1])
+      .withArgs("test_user_id_4", []).and.returnValue(initialScore[2]);
 
     spyOn<any>(service, "extractBet")
       .withArgs(argument2, 1, "test_user_id_1").and.returnValue(argument2[0])
@@ -2333,7 +2333,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const argument4: Score[] = [];
 
-    const initialTableData: Score[] = [
+    const initialScore: Score[] = [
       {
         userId: "test_user_id_1",
         points: 0,
@@ -2393,10 +2393,10 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3", "test_user_id_4"]);
 
     spyOn<any>(service, "initScore")
-      .withArgs("test_user_id_1", []).and.returnValue(initialTableData[0])
-      .withArgs("test_user_id_2", []).and.returnValue(initialTableData[1])
-      .withArgs("test_user_id_3", []).and.returnValue(initialTableData[2])
-      .withArgs("test_user_id_4", []).and.returnValue(initialTableData[3]);
+      .withArgs("test_user_id_1", []).and.returnValue(initialScore[0])
+      .withArgs("test_user_id_2", []).and.returnValue(initialScore[1])
+      .withArgs("test_user_id_3", []).and.returnValue(initialScore[2])
+      .withArgs("test_user_id_4", []).and.returnValue(initialScore[3]);
 
     spyOn<any>(service, "extractBet")
       .withArgs(argument2, 1, "test_user_id_1").and.returnValue(argument2[0])
@@ -2602,5 +2602,1301 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     const expectedValue: Score[] = []
 
     expect(service["getScoreArray"](argument1, argument2, argument3, argument4)).toEqual(expectedValue);
+  });
+
+  // ---------------------------------------------------------------------------
+  // getSeasonScoreArray
+  // ---------------------------------------------------------------------------
+
+  it("getSeasonScoreArray, straight forward, no offset", () => {
+    const argument1: SeasonBet[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 1,
+        teamId: 100
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -2,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -3,
+        teamId: 106
+      },
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const argument2: SeasonResult[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 106
+      }
+    ];
+
+    const initialScore: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 0,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_2",
+        points: 0,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      }
+    ];
+
+    const singleSeasonScore: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 4,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 4
+      },
+      {
+        userId: "test_user_id_2",
+        points: 6,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 6
+      }
+    ];
+
+    spyOn<any>(service, "identifyUsers")
+      .and.returnValue(["test_user_id_1", "test_user_id_2"]);
+
+    spyOn<any>(service, "initScore")
+      .withArgs("test_user_id_1", []).and.returnValue(initialScore[0])
+      .withArgs("test_user_id_2", []).and.returnValue(initialScore[1]);
+
+    pointCalculatorSpy.calcSingleSeasonScore
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_1"), argument2).and.returnValue(singleSeasonScore[0])
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_2"), argument2).and.returnValue(singleSeasonScore[1]);
+
+    const expectedValue: Score[] = singleSeasonScore;
+
+    expect(service["getSeasonScoreArray"](argument1, argument2)).toEqual(expectedValue);
+  });
+
+  it("getSeasonScoreArray, straight forward, offset given", () => {
+    const argument1: SeasonBet[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 1,
+        teamId: 100
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -2,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -3,
+        teamId: 106
+      },
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const argument2: SeasonResult[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 106
+      }
+    ];
+
+    const argument3: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 3,
+        matches: 3,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_2",
+        points: 2,
+        matches: 1,
+        results: 0,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      }
+    ];
+
+    const singleSeasonScore: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 4,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 4
+      },
+      {
+        userId: "test_user_id_2",
+        points: 6,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 6
+      }
+    ];
+
+    spyOn<any>(service, "identifyUsers")
+      .and.returnValue(["test_user_id_1", "test_user_id_2"]);
+
+    spyOn<any>(service, "initScore")
+      .withArgs("test_user_id_1", argument3).and.returnValue(argument3[0])
+      .withArgs("test_user_id_2", argument3).and.returnValue(argument3[1]);
+
+    pointCalculatorSpy.calcSingleSeasonScore
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_1"), argument2).and.returnValue(singleSeasonScore[0])
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_2"), argument2).and.returnValue(singleSeasonScore[1]);
+
+    const expectedValue: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 7,
+        matches: 3,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 4
+      },
+      {
+        userId: "test_user_id_2",
+        points: 8,
+        matches: 1,
+        results: 0,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 6
+      }
+    ];
+
+    expect(service["getSeasonScoreArray"](argument1, argument2, argument3)).toEqual(expectedValue);
+  });
+
+  it("getSeasonScoreArray, straight forward, offset has one user more than bet array", () => {
+    const argument1: SeasonBet[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 1,
+        teamId: 100
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -2,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -3,
+        teamId: 106
+      },
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const argument2: SeasonResult[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 106
+      }
+    ];
+
+    const argument3: Score[] = [
+      {
+        userId: "test_user_id_3",
+        points: 7,
+        matches: 4,
+        results: 2,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_1",
+        points: 3,
+        matches: 3,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_2",
+        points: 2,
+        matches: 1,
+        results: 0,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      }
+    ];
+
+    const singleSeasonScore: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 4,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 4
+      },
+      {
+        userId: "test_user_id_2",
+        points: 6,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 6
+      },
+      {
+        userId: "",
+        points: 0,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      }
+    ];
+
+    spyOn<any>(service, "identifyUsers")
+      .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3"]);
+
+    spyOn<any>(service, "initScore")
+      .withArgs("test_user_id_1", argument3).and.returnValue(argument3[1])
+      .withArgs("test_user_id_2", argument3).and.returnValue(argument3[2])
+      .withArgs("test_user_id_3", argument3).and.returnValue(argument3[0]);
+
+    pointCalculatorSpy.calcSingleSeasonScore
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_1"), argument2).and.returnValue(singleSeasonScore[0])
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_2"), argument2).and.returnValue(singleSeasonScore[1])
+      .withArgs([], argument2).and.returnValue(singleSeasonScore[2]);
+
+    const expectedValue: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 7,
+        matches: 3,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 4
+      },
+      {
+        userId: "test_user_id_2",
+        points: 8,
+        matches: 1,
+        results: 0,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 6
+      },
+      {
+        userId: "test_user_id_3",
+        points: 7,
+        matches: 4,
+        results: 2,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      }
+    ];
+
+    expect(service["getSeasonScoreArray"](argument1, argument2, argument3)).toEqual(expectedValue);
+  });
+
+  it("getSeasonScoreArray, straight forward, offset has one user less than bet array", () => {
+    const argument1: SeasonBet[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 1,
+        teamId: 100
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -2,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -3,
+        teamId: 106
+      },
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const argument2: SeasonResult[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 106
+      }
+    ];
+
+    const argument3: Score[] = [
+      {
+        userId: "test_user_id_2",
+        points: 2,
+        matches: 1,
+        results: 0,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      }
+    ];
+
+    const initialScore: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 0,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      argument3[0]
+    ];
+
+    const singleSeasonScore: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 4,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 4
+      },
+      {
+        userId: "test_user_id_2",
+        points: 6,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 6
+      }
+    ];
+
+    spyOn<any>(service, "identifyUsers")
+      .and.returnValue(["test_user_id_1", "test_user_id_2"]);
+
+    spyOn<any>(service, "initScore")
+      .withArgs("test_user_id_1", argument3).and.returnValue(initialScore[0])
+      .withArgs("test_user_id_2", argument3).and.returnValue(initialScore[1]);
+
+    pointCalculatorSpy.calcSingleSeasonScore
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_1"), argument2).and.returnValue(singleSeasonScore[0])
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_2"), argument2).and.returnValue(singleSeasonScore[1]);
+
+    const expectedValue: Score[] = [
+      singleSeasonScore[0],
+      {
+        userId: "test_user_id_2",
+        points: 8,
+        matches: 1,
+        results: 0,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 6
+      }
+    ];
+
+    expect(service["getSeasonScoreArray"](argument1, argument2, argument3)).toEqual(expectedValue);
+  });
+
+  it("getSeasonScoreArray, betArray empty, offset given", () => {
+    const argument1: SeasonBet[] = [];
+
+    const argument2: SeasonResult[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 106
+      }
+    ];
+
+    const argument3: Score[] = [
+      {
+        userId: "test_user_id_3",
+        points: 7,
+        matches: 4,
+        results: 2,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_1",
+        points: 3,
+        matches: 3,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_2",
+        points: 2,
+        matches: 1,
+        results: 0,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      }
+    ];
+
+    const singleSeasonScore: Score = {
+      userId: "",
+      points: 0,
+      matches: 0,
+      results: 0,
+      extraTop: 0,
+      extraOutsider: 0,
+      extraSeason: 0
+    };
+
+    spyOn<any>(service, "identifyUsers")
+      .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3"]);
+
+    spyOn<any>(service, "initScore")
+      .withArgs("test_user_id_1", argument3).and.returnValue(argument3[1])
+      .withArgs("test_user_id_2", argument3).and.returnValue(argument3[2])
+      .withArgs("test_user_id_3", argument3).and.returnValue(argument3[0]);
+
+    pointCalculatorSpy.calcSingleSeasonScore
+      .withArgs([], argument2).and.returnValue(singleSeasonScore);
+
+    const expectedValue: Score[] = [
+      argument3[1],
+      argument3[2],
+      argument3[0]
+    ];
+
+    expect(service["getSeasonScoreArray"](argument1, argument2, argument3)).toEqual(expectedValue);
+  });
+
+  it("getSeasonScoreArray, resultArray empty, offset given", () => {
+    const argument1: SeasonBet[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 1,
+        teamId: 100
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -2,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -3,
+        teamId: 106
+      },
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const argument2: SeasonResult[] = [];
+    const argument3: Score[] = [
+      {
+        userId: "test_user_id_3",
+        points: 7,
+        matches: 4,
+        results: 2,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_1",
+        points: 3,
+        matches: 3,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_2",
+        points: 2,
+        matches: 1,
+        results: 0,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      }
+    ];
+
+    const singleSeasonScore: Score = {
+      userId: "",
+      points: 0,
+      matches: 0,
+      results: 0,
+      extraTop: 0,
+      extraOutsider: 0,
+      extraSeason: 0
+    };
+
+    spyOn<any>(service, "identifyUsers")
+      .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3"]);
+
+    spyOn<any>(service, "initScore")
+      .withArgs("test_user_id_1", argument3).and.returnValue(argument3[1])
+      .withArgs("test_user_id_2", argument3).and.returnValue(argument3[2])
+      .withArgs("test_user_id_3", argument3).and.returnValue(argument3[0]);
+
+    pointCalculatorSpy.calcSingleSeasonScore
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_1"), []).and.returnValue(singleSeasonScore)
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_2"), []).and.returnValue(singleSeasonScore)
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_3"), []).and.returnValue(singleSeasonScore);
+
+    const expectedValue: Score[] = [
+      argument3[1],
+      argument3[2],
+      argument3[0]
+    ];
+
+    expect(service["getSeasonScoreArray"](argument1, argument2, argument3)).toEqual(expectedValue);
+  });
+
+  it("getSeasonScoreArray, betArray empty, no offset", () => {
+    const argument1: SeasonBet[] = [];
+    const argument2: SeasonResult[] = [
+      {
+        documentId: "test_doc_id_10",
+        season: 2020,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_11",
+        season: 2020,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_12",
+        season: 2020,
+        place: -1,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_13",
+        season: 2020,
+        place: -2,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_14",
+        season: 2020,
+        place: -3,
+        teamId: 106
+      }
+    ];
+
+    spyOn<any>(service, "identifyUsers")
+      .and.returnValue([]);
+
+    const expectedValue: Score[] = [];
+
+    expect(service["getSeasonScoreArray"](argument1, argument2)).toEqual(expectedValue);
+  });
+
+  it("getSeasonScoreArray, resultArray empty, no offset", () => {
+    const argument1: SeasonBet[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 1,
+        teamId: 100
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 2,
+        teamId: 200
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -2,
+        teamId: 164
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: -3,
+        teamId: 106
+      },
+      {
+        documentId: "test_doc_id_0",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: 2,
+        teamId: 201
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -1,
+        teamId: 121
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -2,
+        teamId: 165
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: 2020,
+        userId: "test_user_id_1",
+        isFixed: true,
+        place: -3,
+        teamId: 107
+      }
+    ];
+
+    const argument2: SeasonResult[] = [];
+
+    const initialScore: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 0,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_2",
+        points: 0,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      },
+      {
+        userId: "test_user_id_3",
+        points: 0,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      }
+    ];
+
+    const singleSeasonScore: Score = {
+      userId: "",
+      points: 0,
+      matches: 0,
+      results: 0,
+      extraTop: 0,
+      extraOutsider: 0,
+      extraSeason: 0
+    };
+
+    spyOn<any>(service, "identifyUsers")
+      .and.returnValue(["test_user_id_1", "test_user_id_2", "test_user_id_3"]);
+
+    spyOn<any>(service, "initScore")
+      .withArgs("test_user_id_1", []).and.returnValue(initialScore[0])
+      .withArgs("test_user_id_2", []).and.returnValue(initialScore[1])
+      .withArgs("test_user_id_3", []).and.returnValue(initialScore[2]);
+
+    pointCalculatorSpy.calcSingleSeasonScore
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_1"), []).and.returnValue(singleSeasonScore)
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_2"), []).and.returnValue(singleSeasonScore)
+      .withArgs(argument1.filter(bet => bet.userId == "test_user_id_3"), []).and.returnValue(singleSeasonScore);
+
+    const expectedValue: Score[] = initialScore;
+
+    expect(service["getSeasonScoreArray"](argument1, argument2)).toEqual(expectedValue);
+  });
+
+  it("getSeasonScoreArray, all inputs empty", () => {
+    const argument1: SeasonBet[] = [];
+    const argument2: SeasonResult[] = [];
+
+    spyOn<any>(service, "identifyUsers").and.returnValue([]);
+
+    const expectedValue: Score[] = [];
+
+    expect(service["getSeasonScoreArray"](argument1, argument2)).toEqual(expectedValue);
+  });
+
+  // ---------------------------------------------------------------------------
+  // addScores
+  // ---------------------------------------------------------------------------
+
+
+  it("getSeasonScoreArray, straight forward", () => {
+    const argument1: Score = {
+      userId: "test_user_id_1",
+      points: 30,
+      matches: 18,
+      results: 5,
+      extraTop: 3,
+      extraOutsider: 3,
+      extraSeason: 1
+    };
+    const argument2: Score = {
+      userId: "test_user_id_1",
+      points: 4,
+      matches: 2,
+      results: 1,
+      extraTop: 0,
+      extraOutsider: 1,
+      extraSeason: 0
+    };
+    const expectedValue: Score = {
+      userId: "test_user_id_1",
+      points: 34,
+      matches: 20,
+      results: 6,
+      extraTop: 3,
+      extraOutsider: 4,
+      extraSeason: 1
+    };
+
+    expect(service["addScores"](argument1, argument2)).toEqual(expectedValue);
+  });
+
+  it("getSeasonScoreArray, different user names", () => {
+    const argument1: Score = {
+      userId: "test_user_id_1",
+      points: 30,
+      matches: 18,
+      results: 5,
+      extraTop: 3,
+      extraOutsider: 3,
+      extraSeason: 1
+    };
+    const argument2: Score = {
+      userId: "test_user_id_2",
+      points: 4,
+      matches: 2,
+      results: 1,
+      extraTop: 0,
+      extraOutsider: 1,
+      extraSeason: 0
+    };
+    const expectedValue: Score = {
+      userId: "test_user_id_1",
+      points: 34,
+      matches: 20,
+      results: 6,
+      extraTop: 3,
+      extraOutsider: 4,
+      extraSeason: 1
+    };
+
+    expect(service["addScores"](argument1, argument2)).toEqual(expectedValue);
   });
 });

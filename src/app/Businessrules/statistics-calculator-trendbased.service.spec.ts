@@ -344,7 +344,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   // identifyUsers
   // ---------------------------------------------------------------------------
 
-  it("identifyUsers, 2 matches, 3 users, offset not given", () => {
+  it("identifyUsers, one argument. Objects with duplicated user IDs", () => {
     const argument1: Bet[] = [
       {
         documentId: "test_id",
@@ -396,67 +396,8 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       }
     ];
 
-    const argument2: Score[] = [];
-
     const expectedValue: string[] = ["test_user_id_1", "test_user_id_2", "test_user_id_3"];
-    expect(service["identifyUsers"](argument1, argument2)).toEqual(expectedValue);
-  });
-
-  it("identifyUsers, 2 matches, 3 users, one user without bets set, offset not given", () => {
-    const argument1: Bet[] = [
-      {
-        documentId: "test_id",
-        matchId: 1,
-        userId: "test_user_id_1",
-        isFixed: false,
-        goalsHome: -1,
-        goalsAway: -1
-      },
-      {
-        documentId: "test_id",
-        matchId: 2,
-        userId: "test_user_id_1",
-        isFixed: false,
-        goalsHome: -1,
-        goalsAway: -1
-      },
-      {
-        documentId: "test_id",
-        matchId: 1,
-        userId: "test_user_id_2",
-        isFixed: true,
-        goalsHome: -1,
-        goalsAway: -1
-      },
-      {
-        documentId: "test_id",
-        matchId: 2,
-        userId: "test_user_id_2",
-        isFixed: true,
-        goalsHome: 4,
-        goalsAway: 1
-      },
-      {
-        documentId: "test_id",
-        matchId: 1,
-        userId: "test_user_id_3",
-        isFixed: true,
-        goalsHome: 1,
-        goalsAway: 2
-      },
-      {
-        documentId: "test_id",
-        matchId: 2,
-        userId: "test_user_id_3",
-        isFixed: true,
-        goalsHome: 1,
-        goalsAway: 1
-      }
-    ];
-    const argument2: Score[] = [];
-
-    const expectedValue: string[] = ["test_user_id_1", "test_user_id_2", "test_user_id_3"];
-    expect(service["identifyUsers"](argument1, argument2)).toEqual(expectedValue);
+    expect(service["identifyUsers"](argument1)).toEqual(expectedValue);
   });
 
   it("identifyUsers, bet array empty, no offset given", () => {
@@ -467,9 +408,18 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     expect(service["identifyUsers"](argument1, argument2)).toEqual(expectedValue);
   });
 
-  it("identifyUsers, bet array empty, offset given", () => {
-    const argument1: Bet[] = [];
+  it("identifyUsers, first argument empty, second argument given", () => {
+    const argument1: Score[] = [];
     const argument2: Score[] = [
+      {
+        userId: "test_user_id_3",
+        points: 39,
+        matches: 25,
+        results: 4,
+        extraTop: 5,
+        extraOutsider: 2,
+        extraSeason: 3
+      },
       {
         userId: "test_user_id_1",
         points: 42,
@@ -487,15 +437,6 @@ describe('StatisticsCalculatorTrendbasedService', () => {
         extraTop: 5,
         extraOutsider: 4,
         extraSeason: 1
-      },
-      {
-        userId: "test_user_id_3",
-        points: 39,
-        matches: 25,
-        results: 4,
-        extraTop: 5,
-        extraOutsider: 2,
-        extraSeason: 3
       }
     ];
 
@@ -503,7 +444,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     expect(service["identifyUsers"](argument1, argument2)).toEqual(expectedValue);
   });
 
-  it("identifyUsers, bet array and offset given, same users present", () => {
+  it("identifyUsers, two arguments given, same users present", () => {
     const argument1: Bet[] = [
       {
         documentId: "test_id",
@@ -565,24 +506,24 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     expect(service["identifyUsers"](argument1, argument2)).toEqual(expectedValue);
   });
 
-  it("identifyUsers, bet array and offset given, minimal intersection", () => {
-    const argument1: Bet[] = [
+  it("identifyUsers, two inputs given, minimal intersection", () => {
+    const argument1: SeasonBet[] = [
       {
         documentId: "test_id",
-        matchId: 2,
-        userId: "test_user_id_2",
+        season: 2020,
+        userId: "test_user_id_3",
         isFixed: true,
-        goalsHome: 4,
-        goalsAway: 1
+        place: 1,
+        teamId: 14
       },
       {
         documentId: "test_id",
-        matchId: 1,
-        userId: "test_user_id_3",
+        season: 2020,
+        userId: "test_user_id_2",
         isFixed: true,
-        goalsHome: 1,
-        goalsAway: 2
-      }
+        place: 1,
+        teamId: 35
+      },
     ];
 
     const argument2: Score[] = [
@@ -608,6 +549,78 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
     const expectedValue: string[] = ["test_user_id_1", "test_user_id_2", "test_user_id_3"];
     expect(service["identifyUsers"](argument1, argument2)).toEqual(expectedValue);
+  });
+
+  it("identifyUsers, three inputs given, with intersecting and adding elements", () => {
+    const argument1: SeasonBet[] = [
+      {
+        documentId: "test_id",
+        season: 2020,
+        userId: "test_user_id_3",
+        isFixed: true,
+        place: 1,
+        teamId: 14
+      },
+      {
+        documentId: "test_id",
+        season: 2020,
+        userId: "test_user_id_2",
+        isFixed: true,
+        place: 1,
+        teamId: 35
+      },
+    ];
+
+    const argument2: Score[] = [
+      {
+        userId: "test_user_id_1",
+        points: 42,
+        matches: 28,
+        results: 8,
+        extraTop: 3,
+        extraOutsider: 2,
+        extraSeason: 1
+      },
+      {
+        userId: "test_user_id_2",
+        points: 42,
+        matches: 26,
+        results: 6,
+        extraTop: 4,
+        extraOutsider: 4,
+        extraSeason: 2
+      }
+    ];
+
+    const argument3: Bet[] = [
+      {
+        documentId: "test_id",
+        matchId: 1,
+        userId: "test_user_id_4",
+        isFixed: false,
+        goalsHome: -1,
+        goalsAway: -1
+      },
+      {
+        documentId: "test_id",
+        matchId: 2,
+        userId: "test_user_id_4",
+        isFixed: true,
+        goalsHome: 4,
+        goalsAway: 1
+      },
+      {
+        documentId: "test_id",
+        matchId: 1,
+        userId: "test_user_id_5",
+        isFixed: true,
+        goalsHome: 1,
+        goalsAway: 2
+      }
+    ];
+
+    const expectedValue: string[] = ["test_user_id_1", "test_user_id_2", "test_user_id_3", "test_user_id_4", "test_user_id_5"];
+    expect(service["identifyUsers"](argument1, argument2, argument3)).toEqual(expectedValue);
   });
 
   // ---------------------------------------------------------------------------

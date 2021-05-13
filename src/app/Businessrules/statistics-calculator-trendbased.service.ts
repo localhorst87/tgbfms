@@ -106,15 +106,17 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     return score1;
   }
 
-  private identifyUsers(betArray: any[], offset: Score[]): string[] {
-    // identifies all the users whose bets are present in betArray and returns
-    // an array of unique user IDs. betArray must satisfy the userId property,
-    // thus it can be either a Bet oder SeasonBet
+  private identifyUsers(inputArray: any[], ...furtherArrays: any[]): string[] {
+    // identifies all unique user IDs that are present in objects of inputArray
+    // and furtherArrays, and sorts them by userId.
+    // the objects in inputArray and furtherArrays must fulfill a string property
+    // called userId!
 
-    let usersBet: string[] = betArray.map(bet => bet.userId); // filters user IDs
-    let usersTable: string[] = offset.map(score => score.userId);
-    let usersUnion: string[] = usersBet.concat(usersTable); // combines both userId arrays
-    let uniqueUsers: string[] = usersUnion.filter((val, idx, arr) => arr.indexOf(val) === idx); // makes IDs unique
+    let users: string[] = inputArray.map((el: any) => el.userId); // filters user IDs
+    for (let anotherArray of furtherArrays) {
+      users = users.concat(anotherArray.map((el: any) => el.userId)); // concats user IDs
+    }
+    let uniqueUsers: string[] = users.filter((val, idx, arr) => arr.indexOf(val) === idx); // makes IDs unique
 
     return uniqueUsers.sort();
   }

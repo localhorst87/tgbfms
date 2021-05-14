@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { COLLECTION_NAME_BETS, COLLECTION_NAME_MATCHES, COLLECTION_NAME_RESULTS, COLLECTION_NAME_TEAMS, COLLECTION_NAME_USERS } from './appdata-access-firestore.service';
 import { Bet, Result, Match, User, Team } from '../Businessrules/basic_datastructures';
+import { MatchdayScoreSnapshot } from './import_datastructures';
 
 describe('AppdataAccessFirestoreService', () => {
   let service: AppdataAccessFirestoreService;
@@ -893,4 +894,139 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
+  // ---------------------------------------------------------------------------
+  // getMatchdayScoreSnapshot$
+  // ---------------------------------------------------------------------------
+
+  it("getMatchdayScoreSnapshot$, one dataset", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 17;
+
+    const targetSnap: MatchdayScoreSnapshot = {
+      documentId: "target_id",
+      season: argument1,
+      matchday: argument2,
+      userId: ["test_user_id_0", "test_user_id_1"],
+      points: [9, 8],
+      matches: [6, 5],
+      results: [2, 1],
+      extraTop: [1, 0],
+      extraOutsider: [0, 2],
+      extraSeason: [0, 0]
+    };
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetSnap])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: MatchdayScoreSnapshot[] = [targetSnap];
+
+    let i: number = 0;
+    service["getMatchdayScoreSnapshot$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getMatchdayScoreSnapshot$, dataset available twice", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 17;
+
+    const targetSnap: MatchdayScoreSnapshot = {
+      documentId: "target_id",
+      season: argument1,
+      matchday: argument2,
+      userId: ["test_user_id_0", "test_user_id_1"],
+      points: [9, 8],
+      matches: [6, 5],
+      results: [2, 1],
+      extraTop: [1, 0],
+      extraOutsider: [0, 2],
+      extraSeason: [0, 0]
+    };
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetSnap, targetSnap])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: MatchdayScoreSnapshot[] = [targetSnap];
+
+    let i: number = 0;
+    service["getMatchdayScoreSnapshot$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getMatchdayScoreSnapshot$, dataset emitted twice", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 17;
+
+    const targetSnap: MatchdayScoreSnapshot = {
+      documentId: "target_id",
+      season: argument1,
+      matchday: argument2,
+      userId: ["test_user_id_0", "test_user_id_1"],
+      points: [9, 8],
+      matches: [6, 5],
+      results: [2, 1],
+      extraTop: [1, 0],
+      extraOutsider: [0, 2],
+      extraSeason: [0, 0]
+    };
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetSnap], [targetSnap])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: MatchdayScoreSnapshot[] = [targetSnap];
+
+    let i: number = 0;
+    service["getMatchdayScoreSnapshot$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getMatchdayScoreSnapshot$, no dataset available", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 17;
+
+    const unknownSnap: MatchdayScoreSnapshot = {
+      documentId: "",
+      season: argument1,
+      matchday: argument2,
+      userId: [],
+      points: [],
+      matches: [],
+      results: [],
+      extraTop: [],
+      extraOutsider: [],
+      extraSeason: []
+    };
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: MatchdayScoreSnapshot[] = [unknownSnap];
+
+    let i: number = 0;
+    service["getMatchdayScoreSnapshot$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
 });

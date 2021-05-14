@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Bet, Match, Result, Team, User } from '../Businessrules/basic_datastructures';
+import { MatchdayScoreSnapshot } from './import_datastructures';
 
 @Injectable()
 export abstract class AppdataAccessService {
@@ -15,10 +16,13 @@ export abstract class AppdataAccessService {
   public abstract getTeamNameByTeamId$(teamId: number, shortName?: boolean): Observable<string>;
   public abstract getActiveUserIds$(): Observable<string>;
   public abstract getUserDataById$(userId: string): Observable<User>;
+  public abstract getMatchdayScoreSnapshot$(season: number, matchday: number): Observable<MatchdayScoreSnapshot>;
   public abstract addBet(bet: Bet): void;
   public abstract addMatch(match: Match): void;
   public abstract addResult(result: Result): void;
+  public abstract addMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void;
   public abstract updateBet(documentId: string, bet: Bet): void;
   public abstract updateMatch(documentId: string, match: Match): void;
   public abstract updateResult(documentId: string, result: Result): void;
+  public abstract updateMatchdayScoreSnapshot(documentId: string, snapshot: MatchdayScoreSnapshot): void;
 }

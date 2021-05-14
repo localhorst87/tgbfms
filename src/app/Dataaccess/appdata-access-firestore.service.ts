@@ -6,12 +6,14 @@ import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument 
 import firebase from 'firebase/app';
 import Timestamp = firebase.firestore.Timestamp;
 import { Bet, Match, Result, Team, User } from '../Businessrules/basic_datastructures';
+import { MatchdayScoreSnapshot } from './import_datastructures';
 
 export const COLLECTION_NAME_BETS: string = 'bets';
 export const COLLECTION_NAME_MATCHES: string = 'matches';
 export const COLLECTION_NAME_RESULTS: string = 'results';
 export const COLLECTION_NAME_TEAMS: string = 'teams';
 export const COLLECTION_NAME_USERS: string = 'users';
+export const COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT: string = 'matchday_score_snapshots';
 const SECONDS_PER_DAY: number = 86400;
 
 @Injectable()
@@ -265,6 +267,27 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
+  getMatchdayScoreSnapshot$(season: number, matchday: number): Observable<MatchdayScoreSnapshot> {
+    // returns the MatchdayScoreSnapshot according to the given arguments
+
+    let snapshotQuery$: Observable<MatchdayScoreSnapshot[]> = this.firestore.collection<MatchdayScoreSnapshot>(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT, ref =>
+      ref.where("season", "==", season).where("matchday", "==", matchday))
+      .valueChanges({ idField: 'documentId' });
+
+    return snapshotQuery$.pipe(
+      take(1),
+      map((scoreSnapshot: MatchdayScoreSnapshot[]) => {
+        if (scoreSnapshot.length == 0) {
+          return this.makeUnknownScoreSnapshot(season, matchday);
+        }
+        else {
+          return scoreSnapshot[0];
+        }
+      }),
+      distinct()
+    );
+  }
+
   addMatch(match: Match): void {
     let matchToWrite: any = match;
     delete matchToWrite.documentId;
@@ -281,6 +304,12 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     let resultToWrite: any = result;
     delete resultToWrite.documentId;
     this.firestore.collection(COLLECTION_NAME_RESULTS).add(resultToWrite);
+  }
+
+  addMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void {
+    let snapshotToWrite: any = snapshot;
+    delete snapshotToWrite.documentId;
+    this.firestore.collection(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT).add(snapshotToWrite);
   }
 
   updateMatch(documentId: string, match: Match): void {
@@ -305,6 +334,14 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let resultDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_RESULTS + "/" + documentId);
     resultDocument.update(resultToUpdate);
+  }
+
+  updateMatchdayScoreSnapshot(documentId: string, snapshot: MatchdayScoreSnapshot): void {
+    let snapshotToUpdate: any = snapshot;
+    delete snapshotToUpdate.documentId;
+
+    let snapshotDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT + "/" + documentId);
+    snapshotDocument.update(snapshotToUpdate);
   }
 
   private makeUnknownMatch(matchId: number): Match {
@@ -357,6 +394,23 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       displayName: "unknown user",
       isAdmin: false,
       isActive: false
+    };
+  }
+
+  private makeUnknownScoreSnapshot(season: number, matchday: number): MatchdayScoreSnapshot {
+    // returns an unknown dummy MatchdayScoreSnapshot
+
+    return {
+      documentId: "",
+      season: season,
+      matchday: matchday,
+      userId: [],
+      points: [],
+      matches: [],
+      results: [],
+      extraTop: [],
+      extraOutsider: [],
+      extraSeason: []
     };
   }
 

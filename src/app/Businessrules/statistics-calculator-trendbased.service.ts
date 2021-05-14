@@ -8,22 +8,22 @@ import { PointCalculatorService } from './point-calculator.service';
 export class StatisticsCalculatorTrendbasedService implements StatisticsCalculatorService {
   constructor(private pointCalculator: PointCalculatorService) { }
 
-  getScoreArray(matchArray: Match[], betArray: Bet[], resultArray: Result[], offset: Score[] = []): Score[] {
-    // calculates all scores from the given bets, results and score offsets
-    // for the matches given in the matchArray, sorted by user id
+  getScoreArray(matchArray: Match[], betArray: Bet[], resultArray: Result[]): Score[] {
+    // calculates all scores from the given bets, results for the matches given
+    // in the matchArray, returns the Score sorted alphabetically by userId
 
     let scores: Score[] = [];
-
-    let availableUsers: string[] = this.identifyUsers(betArray, offset);
+    let availableUsers: string[] = this.identifyUsers(betArray);
 
     for (let userId of availableUsers) {
-      let scoreUser: Score = this.initScore(userId, offset);
+      let scoreUser: Score = this.initScore(userId);
 
       for (let match of matchArray) {
         let betUser: Bet = this.extractBet(betArray, match.matchId, userId);
         let allMatchBets: Bet[] = betArray.filter(bet => bet.matchId == match.matchId);
         let result: Result = this.extractResult(resultArray, match.matchId);
         let matchScore: Score = this.pointCalculator.calcSingleMatchScore(userId, allMatchBets, result, match);
+
         scoreUser = this.addScores(scoreUser, matchScore);
       }
 
@@ -33,15 +33,14 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     return scores;
   }
 
-  getSeasonScoreArray(betArray: SeasonBet[], resultArray: SeasonResult[], offset: Score[] = []): Score[] {
+  getSeasonScoreArray(betArray: SeasonBet[], resultArray: SeasonResult[]): Score[] {
     // calculates all scores of the given bets and results, sorted by user id
 
     let scores: Score[] = [];
-
-    let availableUsers: string[] = this.identifyUsers(betArray, offset);
+    let availableUsers: string[] = this.identifyUsers(betArray);
 
     for (let userId of availableUsers) {
-      let scoreUser: Score = this.initScore(userId, offset);
+      let scoreUser: Score = this.initScore(userId);
       let betArrayUser: SeasonBet[] = betArray.filter(bet => bet.userId == userId);
       let seasonScore = this.pointCalculator.calcSingleSeasonScore(betArrayUser, resultArray);
 
@@ -106,6 +105,27 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     return score1;
   }
 
+  addScoreArrays(scoreArray: Score[], ...furtherScoreArrays: Score[][]): Score[] {
+    // adds all the Score elements given in the scoreArray and furtherScoreArrays
+    // returns the Scores alphabetically according to the userId
+
+    let scores: Score[] = [];
+    let availableUsers: string[] = this.identifyUsers(scoreArray, ...furtherScoreArrays);
+
+    for (let userId of availableUsers) {
+      let scoreUser: Score = this.initScore(userId, scoreArray);
+
+      for (let scoreArrayToAdd of furtherScoreArrays) {
+        let scoreToAdd: Score = this.extractScore(scoreArrayToAdd, userId);
+        scoreUser = this.addScores(scoreUser, scoreToAdd);
+      }
+
+      scores.push(scoreUser);
+    }
+
+    return scores;
+  }
+
   private identifyUsers(inputArray: any[], ...furtherArrays: any[]): string[] {
     // identifies all unique user IDs that are present in objects of inputArray
     // and furtherArrays, and sorts them by userId.
@@ -121,7 +141,7 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     return uniqueUsers.sort();
   }
 
-  private initScore(userId: string, offset: Score[]): Score {
+  private initScore(userId: string, offset: Score[] = []): Score {
     // returns the Score from the offset table. If the userId is not
     // available in the offset, or the offset table is empty, a zero point
     // Score will be emitted
@@ -182,5 +202,28 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
         goalsAway: -1
       };
     }
+  }
+
+  private extractScore(scoreArray: Score[], userId: string): Score {
+    // extracts the Score with the given userId from scoreArray.
+    // If the conditions are not met, a default zero value will be returned
+
+    let idx: number = scoreArray.findIndex(score => score.userId == userId);
+
+    if (idx >= 0) {
+      return scoreArray[idx];
+    }
+    else {
+      return {
+        userId: userId,
+        points: 0,
+        matches: 0,
+        results: 0,
+        extraTop: 0,
+        extraOutsider: 0,
+        extraSeason: 0
+      };
+    }
+
   }
 }

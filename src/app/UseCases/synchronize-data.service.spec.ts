@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
-import { MatchImportData } from '../Dataaccess/matchdata_datastructures';
+import { MatchImportData } from '../Dataaccess/import_datastructures';
 import { Bet, Match, Result, Team } from '../Businessrules/basic_datastructures';
 import { SynchronizeDataService } from './synchronize-data.service';
 import { of, from } from 'rxjs';

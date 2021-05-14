@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
-import { MatchImportData } from '../Dataaccess/matchdata_datastructures';
+import { MatchImportData } from '../Dataaccess/import_datastructures';
 import { Bet, Match, Result, Team } from '../Businessrules/basic_datastructures';
 
 @Injectable({

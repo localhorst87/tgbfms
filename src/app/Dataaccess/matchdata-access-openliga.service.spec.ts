@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { MatchdataAccessOpenligaService } from './matchdata-access-openliga.service';
-import { MatchImportData } from './matchdata_datastructures';
+import { MatchImportData } from './import_datastructures';
 
 describe('MatchdataAccessOpenligaService', () => {
   let service: MatchdataAccessOpenligaService;

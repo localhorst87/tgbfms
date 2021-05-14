@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { MatchImportData } from './matchdata_datastructures';
+import { MatchImportData } from './import_datastructures';
 import { MatchdataAccessService } from './matchdata-access.service';
 
 const URL_TRUNK: string = "https://www.openligadb.de/api/getmatchdata/bl1";

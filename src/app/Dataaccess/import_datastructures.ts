@@ -21,3 +21,14 @@ export interface MatchdayScoreSnapshot {
   extraOutsider: number[];
   extraSeason: number[];
 }
+
+export interface TeamRankingImportData {
+  teamId: number;
+  matches: number;
+  points: number;
+  won: number;
+  draw: number;
+  lost: number;
+  goals: number;
+  goalsAgainst: number;
+}

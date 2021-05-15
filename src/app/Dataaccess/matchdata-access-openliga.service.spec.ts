@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { MatchdataAccessOpenligaService } from './matchdata-access-openliga.service';
-import { MatchImportData } from './import_datastructures';
+import { MatchImportData, TeamRankingImportData } from './import_datastructures';
 
 describe('MatchdataAccessOpenligaService', () => {
   let service: MatchdataAccessOpenligaService;
@@ -280,6 +280,135 @@ describe('MatchdataAccessOpenligaService', () => {
       );
   });
 
+  // ---------------------------------------------------------------------------
+  // convertRankingJson$
+  // ---------------------------------------------------------------------------
+
+  it("convertRankingJson$, ranking available", (done: DoneFn) => {
+    const argument: any[] = [
+      {
+        "Draw": 5,
+        "Goals": 92,
+        "Lost": 4,
+        "Matches": 32,
+        "OpponentGoals": 40,
+        "Points": 74,
+        "TeamInfoId": 40,
+        "Won": 23
+      },
+      {
+        "Draw": 7,
+        "Goals": 57,
+        "Lost": 6,
+        "Matches": 32,
+        "OpponentGoals": 28,
+        "Points": 64,
+        "TeamInfoId": 1635,
+        "Won": 19
+      },
+      {
+        "Draw": 9,
+        "Goals": 57,
+        "Lost": 6,
+        "Matches": 32,
+        "OpponentGoals": 32,
+        "Points": 60,
+        "TeamInfoId": 131,
+        "Won": 17
+      }
+    ];
+
+    const expectedValues: TeamRankingImportData[] = [
+      {
+        teamId: 40,
+        matches: 32,
+        points: 74,
+        won: 23,
+        draw: 5,
+        lost: 4,
+        goals: 92,
+        goalsAgainst: 40
+      },
+      {
+        teamId: 1635,
+        matches: 32,
+        points: 64,
+        won: 19,
+        draw: 7,
+        lost: 6,
+        goals: 57,
+        goalsAgainst: 28
+      },
+      {
+        teamId: 131,
+        matches: 32,
+        points: 60,
+        won: 17,
+        draw: 9,
+        lost: 6,
+        goals: 57,
+        goalsAgainst: 32
+      }
+    ];
+
+    let i: number = 0;
+    service["convertRankingJson$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("convertRankingJson$, no ranking available", (done: DoneFn) => {
+    const argument: any = [];
+    const defaultValue: TeamRankingImportData = {
+      teamId: -1,
+      matches: -1,
+      points: -1,
+      won: -1,
+      draw: -1,
+      lost: -1,
+      goals: -1,
+      goalsAgainst: -1
+    };
+
+    let i: number = 0;
+    service["convertRankingJson$"](argument).pipe(
+      defaultIfEmpty(defaultValue)).subscribe(
+        val => {
+          expect(val).toEqual(defaultValue);
+          done();
+        }
+      );
+  });
+
+  it("convertRankingJson$, received http error as argument", (done: DoneFn) => {
+    const argument = new HttpErrorResponse({
+      error: 'test error',
+      status: 400,
+      statusText: 'bad request'
+    });
+    const defaultValue: TeamRankingImportData = {
+      teamId: -1,
+      matches: -1,
+      points: -1,
+      won: -1,
+      draw: -1,
+      lost: -1,
+      goals: -1,
+      goalsAgainst: -1
+    };
+
+    let i: number = 0;
+    service["convertRankingJson$"](argument).pipe(
+      defaultIfEmpty(defaultValue)).subscribe(
+        val => {
+          expect(val).toEqual(defaultValue);
+          done();
+        }
+      );
+  });
 
   // ---------------------------------------------------------------------------
   // importMatchdata$
@@ -373,6 +502,118 @@ describe('MatchdataAccessOpenligaService', () => {
 
     let i: number = 0;
     service["importMatchdata$"](argument1, argument2).pipe(
+      defaultIfEmpty(defaultValue)).subscribe(
+        val => {
+          expect(val).toEqual(defaultValue);
+          done();
+        }
+      );
+  });
+
+  // ---------------------------------------------------------------------------
+  // importCurrentTeamRanking$
+  // ---------------------------------------------------------------------------
+
+  it("importCurrentTeamRanking$, ranking available", (done: DoneFn) => {
+    const argument: number = 2020;
+
+    const jsonArray: any[] = [
+      {
+        "Draw": 5,
+        "Goals": 92,
+        "Lost": 4,
+        "Matches": 32,
+        "OpponentGoals": 40,
+        "Points": 74,
+        "TeamInfoId": 40,
+        "Won": 23
+      },
+      {
+        "Draw": 7,
+        "Goals": 57,
+        "Lost": 6,
+        "Matches": 32,
+        "OpponentGoals": 28,
+        "Points": 64,
+        "TeamInfoId": 1635,
+        "Won": 19
+      },
+      {
+        "Draw": 9,
+        "Goals": 57,
+        "Lost": 6,
+        "Matches": 32,
+        "OpponentGoals": 32,
+        "Points": 60,
+        "TeamInfoId": 131,
+        "Won": 17
+      }
+    ];
+
+    const expectedValues: TeamRankingImportData[] = [
+      {
+        teamId: 40,
+        matches: 32,
+        points: 74,
+        won: 23,
+        draw: 5,
+        lost: 4,
+        goals: 92,
+        goalsAgainst: 40
+      },
+      {
+        teamId: 1635,
+        matches: 32,
+        points: 64,
+        won: 19,
+        draw: 7,
+        lost: 6,
+        goals: 57,
+        goalsAgainst: 28
+      },
+      {
+        teamId: 131,
+        matches: 32,
+        points: 60,
+        won: 17,
+        draw: 9,
+        lost: 6,
+        goals: 57,
+        goalsAgainst: 32
+      }
+    ];
+
+    httpClientSpy.get.and.returnValue(of(jsonArray));
+    spyOn<any>(service, "convertRankingJson$").withArgs(jsonArray).and.returnValue(from(expectedValues));
+
+    let i: number = 0;
+    service["importCurrentTeamRanking$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("importCurrentTeamRanking$, ranking not available", (done: DoneFn) => {
+    const argument: number = 2022;
+
+    const defaultValue: TeamRankingImportData = {
+      teamId: -1,
+      matches: -1,
+      points: -1,
+      won: -1,
+      draw: -1,
+      lost: -1,
+      goals: -1,
+      goalsAgainst: -1
+    };
+
+    httpClientSpy.get.and.returnValue(of([]));
+    spyOn<any>(service, "convertRankingJson$").withArgs([]).and.returnValue(from([]));
+
+    let i: number = 0;
+    service["importCurrentTeamRanking$"](argument).pipe(
       defaultIfEmpty(defaultValue)).subscribe(
         val => {
           expect(val).toEqual(defaultValue);

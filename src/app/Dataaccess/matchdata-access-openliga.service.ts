@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { MatchImportData } from './import_datastructures';
+import { MatchImportData, TeamRankingImportData } from './import_datastructures';
 import { MatchdataAccessService } from './matchdata-access.service';
 
-const URL_TRUNK: string = "https://www.openligadb.de/api/getmatchdata/bl1";
+const URL_TRUNK_MATCHES: string = "https://www.openligadb.de/api/getmatchdata/bl1";
+const URL_TRUNK_RANKING: string = "https://www.openligadb.de/api/getbltable/bl1";
 
 @Injectable()
 export class MatchdataAccessOpenligaService implements MatchdataAccessService {
@@ -15,9 +16,18 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     // imports the data of the given season and matchday
     // and extracts the required information to MatchImportData
 
-    let fullUrl: string = URL_TRUNK + "/" + String(season) + "/" + String(matchday);
+    let fullUrl: string = URL_TRUNK_MATCHES + "/" + String(season) + "/" + String(matchday);
     return this.http.get(fullUrl, { responseType: 'json' }).pipe(
       switchMap(matchdayData => this.convertMatchdayJson$(matchdayData))
+    );
+  }
+
+  importCurrentTeamRanking$(season: number): Observable<TeamRankingImportData> {
+    //
+
+    let fullUrl: string = URL_TRUNK_RANKING + "/" + String(season);
+    return this.http.get(fullUrl, { responseType: 'json' }).pipe(
+      switchMap(rankingData => this.convertRankingJson$(rankingData))
     );
   }
 
@@ -48,6 +58,34 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     }
 
     return from(matchArray);
+  }
+
+  private convertRankingJson$(rankingJson: any): Observable<TeamRankingImportData> {
+    // converts the openligadb structure to TeamRankingImportData structure
+
+    let rankingArray: TeamRankingImportData[] = [];
+
+    if (!("error" in rankingJson)) {
+      // http error throws object with error property
+      // error response will result in empty matchArray
+
+      for (let team of rankingJson) {
+        let rankingElement: TeamRankingImportData = {
+          teamId: team.TeamInfoId,
+          matches: team.Matches,
+          points: team.Points,
+          won: team.Won,
+          draw: team.Draw,
+          lost: team.Lost,
+          goals: team.Goals,
+          goalsAgainst: team.OpponentGoals
+        };
+        rankingArray.push(rankingElement);
+      }
+
+    }
+
+    return from(rankingArray);
   }
 
   private extractResult(matchJson: any): number[] {

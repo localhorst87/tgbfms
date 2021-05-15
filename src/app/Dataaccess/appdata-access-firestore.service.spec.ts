@@ -6,7 +6,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { of } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { COLLECTION_NAME_BETS, COLLECTION_NAME_MATCHES, COLLECTION_NAME_RESULTS, COLLECTION_NAME_TEAMS, COLLECTION_NAME_USERS } from './appdata-access-firestore.service';
-import { Bet, Result, Match, User, Team } from '../Businessrules/basic_datastructures';
+import { Bet, Result, Match, User, Team, SeasonBet } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot } from './import_datastructures';
 
 describe('AppdataAccessFirestoreService', () => {
@@ -108,6 +108,237 @@ describe('AppdataAccessFirestoreService', () => {
     service["getBet$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
+        done();
+      }
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // getSeasonBets$
+  // ---------------------------------------------------------------------------
+
+  it("getSeasonBets$, data available", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: string = "test_user_id";
+
+    const targetBets: SeasonBet[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -3,
+        teamId: 13,
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -2,
+        teamId: 12,
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -1,
+        teamId: 11,
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: 1,
+        teamId: 101,
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: 2,
+        teamId: 102,
+      }
+    ];
+
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of(targetBets)) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: SeasonBet[] = targetBets;
+
+    let i: number = 0;
+    service["getSeasonBets$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getSeasonBets$, same dataset twice", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: string = "test_user_id";
+
+    const targetBets: SeasonBet[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -3,
+        teamId: 13
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -2,
+        teamId: 12
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -1,
+        teamId: 11
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: 2,
+        teamId: 102
+      }
+    ];
+
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of(targetBets, targetBets)) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: SeasonBet[] = targetBets;
+
+    let i: number = 0;
+    service["getSeasonBets$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getSeasonBets$, emitting twice", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: string = "test_user_id";
+
+    const targetBets: SeasonBet[] = [
+      {
+        documentId: "test_doc_id_0",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -3,
+        teamId: 13
+      },
+      {
+        documentId: "test_doc_id_1",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -2,
+        teamId: 12
+      },
+      {
+        documentId: "test_doc_id_2",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -1,
+        teamId: 11
+      },
+      {
+        documentId: "test_doc_id_3",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "test_doc_id_4",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: 2,
+        teamId: 102
+      }
+    ];
+
+    const collectionStub: any = {
+      valueChanges: jasmine.createSpy("valueChanges")
+        .and.returnValue(of([targetBets[0], targetBets[1], targetBets[2], targetBets[3], targetBets[4],
+        targetBets[0], targetBets[1], targetBets[2], targetBets[3], targetBets[4]]))
+    };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: SeasonBet[] = targetBets;
+
+    let i: number = 0;
+    service["getSeasonBets$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getSeasonBets$, no dataset available", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: string = "test_user_id";
+
+    const unknwonBet: SeasonBet =
+    {
+      documentId: "",
+      season: argument1,
+      userId: argument2,
+      isFixed: false,
+      place: 0,
+      teamId: -1
+    };
+
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([unknwonBet])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: SeasonBet[] = [unknwonBet];
+
+    let i: number = 0;
+    service["getSeasonBets$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
         done();
       }
     );

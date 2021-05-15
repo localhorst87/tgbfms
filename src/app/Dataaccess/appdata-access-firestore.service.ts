@@ -5,7 +5,7 @@ import { map, switchMap, distinct, take, pluck } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import firebase from 'firebase/app';
 import Timestamp = firebase.firestore.Timestamp;
-import { Bet, Match, Result, Team, User } from '../Businessrules/basic_datastructures';
+import { Bet, Match, Result, Team, User, SeasonBet } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot } from './import_datastructures';
 
 export const COLLECTION_NAME_BETS: string = 'bets';
@@ -14,6 +14,7 @@ export const COLLECTION_NAME_RESULTS: string = 'results';
 export const COLLECTION_NAME_TEAMS: string = 'teams';
 export const COLLECTION_NAME_USERS: string = 'users';
 export const COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT: string = 'matchday_score_snapshots';
+export const COLLECTION_NAME_SEASON_BETS: string = 'season_bets';
 const SECONDS_PER_DAY: number = 86400;
 
 @Injectable()
@@ -82,6 +83,26 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
 
     return match$;
+  }
+
+  getSeasonBets$(season: number, userId: string): Observable<SeasonBet> {
+    // queries the SeasonBets with the given season and userId and returns
+    // the corresponding Observable
+
+    let betQuery$: Observable<SeasonBet[]> = this.firestore.collection<SeasonBet>(COLLECTION_NAME_SEASON_BETS, ref =>
+      ref.where("season", "==", season).where("userId", "==", userId))
+      .valueChanges({ idField: 'documentId' });
+
+    return betQuery$.pipe(
+      take(1),
+      switchMap(betArray => {
+        if (betArray.length == 0) {
+          betArray.push(this.makeUnknownSeasonBet(season, userId));
+        }
+        return from(betArray);
+      }),
+      distinct()
+    );
   }
 
   getMatchesByMatchday$(season: number, matchday: number): Observable<Match> {
@@ -306,6 +327,12 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     this.firestore.collection(COLLECTION_NAME_RESULTS).add(resultToWrite);
   }
 
+  addSeasonBet(bet: SeasonBet): void {
+    let betToWrite: any = bet;
+    delete betToWrite.documentId;
+    this.firestore.collection(COLLECTION_NAME_SEASON_BETS).add(betToWrite);
+  }
+
   addMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void {
     let snapshotToWrite: any = snapshot;
     delete snapshotToWrite.documentId;
@@ -334,6 +361,14 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let resultDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_RESULTS + "/" + documentId);
     resultDocument.update(resultToUpdate);
+  }
+
+  updateSeasonBet(documentId: string, bet: SeasonBet): void {
+    let betToUpdate: any = bet;
+    delete betToUpdate.documentId;
+
+    let betDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_SEASON_BETS + "/" + documentId);
+    betDocument.update(betToUpdate);
   }
 
   updateMatchdayScoreSnapshot(documentId: string, snapshot: MatchdayScoreSnapshot): void {
@@ -411,6 +446,19 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       extraTop: [],
       extraOutsider: [],
       extraSeason: []
+    };
+  }
+
+  private makeUnknownSeasonBet(season: number, userId: string): SeasonBet {
+    // returns an unknown dummy SeasonBet
+
+    return {
+      documentId: "",
+      season: season,
+      userId: userId,
+      isFixed: false,
+      place: 0,
+      teamId: -1
     };
   }
 

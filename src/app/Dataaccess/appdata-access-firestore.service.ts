@@ -5,7 +5,7 @@ import { map, switchMap, distinct, take, pluck } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import firebase from 'firebase/app';
 import Timestamp = firebase.firestore.Timestamp;
-import { Bet, Match, Result, Team, User, SeasonBet } from '../Businessrules/basic_datastructures';
+import { Bet, Match, Result, Team, User, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot } from './import_datastructures';
 
 export const COLLECTION_NAME_BETS: string = 'bets';
@@ -15,6 +15,7 @@ export const COLLECTION_NAME_TEAMS: string = 'teams';
 export const COLLECTION_NAME_USERS: string = 'users';
 export const COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT: string = 'matchday_score_snapshots';
 export const COLLECTION_NAME_SEASON_BETS: string = 'season_bets';
+export const COLLECTION_NAME_SEASON_RESULTS: string = 'season_results';
 const SECONDS_PER_DAY: number = 86400;
 
 @Injectable()
@@ -95,12 +96,22 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     return betQuery$.pipe(
       take(1),
-      switchMap(betArray => {
-        if (betArray.length == 0) {
-          betArray.push(this.makeUnknownSeasonBet(season, userId));
-        }
-        return from(betArray);
-      }),
+      switchMap(betArray => from(betArray)),
+      distinct()
+    );
+  }
+
+  getSeasonResults$(season: number): Observable<SeasonResult> {
+    // queries the SeasonResult with the given season and returns
+    // the corresponding Observable
+
+    let resultQuery$: Observable<SeasonResult[]> = this.firestore.collection<SeasonResult>(COLLECTION_NAME_SEASON_RESULTS, ref =>
+      ref.where("season", "==", season))
+      .valueChanges({ idField: 'documentId' });
+
+    return resultQuery$.pipe(
+      take(1),
+      switchMap(resultArray => from(resultArray)),
       distinct()
     );
   }
@@ -333,6 +344,12 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     this.firestore.collection(COLLECTION_NAME_SEASON_BETS).add(betToWrite);
   }
 
+  addSeasonResult(result: SeasonResult): void {
+    let resultToWrite: any = result;
+    delete resultToWrite.documentId;
+    this.firestore.collection(COLLECTION_NAME_SEASON_RESULTS).add(resultToWrite);
+  }
+
   addMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void {
     let snapshotToWrite: any = snapshot;
     delete snapshotToWrite.documentId;
@@ -369,6 +386,14 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let betDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_SEASON_BETS + "/" + documentId);
     betDocument.update(betToUpdate);
+  }
+
+  updateSeasonResult(documentId: string, result: SeasonResult): void {
+    let resultToUpdate: any = result;
+    delete resultToUpdate.documentId;
+
+    let resultDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_SEASON_RESULTS + "/" + documentId);
+    resultDocument.update(resultToUpdate);
   }
 
   updateMatchdayScoreSnapshot(documentId: string, snapshot: MatchdayScoreSnapshot): void {

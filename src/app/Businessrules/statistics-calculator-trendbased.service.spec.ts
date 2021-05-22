@@ -31,7 +31,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
   // makePositions
   // ---------------------------------------------------------------------------
 
-  it("straight forward", () => {
+  it("makePosition, straight forward", () => {
 
     const argument: Score[] = [
       {
@@ -76,7 +76,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     expect(service["makePositions"](argument, compareFcnSpy)).toEqual(expectedValue);
   });
 
-  it("all equal", () => {
+  it("makePositions, all equal", () => {
 
     const argument: Score[] = [
       {
@@ -121,7 +121,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     expect(service["makePositions"](argument, compareFcnSpy)).toEqual(expectedValue);
   });
 
-  it("two arguments with same valuation", () => {
+  it("makePositions, two arguments with same valuation", () => {
 
     const argument: Score[] = [
       {
@@ -177,6 +177,15 @@ describe('StatisticsCalculatorTrendbasedService', () => {
       .withArgs(argument[3], argument[2]).and.returnValue(-1);
 
     const expectedValue: number[] = [1, 2, 2, 4]
+
+    expect(service["makePositions"](argument, compareFcnSpy)).toEqual(expectedValue);
+  });
+
+  it("empty score array", () => {
+    const argument: Score[] = [];
+
+    compareFcnSpy.and.returnValue(0);
+    const expectedValue: number[] = [];
 
     expect(service["makePositions"](argument, compareFcnSpy)).toEqual(expectedValue);
   });

@@ -71,8 +71,12 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
   makePositions(scores: Score[], compareFcn: (arg0: Score, arg1: Score) => number): number[] {
     // returns the position array of the sorted scores array according to the
     // given compare function compareFcn
-    let places: number[] = [1];
-    let scoresSorted: Score[] = scores.sort(compareFcn);
+    let places: number[] = [];
+
+    if (scores.length > 0) {
+      scores = scores.sort(compareFcn);
+      places.push(1);
+    }
 
     for (let i = 0; i < scores.length - 1; i++) {
       let newPlace: number;

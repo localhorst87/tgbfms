@@ -28,3 +28,14 @@ export interface BetOverviewUserData {
   betGoalsHome: number;
   betGoalsAway: number;
 }
+
+export interface TableData {
+  position: number;
+  userName: string;
+  points: number;
+  matches: number;
+  results: number;
+  extraTop: number;
+  extraOutsider: number;
+  extraSeason: number;
+}

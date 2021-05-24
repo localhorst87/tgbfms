@@ -23,7 +23,7 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
   }
 
   importCurrentTeamRanking$(season: number): Observable<TeamRankingImportData> {
-    //
+    // returns the table of the current campaign
 
     let fullUrl: string = URL_TRUNK_RANKING + "/" + String(season);
     return this.http.get(fullUrl, { responseType: 'json' }).pipe(

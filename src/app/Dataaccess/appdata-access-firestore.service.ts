@@ -4,7 +4,6 @@ import { Observable, from } from 'rxjs';
 import { map, switchMap, distinct, take, pluck } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import firebase from 'firebase/app';
-import Timestamp = firebase.firestore.Timestamp;
 import { Bet, Match, Result, Team, User, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot } from './import_datastructures';
 
@@ -135,9 +134,10 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
   getNextMatchesByTime$(nextDays: number): Observable<Match> {
     // returns all matches within the nextDays days
-    let timestampNow: Timestamp = firebase.firestore.Timestamp.fromDate(new Date());
-    let timestampFuture = new Date(Date.now() + nextDays * SECONDS_PER_DAY * 1000);
-    let timeStampNextDays = new Date(timestampFuture.getFullYear(), timestampFuture.getMonth(), timestampFuture.getDate(), 23, 59, 59); // ceil to end of day
+    let timestampNow: number = Math.floor((new Date()).getTime() / 1000);
+    let dateFuture: Date = new Date(Date.now() + nextDays * SECONDS_PER_DAY * 1000);
+    let dateNextDays: Date = new Date(dateFuture.getFullYear(), dateFuture.getMonth(), dateFuture.getDate(), 23, 59, 59); // ceil to end of day
+    let timeStampNextDays: number = Math.floor(dateNextDays.getTime() / 1000);
 
     let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
       ref.where("timestamp", ">", timestampNow).where("timestamp", "<", timeStampNextDays)
@@ -180,7 +180,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     // returns the next match that will take place. If no matches are left,
     // the function returns null
 
-    let timestampNow: Timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+    let timestampNow: number = Math.floor((new Date()).getTime() / 1000);
 
     let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
       ref.where("time", ">", timestampNow)
@@ -208,7 +208,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     // returns the last match that took place. If no match has been played yet,
     // the function returns null
 
-    let timestampNow: Timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+    let timestampNow: number = Math.floor((new Date()).getTime() / 1000);
 
     let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
       ref.where("time", "<", timestampNow)

@@ -32,3 +32,10 @@ export interface TeamRankingImportData {
   goals: number;
   goalsAgainst: number;
 }
+
+export interface SyncTime {
+  documentId: string;
+  season: number;
+  matchday: number;
+  timestamp: number;
+}

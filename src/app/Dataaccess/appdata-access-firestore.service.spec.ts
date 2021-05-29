@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { COLLECTION_NAME_BETS, COLLECTION_NAME_MATCHES, COLLECTION_NAME_RESULTS, COLLECTION_NAME_TEAMS, COLLECTION_NAME_USERS } from './appdata-access-firestore.service';
 import { Bet, Result, Match, User, Team, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
-import { MatchdayScoreSnapshot } from './import_datastructures';
+import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
 
 describe('AppdataAccessFirestoreService', () => {
   let service: AppdataAccessFirestoreService;
@@ -1446,4 +1446,114 @@ describe('AppdataAccessFirestoreService', () => {
       }
     );
   });
+
+  // ---------------------------------------------------------------------------
+  // getLastUpdateTime$
+  // ---------------------------------------------------------------------------
+
+  it("getLastUpdateTime$, one dataset", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 23;
+
+    const targetSyncTime: SyncTime = {
+      documentId: "doc_id_0",
+      season: argument1,
+      matchday: argument2,
+      timestamp: 1619980993
+    };
+
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetSyncTime])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValue: number[] = [targetSyncTime.timestamp];
+
+    let i: number = 0;
+    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getLastUpdateTime$, more than one dataset", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 23;
+
+    const targetSyncTime: SyncTime = {
+      documentId: "doc_id_0",
+      season: argument1,
+      matchday: argument2,
+      timestamp: 1619980993
+    };
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetSyncTime, targetSyncTime])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValue: number[] = [targetSyncTime.timestamp];
+
+    let i: number = 0;
+    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getLastUpdateTime$, emitting twice", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 23;
+
+    const targetSyncTime: SyncTime = {
+      documentId: "doc_id_0",
+      season: argument1,
+      matchday: argument2,
+      timestamp: 1619980993
+    };
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetSyncTime], [targetSyncTime])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValue: number[] = [targetSyncTime.timestamp];
+
+    let i: number = 0;
+    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getLastUpdateTime$, no dataset available", (done: DoneFn) => {
+    const argument: string = "test_user";
+
+    const argument1: number = 2020;
+    const argument2: number = 23;
+
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValue: number[] = [-1];
+
+    let i: number = 0;
+    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue[i++]);
+        done();
+      }
+    );
+  });
+
 });

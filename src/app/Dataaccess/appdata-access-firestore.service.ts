@@ -5,7 +5,7 @@ import { map, switchMap, distinct, take, pluck } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import firebase from 'firebase/app';
 import { Bet, Match, Result, Team, User, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
-import { MatchdayScoreSnapshot } from './import_datastructures';
+import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
 
 export const COLLECTION_NAME_BETS: string = 'bets';
 export const COLLECTION_NAME_MATCHES: string = 'matches';
@@ -15,6 +15,7 @@ export const COLLECTION_NAME_USERS: string = 'users';
 export const COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT: string = 'matchday_score_snapshots';
 export const COLLECTION_NAME_SEASON_BETS: string = 'season_bets';
 export const COLLECTION_NAME_SEASON_RESULTS: string = 'season_results';
+export const COLLECTION_NAME_UPDATE_TIMES: string = 'sync_times';
 const SECONDS_PER_DAY: number = 86400;
 
 @Injectable()
@@ -320,6 +321,28 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
+  getLastUpdateTime$(season: number, matchday: number): Observable<number> {
+    // returns the last time as unix timestamp of when the last change in the
+    // app database was made with respect to the given season and matchday
+
+    let timeQuery$: Observable<SyncTime[]> = this.firestore.collection<SyncTime>(COLLECTION_NAME_UPDATE_TIMES, ref =>
+      ref.where("season", "==", season).where("matchday", "==", matchday))
+      .valueChanges({ idField: 'documentId' });
+
+    return timeQuery$.pipe(
+      take(1),
+      map((syncTimeArray: SyncTime[]) => {
+        if (syncTimeArray.length == 0) {
+          return -1;
+        }
+        else {
+          return syncTimeArray[0].timestamp;
+        }
+      }),
+      distinct()
+    );
+  }
+
   addMatch(match: Match): void {
     let matchToWrite: any = match;
     delete matchToWrite.documentId;
@@ -354,6 +377,12 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     let snapshotToWrite: any = snapshot;
     delete snapshotToWrite.documentId;
     this.firestore.collection(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT).add(snapshotToWrite);
+  }
+
+  addLastUpdateTime(syncTime: SyncTime): void {
+    let syncTimeToWrite: any = syncTime;
+    delete syncTimeToWrite.documentId;
+    this.firestore.collection(COLLECTION_NAME_UPDATE_TIMES).add(syncTimeToWrite);
   }
 
   updateMatch(documentId: string, match: Match): void {
@@ -402,6 +431,14 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let snapshotDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT + "/" + documentId);
     snapshotDocument.update(snapshotToUpdate);
+  }
+
+  updateLastUpdateTime(documentId: string, syncTime: SyncTime): void {
+    let syncTimeToUpdate: any = syncTime;
+    delete syncTimeToUpdate.documentId;
+
+    let syncTimeDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_UPDATE_TIMES + "/" + documentId);
+    syncTimeDocument.update(syncTimeToUpdate);
   }
 
   private makeUnknownMatch(matchId: number): Match {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { MatchImportData, TeamRankingImportData } from './import_datastructures';
@@ -7,6 +7,7 @@ import { MatchdataAccessService } from './matchdata-access.service';
 
 const URL_TRUNK_MATCHES: string = "https://www.openligadb.de/api/getmatchdata/bl1";
 const URL_TRUNK_RANKING: string = "https://www.openligadb.de/api/getbltable/bl1";
+const URL_TRUNK_UPDATETIME: string = "https://www.openligadb.de/api/getlastchangedate/bl1";
 
 @Injectable()
 export class MatchdataAccessOpenligaService implements MatchdataAccessService {
@@ -28,6 +29,15 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     let fullUrl: string = URL_TRUNK_RANKING + "/" + String(season);
     return this.http.get(fullUrl, { responseType: 'json' }).pipe(
       switchMap(rankingData => this.convertRankingJson$(rankingData))
+    );
+  }
+
+  getLastUpdateTime$(season: number, matchday: number): Observable<number> {
+    // returns the time when the data of the season/matchday was changed the last time
+
+    let fullUrl: string = URL_TRUNK_UPDATETIME + "/" + String(season) + "/" + String(matchday);
+    return this.http.get(fullUrl, { responseType: 'json' }).pipe(
+      switchMap(updateTime => this.convertUpdateTime$(updateTime))
     );
   }
 
@@ -86,6 +96,22 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     }
 
     return from(rankingArray);
+  }
+
+  private convertUpdateTime$(updateTime: any): Observable<number> {
+    // converts the imported updateTime into unix timestamp in seconds
+
+    let convertedTimestamp: number = -1; // default Date with timestamp -1
+
+    if (typeof updateTime == "string") {
+      let timeString: string = String(updateTime).trim();
+      if (timeString != "") {
+        let convertedDate: Date = new Date(timeString);
+        convertedTimestamp = Math.floor(convertedDate.getTime() / 1000);
+      }
+    }
+
+    return of(convertedTimestamp);
   }
 
   private extractResult(matchJson: any): number[] {

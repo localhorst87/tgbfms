@@ -22,6 +22,46 @@ describe('MatchdataAccessOpenligaService', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // getLastUpdateTime$
+  // ---------------------------------------------------------------------------
+
+  it("getLastUpdateTime$, data available", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 34;
+
+    const httpResponse: any = "2021-05-22T22:06:37.197";
+    httpClientSpy.get.and.returnValue(of(httpResponse));
+
+    const expectedValue: number = Math.floor((new Date(String(httpResponse))).getTime() / 1000);
+    spyOn<any>(service, "convertUpdateTime$").withArgs(String(httpResponse)).and.returnValue(of(expectedValue));
+
+    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  it("getLastUpdateTime$, no data available", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 34;
+
+    const httpResponse: any = "";
+    httpClientSpy.get.and.returnValue(of(httpResponse));
+
+    const expectedValue: number = -1;
+    spyOn<any>(service, "convertUpdateTime$").withArgs(String(httpResponse)).and.returnValue(of(expectedValue));
+
+    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  // ---------------------------------------------------------------------------
   // isMatchStarted
   // ---------------------------------------------------------------------------
 
@@ -169,10 +209,70 @@ describe('MatchdataAccessOpenligaService', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // convertUpdateTime$
+  // ---------------------------------------------------------------------------
+
+  it("convertUpdateTime$, time available", (done: DoneFn) => {
+    const argument: any = "2021-05-22T22:06:37.197";
+
+    const expectedValue: number = Math.floor((new Date(String(argument))).getTime() / 1000);
+
+    service["convertUpdateTime$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  it("convertUpdateTime$, time available with leading whitespace", (done: DoneFn) => {
+    const argument: any = " 2021-05-22T22:06:37.197";
+
+    const expectedValue: number = Math.floor((new Date(String(argument).trim())).getTime() / 1000);
+
+    service["convertUpdateTime$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  it("convertUpdateTime$, time empty", (done: DoneFn) => {
+    const argument: any = " ";
+
+    const expectedValue: number = -1;
+
+    service["convertUpdateTime$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  it("convertUpdateTime$, http error", (done: DoneFn) => {
+    const argument = new HttpErrorResponse({
+      error: 'test error',
+      status: 500,
+      statusText: 'internal server error'
+    });
+
+    const expectedValue: number = -1;
+
+    service["convertUpdateTime$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  // ---------------------------------------------------------------------------
   // convertMatchdayJson$
   // ---------------------------------------------------------------------------
 
-  it("convertMatchdayJson two complete matches available", (done: DoneFn) => {
+  it("convertMatchdayJson, two complete matches available", (done: DoneFn) => {
     const argument: any = [
       {
         "MatchID": 58814,

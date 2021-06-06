@@ -15,8 +15,8 @@ describe('SynchronizeDataService', () => {
   let matchImportData: MatchImportData[];
 
   beforeEach(() => {
-    appDataSpy = jasmine.createSpyObj(["getMatch$", "addMatch", "updateMatch", "getResult$", "addResult", "updateResult", "getSeasonResults$", "addSeasonResult", "updateSeasonResult"]);
-    matchDataSpy = jasmine.createSpyObj(["importMatchdata$", "importCurrentTeamRanking$"]);
+    appDataSpy = jasmine.createSpyObj(["getMatch$", "addMatch", "updateMatch", "getResult$", "addResult", "updateResult", "getSeasonResults$", "addSeasonResult", "updateSeasonResult", "getLastUpdateTime$"]);
+    matchDataSpy = jasmine.createSpyObj(["importMatchdata$", "importCurrentTeamRanking$", "getLastUpdateTime$"]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -70,13 +70,39 @@ describe('SynchronizeDataService', () => {
   // syncData
   // ---------------------------------------------------------------------------
 
-  it('syncData, import data available', () => {
+  it('syncData, import required and data available', () => {
     const argument1: number = 2020;
-    const argument2: number = 12;
+    const argument2: number = 33;
 
+    const rankingImportData: TeamRankingImportData[] = [
+      {
+        teamId: 101,
+        matches: 34,
+        points: 80,
+        won: 25,
+        draw: 5,
+        lost: 4,
+        goals: 85,
+        goalsAgainst: 35
+      },
+      {
+        teamId: 102,
+        matches: 34,
+        points: 75,
+        won: 22,
+        draw: 9,
+        lost: 3,
+        goals: 60,
+        goalsAgainst: 30
+      }
+    ];
+
+    spyOn<any>(service, "isSyncNeeded$").and.returnValue(of(true));
     matchDataSpy.importMatchdata$.and.returnValue(from(matchImportData));
+    matchDataSpy.importCurrentTeamRanking$.and.returnValue(from(rankingImportData));
     spyOn<any>(service, "syncMatch").and.stub();
     spyOn<any>(service, "syncResult").and.stub();
+    spyOn<any>(service, "syncSeasonResult").and.stub();
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).toHaveBeenCalledWith(argument1, matchImportData[0]);
@@ -85,24 +111,131 @@ describe('SynchronizeDataService', () => {
     expect(service["syncResult"]).toHaveBeenCalledWith(matchImportData[0]);
     expect(service["syncResult"]).toHaveBeenCalledWith(matchImportData[1]);
     expect(service["syncResult"]).toHaveBeenCalledWith(matchImportData[2]);
+    expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, rankingImportData);
   });
 
-  it('syncData, no import data available', () => {
+  it('syncData, import required but no match data available', () => {
     const argument1: number = 2020;
-    const argument2: number = 12;
+    const argument2: number = 33;
 
+    const rankingImportData: TeamRankingImportData[] = [
+      {
+        teamId: 101,
+        matches: 34,
+        points: 80,
+        won: 25,
+        draw: 5,
+        lost: 4,
+        goals: 85,
+        goalsAgainst: 35
+      },
+      {
+        teamId: 102,
+        matches: 34,
+        points: 75,
+        won: 22,
+        draw: 9,
+        lost: 3,
+        goals: 60,
+        goalsAgainst: 30
+      }
+    ];
+
+    spyOn<any>(service, "isSyncNeeded$").and.returnValue(of(true));
     matchDataSpy.importMatchdata$.and.returnValue(from([]));
+    matchDataSpy.importCurrentTeamRanking$.and.returnValue(from(rankingImportData));
     spyOn<any>(service, "syncMatch").and.stub();
     spyOn<any>(service, "syncResult").and.stub();
+    spyOn<any>(service, "syncSeasonResult").and.stub();
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).not.toHaveBeenCalled();
     expect(service["syncResult"]).not.toHaveBeenCalled();
+    expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, rankingImportData);
+  });
+
+  it('syncData, import required but no match data available', () => {
+    const argument1: number = 2020;
+    const argument2: number = 33;
+
+    const rankingImportData: TeamRankingImportData[] = [
+      {
+        teamId: 101,
+        matches: 34,
+        points: 80,
+        won: 25,
+        draw: 5,
+        lost: 4,
+        goals: 85,
+        goalsAgainst: 35
+      },
+      {
+        teamId: 102,
+        matches: 34,
+        points: 75,
+        won: 22,
+        draw: 9,
+        lost: 3,
+        goals: 60,
+        goalsAgainst: 30
+      }
+    ];
+
+    spyOn<any>(service, "isSyncNeeded$").and.returnValue(of(false));
+    matchDataSpy.importMatchdata$.and.returnValue(from(matchImportData));
+    matchDataSpy.importCurrentTeamRanking$.and.returnValue(from(rankingImportData));
+    spyOn<any>(service, "syncMatch").and.stub();
+    spyOn<any>(service, "syncResult").and.stub();
+    spyOn<any>(service, "syncSeasonResult").and.stub();
+
+    service.syncData(argument1, argument2);
+    expect(service["syncMatch"]).not.toHaveBeenCalled();
+    expect(service["syncResult"]).not.toHaveBeenCalled();
+    expect(service["syncSeasonResult"]).not.toHaveBeenCalled();
+  });
+
+  // ---------------------------------------------------------------------------
+  // isSyncNeeded
+  // ---------------------------------------------------------------------------
+
+  it('syncData, match import data is newer', (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 33;
+
+    matchDataSpy.getLastUpdateTime$.and.returnValue(of(1620890000));
+    appDataSpy.getLastUpdateTime$.and.returnValue(of(1620840000));
+
+    const expectedValue: boolean = true;
+
+    service["isSyncNeeded$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  it('syncData, times equal', (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 33;
+
+    matchDataSpy.getLastUpdateTime$.and.returnValue(of(1620790000));
+    appDataSpy.getLastUpdateTime$.and.returnValue(of(1620790000));
+
+    const expectedValue: boolean = false;
+
+    service["isSyncNeeded$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
   });
 
   // ---------------------------------------------------------------------------
   // syncMatch
   // ---------------------------------------------------------------------------
+
 
   it('syncMatch, match is new to app data', () => {
     const argument1: number = 2020;

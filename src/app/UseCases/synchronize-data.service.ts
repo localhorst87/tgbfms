@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable, combineLatest } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
@@ -19,11 +20,36 @@ export class SynchronizeDataService {
     // performs synchronization of Match and Result data of the app data
     // with the match data
 
-    this.matchDataAccess.importMatchdata$(season, matchday).subscribe(
-      (importedData: MatchImportData) => {
+    this.isSyncNeeded$(season, matchday).subscribe(
+      (isNeeded: boolean) => {
+        if (isNeeded) {
 
-        this.syncMatch(season, importedData);
-        this.syncResult(importedData);
+          this.matchDataAccess.importMatchdata$(season, matchday).subscribe(
+            (importedMatch: MatchImportData) => {
+              this.syncMatch(season, importedMatch);
+              this.syncResult(importedMatch);
+            }
+          );
+
+          this.matchDataAccess.importCurrentTeamRanking$(season).pipe(toArray()).subscribe(
+            (importedRanking: TeamRankingImportData[]) => {
+              this.syncSeasonResult(season, importedRanking);
+            }
+          );
+
+        }
+      }
+    );
+  }
+
+  private isSyncNeeded$(season: number, matchday: number): Observable<boolean> {
+    // checks if a synchronization  for the given season and matchday is needed
+
+    return combineLatest(
+      this.appDataAccess.getLastUpdateTime$(season, matchday),
+      this.matchDataAccess.getLastUpdateTime$(season, matchday),
+      (updateTimeAppData: number, updateTimeMatchData: number) => {
+        return updateTimeMatchData > updateTimeAppData;
       }
     );
   }

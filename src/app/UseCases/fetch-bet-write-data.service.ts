@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { Observable, combineLatest } from 'rxjs';
-import { mergeMap, distinct } from 'rxjs/operators';
-import { Bet, Match, Result } from '../Businessrules/basic_datastructures';
-import { BetWriteData } from './output_datastructures';
+import { map, mergeMap, distinct } from 'rxjs/operators';
+import { Bet, Match, Result, SeasonBet } from '../Businessrules/basic_datastructures';
+import { BetWriteData, SeasonBetWriteData } from './output_datastructures';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +29,31 @@ export class FetchBetWriteDataService {
     return this.appData.getNextMatchesByTime$(nextDays).pipe(
       mergeMap(match => this.makeBetWriteData$(match, userId)),
       distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet if real-time reading is active
+    );
+  }
+
+  public fetchSeasonData$(season: number, userId: string): Observable<SeasonBetWriteData> {
+    // returns the required SeasonBetWriteData of the given season as Observable
+
+    return this.appData.getSeasonBets$(season, userId).pipe(
+      mergeMap((bet: SeasonBet) => this.makeSeasonBetWriteData$(bet)),
+      distinct(betWriteData => betWriteData.place) // prevents adding new form on changing a bet if real-time reading is active
+    );
+  }
+
+  private makeSeasonBetWriteData$(bet: SeasonBet): Observable<SeasonBetWriteData> {
+    // converts SeasonBet into the output data structure SeasonBetWriteData
+
+    return this.appData.getTeamNameByTeamId$(bet.teamId).pipe(
+      map((teamName: string) => {
+        return {
+          season: bet.season,
+          place: bet.place,
+          teamName: teamName,
+          isBetFixed: bet.isFixed,
+          betDocumentId: bet.documentId
+        };
+      })
     );
   }
 

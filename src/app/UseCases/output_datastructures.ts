@@ -29,6 +29,14 @@ export interface BetOverviewUserData {
   betGoalsAway: number;
 }
 
+export interface SeasonBetWriteData {
+  season: number;
+  place: number;
+  teamName: string;
+  isBetFixed: boolean;
+  betDocumentId: string;
+}
+
 export interface TableData {
   position: number;
   userName: string;

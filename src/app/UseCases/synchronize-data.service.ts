@@ -5,9 +5,7 @@ import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { MatchImportData, TeamRankingImportData } from '../Dataaccess/import_datastructures';
 import { Bet, Match, Result, Team, SeasonResult } from '../Businessrules/basic_datastructures';
-
-const RELEVANT_FIRST_PLACES_COUNT: number = 2; // indicates number of first places of season bets to evaluate
-const RELEVANT_LAST_PLACES_COUNT: number = 3; // indicates number of last places of season bets to evaluate
+import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';
 
 @Injectable({
   providedIn: 'root'

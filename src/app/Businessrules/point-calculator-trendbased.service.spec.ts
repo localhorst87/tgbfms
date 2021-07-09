@@ -4,7 +4,7 @@ import { PointCalculatorTrendbasedService } from './point-calculator-trendbased.
 import {
   POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE,
   POINTS_SEASON_FIRST_EXACT, POINTS_SEASON_SECOND_EXACT, POINTS_SEASON_LOSER_EXACT, POINTS_SEASON_LOSER_CORRECT
-} from './point-calculator-trendbased.service';
+} from './rule_defined_values';
 import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
 
 

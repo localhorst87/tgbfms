@@ -1,16 +1,11 @@
 import { Injectable } from '@angular/core';
 import { PointCalculatorService } from './point-calculator.service';
 import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
-
-export const POINTS_TENDENCY: number = 1; // points if the tendency is correct
-export const POINTS_ADDED_RESULT: number = 1; // added points if the result is correct
-export const FACTOR_TOP_MATCH: number = 2; // raw points are multiplicated in case of top match
-export const POINTS_ADDED_OUTSIDER_TWO: number = 1; // points added if only two users bet on a specific tendency
-export const POINTS_ADDED_OUTSIDER_ONE: number = 2; // points added if only one user bet on a specific tendency
-export const POINTS_SEASON_FIRST_EXACT: number = 3; // points if the 1st place bet is correct
-export const POINTS_SEASON_SECOND_EXACT: number = 2; // points if the 2nd place bet is correct
-export const POINTS_SEASON_LOSER_EXACT: number = 2; // points if a relegator bet is exactly correct
-export const POINTS_SEASON_LOSER_CORRECT: number = 1; // points if the relegator bet is among results, but not exactly
+import {
+  POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH,
+  POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE, POINTS_SEASON_FIRST_EXACT,
+  POINTS_SEASON_SECOND_EXACT, POINTS_SEASON_LOSER_EXACT, POINTS_SEASON_LOSER_CORRECT
+} from './rule_defined_values';
 
 @Injectable()
 export class PointCalculatorTrendbasedService implements PointCalculatorService {

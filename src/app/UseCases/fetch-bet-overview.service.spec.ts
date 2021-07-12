@@ -2,8 +2,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { FetchBetOverviewService } from './fetch-bet-overview.service';
-import { BetOverviewFrameData, BetOverviewUserData } from './output_datastructures';
-import { Bet, Match, Result, User } from '../Businessrules/basic_datastructures';
+import { BetOverviewFrameData, BetOverviewUserData, SeasonBetOverviewUserData, SeasonBetOverviewFrameData } from './output_datastructures';
+import { Bet, Match, Result, SeasonBet, SeasonResult, User } from '../Businessrules/basic_datastructures';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 
@@ -15,13 +15,18 @@ describe('FetchBetOverviewService', () => {
   let bets: Bet[];
   let results: Result[];
   let matches: Match[];
+  let seasonBets: SeasonBet[];
+  let seasonResults: SeasonResult[];
+  let teamNames: string[];
   let expectedFrameValues: BetOverviewFrameData[];
-  let expectedUserValues: BetOverviewUserData[]
+  let expectedUserValues: BetOverviewUserData[];
+  let expectedSeasonFrameValues: SeasonBetOverviewFrameData[];
+  let expectedSeasonUserData: SeasonBetOverviewUserData[];
   let defaultFrameValue: BetOverviewFrameData;
   let defaultUserValue: BetOverviewUserData;
 
   beforeEach(() => {
-    appDataSpy = jasmine.createSpyObj(["getActiveUserIds$", "getUserDataById$", "getResult$", "getBet$", "getTeamNameByTeamId$", "getMatchesByMatchday$"]);
+    appDataSpy = jasmine.createSpyObj(["getActiveUserIds$", "getUserDataById$", "getResult$", "getBet$", "getTeamNameByTeamId$", "getMatchesByMatchday$", "getSeasonBet$", "getSeasonResult$"]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -109,6 +114,102 @@ describe('FetchBetOverviewService', () => {
       } // match 58817, user 2
     ];
 
+    seasonBets = [
+      {
+        documentId: "doc_id_0",
+        season: 2021,
+        userId: userData[0].id,
+        isFixed: true,
+        place: 1,
+        teamId: 45
+      },
+      {
+        documentId: "doc_id_1",
+        season: 2021,
+        userId: userData[0].id,
+        isFixed: true,
+        place: 2,
+        teamId: 76
+      },
+      {
+        documentId: "doc_id_2",
+        season: 2021,
+        userId: userData[0].id,
+        isFixed: true,
+        place: -3,
+        teamId: 122
+      },
+      {
+        documentId: "doc_id_3",
+        season: 2021,
+        userId: userData[0].id,
+        isFixed: true,
+        place: -2,
+        teamId: 70
+      },
+      {
+        documentId: "doc_id_4",
+        season: 2021,
+        userId: userData[0].id,
+        isFixed: true,
+        place: -1,
+        teamId: 99
+      },
+      {
+        documentId: "doc_id_5",
+        season: 2021,
+        userId: userData[1].id,
+        isFixed: true,
+        place: 1,
+        teamId: 32
+      },
+      {
+        documentId: "doc_id_6",
+        season: 2021,
+        userId: userData[1].id,
+        isFixed: true,
+        place: 2,
+        teamId: 3
+      },
+      {
+        documentId: "doc_id_7",
+        season: 2021,
+        userId: userData[1].id,
+        isFixed: true,
+        place: -3,
+        teamId: 23
+      },
+      {
+        documentId: "doc_id_8",
+        season: 2021,
+        userId: userData[1].id,
+        isFixed: true,
+        place: -2,
+        teamId: 87
+      },
+      {
+        documentId: "doc_id_9",
+        season: 2021,
+        userId: userData[1].id,
+        isFixed: true,
+        place: -1,
+        teamId: 199
+      },
+    ];
+
+    teamNames = [
+      "team_name_45",
+      "team_name_76",
+      "team_name_122",
+      "team_name_70",
+      "team_name_99",
+      "team_name_32",
+      "team_name_3",
+      "team_name_23",
+      "team_name_87",
+      "team_name_199"
+    ];
+
     results = [
       {
         documentId: "result_document_id_0",
@@ -121,6 +222,39 @@ describe('FetchBetOverviewService', () => {
         matchId: matches[1].matchId,
         goalsHome: 0,
         goalsAway: 0
+      }
+    ];
+
+    seasonResults = [
+      {
+        documentId: "result_document_id_0",
+        season: 2021,
+        place: 1,
+        teamId: 101
+      },
+      {
+        documentId: "result_document_id_1",
+        season: 2021,
+        place: 2,
+        teamId: 102
+      },
+      {
+        documentId: "result_document_id_2",
+        season: 2021,
+        place: -3,
+        teamId: 203
+      },
+      {
+        documentId: "result_document_id_3",
+        season: 2021,
+        place: -2,
+        teamId: 202
+      },
+      {
+        documentId: "result_document_id_4",
+        season: 2021,
+        place: -1,
+        teamId: 201
       }
     ];
 
@@ -143,6 +277,34 @@ describe('FetchBetOverviewService', () => {
         resultGoalsHome: results[1].goalsHome,
         resultGoalsAway: results[1].goalsAway,
         isBetFixed: true
+      }
+    ];
+
+    expectedSeasonFrameValues = [
+      {
+        place: 1,
+        resultTeamName: "team_name_101",
+        isBetFixed: true,
+      },
+      {
+        place: 2,
+        resultTeamName: "team_name_102",
+        isBetFixed: true,
+      },
+      {
+        place: -3,
+        resultTeamName: "team_name_203",
+        isBetFixed: true,
+      },
+      {
+        place: -2,
+        resultTeamName: "team_name_202",
+        isBetFixed: true,
+      },
+      {
+        place: -1,
+        resultTeamName: "team_name_201",
+        isBetFixed: true,
       }
     ];
 
@@ -171,6 +333,59 @@ describe('FetchBetOverviewService', () => {
         betGoalsHome: bets[3].goalsHome,
         betGoalsAway: bets[3].goalsAway
       } // match 58817, user 2
+    ];
+
+    expectedSeasonUserData = [
+      {
+        place: seasonBets[0].place,
+        userName: userData[0].displayName,
+        teamName: teamNames[0]
+      },
+      {
+        place: seasonBets[1].place,
+        userName: userData[0].displayName,
+        teamName: teamNames[1]
+      },
+      {
+        place: seasonBets[2].place,
+        userName: userData[0].displayName,
+        teamName: teamNames[2]
+      },
+      {
+        place: seasonBets[3].place,
+        userName: userData[0].displayName,
+        teamName: teamNames[3]
+      },
+      {
+        place: seasonBets[4].place,
+        userName: userData[0].displayName,
+        teamName: teamNames[4]
+      },
+      {
+        place: seasonBets[5].place,
+        userName: userData[1].displayName,
+        teamName: teamNames[5]
+      },
+      {
+        place: seasonBets[6].place,
+        userName: userData[1].displayName,
+        teamName: teamNames[6]
+      },
+      {
+        place: seasonBets[7].place,
+        userName: userData[1].displayName,
+        teamName: teamNames[7]
+      },
+      {
+        place: seasonBets[8].place,
+        userName: userData[1].displayName,
+        teamName: teamNames[8]
+      },
+      {
+        place: seasonBets[9].place,
+        userName: userData[1].displayName,
+        teamName: teamNames[9]
+      }
     ];
 
     defaultFrameValue = {
@@ -253,6 +468,80 @@ describe('FetchBetOverviewService', () => {
         }
       );
   });
+
+  // ---------------------------------------------------------------------------
+  // fetchSeasonFrameData$
+  // ---------------------------------------------------------------------------
+
+  it('fetchSeasonFrameData$, data available', (done: DoneFn) => {
+    const argument1: number = 2021;
+    const argument2: string = "test_user_id";
+
+    spyOn<any>(service, "makeSeasonFrameData$")
+      .withArgs(argument1, 1, argument2).and.returnValue(of(expectedSeasonFrameValues[0]))
+      .withArgs(argument1, 2, argument2).and.returnValue(of(expectedSeasonFrameValues[1]))
+      .withArgs(argument1, -3, argument2).and.returnValue(of(expectedSeasonFrameValues[2]))
+      .withArgs(argument1, -2, argument2).and.returnValue(of(expectedSeasonFrameValues[3]))
+      .withArgs(argument1, -1, argument2).and.returnValue(of(expectedSeasonFrameValues[4]));
+
+    let i: number = 0;
+    service["fetchSeasonFrameData$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedSeasonFrameValues[i++]);
+        done();
+      }
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // fetchUserSeasonBetData$
+  // ---------------------------------------------------------------------------
+
+  it('fetchUserSeasonBetData$, bets available', (done: DoneFn) => {
+    const argument: number = 2021;
+
+    spyOn<any>(service, "getAllUserSeasonBets$").and.returnValues(from(seasonBets));
+    spyOn<any>(service, "makeSeasonBetData$")
+      .withArgs(seasonBets[0]).and.returnValue(of(expectedSeasonUserData[0]))
+      .withArgs(seasonBets[1]).and.returnValue(of(expectedSeasonUserData[1]))
+      .withArgs(seasonBets[2]).and.returnValue(of(expectedSeasonUserData[2]))
+      .withArgs(seasonBets[3]).and.returnValue(of(expectedSeasonUserData[3]))
+      .withArgs(seasonBets[4]).and.returnValue(of(expectedSeasonUserData[4]))
+      .withArgs(seasonBets[5]).and.returnValue(of(expectedSeasonUserData[5]))
+      .withArgs(seasonBets[6]).and.returnValue(of(expectedSeasonUserData[6]))
+      .withArgs(seasonBets[7]).and.returnValue(of(expectedSeasonUserData[7]))
+      .withArgs(seasonBets[8]).and.returnValue(of(expectedSeasonUserData[8]))
+      .withArgs(seasonBets[9]).and.returnValue(of(expectedSeasonUserData[9]));
+
+    let i: number = 0;
+    service["fetchUserSeasonBetData$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedSeasonUserData[i++]);
+        done();
+      }
+    );
+  });
+
+  it('fetchUserSeasonBetData$, no bets available', (done: DoneFn) => {
+    const argument: number = 2021;
+
+    spyOn<any>(service, "getAllUserSeasonBets$").and.returnValues(from([]));
+
+    const defaultSeasonUserValue: SeasonBetOverviewUserData = {
+      place: 0,
+      userName: "",
+      teamName: ""
+    };
+
+    service["fetchUserSeasonBetData$"](argument).pipe(
+      defaultIfEmpty(defaultSeasonUserValue)).subscribe(
+        val => {
+          expect(val).toEqual(defaultSeasonUserValue);
+          done();
+        }
+      );
+  });
+
 
   // ---------------------------------------------------------------------------
   // fetchUserBetDataByMatchday$
@@ -400,6 +689,35 @@ describe('FetchBetOverviewService', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // makeSeasonFrameData$
+  // ---------------------------------------------------------------------------
+
+  it('makeSeasonFrameData$, bets available', (done: DoneFn) => {
+    const argument1: number = 2021;
+    const argument2: number = 1;
+    const argument3: string = userData[0].id;
+
+    appDataSpy.getSeasonResult$
+      .withArgs(argument1, argument2).and.returnValue(of(seasonResults[0]));
+
+    appDataSpy.getSeasonBet$
+      .withArgs(argument1, argument2, argument3).and.returnValue(of(seasonBets[0]));
+
+    appDataSpy.getTeamNameByTeamId$
+      .withArgs(seasonResults[0].teamId).and.returnValue(of(expectedSeasonFrameValues[0].resultTeamName));
+
+    const expectedValues: SeasonBetOverviewFrameData[] = [expectedSeasonFrameValues[0]];
+
+    let i: number = 0;
+    service["makeSeasonFrameData$"](argument1, argument2, argument3).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  // ---------------------------------------------------------------------------
   // getAllUserBets$
   // ---------------------------------------------------------------------------
 
@@ -474,6 +792,99 @@ describe('FetchBetOverviewService', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // getAllUserSeasonBets$
+  // ---------------------------------------------------------------------------
+
+  it('getAllUserSeasonBets$, bets available', (done: DoneFn) => {
+    const argument: number = 2021;
+
+    appDataSpy.getActiveUserIds$.and.returnValue(of(userData[0].id, userData[1].id));
+    appDataSpy.getSeasonBet$
+      .withArgs(argument, 1, userData[0].id).and.returnValue(of(seasonBets[0]))
+      .withArgs(argument, 2, userData[0].id).and.returnValue(of(seasonBets[1]))
+      .withArgs(argument, -3, userData[0].id).and.returnValue(of(seasonBets[2]))
+      .withArgs(argument, -2, userData[0].id).and.returnValue(of(seasonBets[3]))
+      .withArgs(argument, -1, userData[0].id).and.returnValue(of(seasonBets[4]))
+      .withArgs(argument, 1, userData[1].id).and.returnValue(of(seasonBets[5]))
+      .withArgs(argument, 2, userData[1].id).and.returnValue(of(seasonBets[6]))
+      .withArgs(argument, -3, userData[1].id).and.returnValue(of(seasonBets[7]))
+      .withArgs(argument, -2, userData[1].id).and.returnValue(of(seasonBets[8]))
+      .withArgs(argument, -1, userData[1].id).and.returnValue(of(seasonBets[9]));
+
+
+    const expectedValues: SeasonBet[] = seasonBets;
+
+    let i: number = 0;
+    service["getAllUserSeasonBets$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it('getAllUserSeasonBets$, some bets emitted twice', (done: DoneFn) => {
+    const argument: number = 2021;
+
+    appDataSpy.getActiveUserIds$.and.returnValue(of(userData[0].id, userData[1].id));
+    appDataSpy.getSeasonBet$
+      .withArgs(argument, 1, userData[0].id).and.returnValue(of(seasonBets[0]))
+      .withArgs(argument, 2, userData[0].id).and.returnValue(of(seasonBets[1]))
+      .withArgs(argument, -3, userData[0].id).and.returnValue(of(seasonBets[2], seasonBets[2]))
+      .withArgs(argument, -2, userData[0].id).and.returnValue(of(seasonBets[3]))
+      .withArgs(argument, -1, userData[0].id).and.returnValue(of(seasonBets[4]))
+      .withArgs(argument, 1, userData[1].id).and.returnValue(of(seasonBets[5]))
+      .withArgs(argument, 2, userData[1].id).and.returnValue(of(seasonBets[6], seasonBets[6]))
+      .withArgs(argument, -3, userData[1].id).and.returnValue(of(seasonBets[7]))
+      .withArgs(argument, -2, userData[1].id).and.returnValue(of(seasonBets[8]))
+      .withArgs(argument, -1, userData[1].id).and.returnValue(of(seasonBets[9]));
+
+    const expectedValues: SeasonBet[] = seasonBets;
+
+    let i: number = 0;
+    service["getAllUserSeasonBets$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it('getAllUserSeasonBets$, no bets emitted', (done: DoneFn) => {
+    const argument: number = 2021;
+
+    appDataSpy.getActiveUserIds$.and.returnValue(of(userData[0].id, userData[1].id));
+    appDataSpy.getSeasonBet$
+      .withArgs(argument, 1, userData[0].id).and.returnValue(of())
+      .withArgs(argument, 2, userData[0].id).and.returnValue(of())
+      .withArgs(argument, -3, userData[0].id).and.returnValue(of())
+      .withArgs(argument, -2, userData[0].id).and.returnValue(of())
+      .withArgs(argument, -1, userData[0].id).and.returnValue(of())
+      .withArgs(argument, 1, userData[1].id).and.returnValue(of())
+      .withArgs(argument, 2, userData[1].id).and.returnValue(of())
+      .withArgs(argument, -3, userData[1].id).and.returnValue(of())
+      .withArgs(argument, -2, userData[1].id).and.returnValue(of())
+      .withArgs(argument, -1, userData[1].id).and.returnValue(of());
+
+    const defaultSeasonBet: SeasonBet = {
+      documentId: "doc_id_0",
+      season: -1,
+      userId: "",
+      isFixed: false,
+      place: 0,
+      teamId: -1
+    };
+
+    service["getAllUserSeasonBets$"](argument).pipe(
+      defaultIfEmpty(defaultSeasonBet)).subscribe(
+        val => {
+          expect(val).toEqual(defaultSeasonBet);
+          done();
+        }
+      );
+  });
+
+  // ---------------------------------------------------------------------------
   // makeBetData$
   // ---------------------------------------------------------------------------
 
@@ -508,4 +919,50 @@ describe('FetchBetOverviewService', () => {
       );
   });
 
+  // ---------------------------------------------------------------------------
+  // makeSeasonBetData$
+  // ---------------------------------------------------------------------------
+
+  it('makeSeasonBetData$, data available', (done: DoneFn) => {
+    const argument: SeasonBet = seasonBets[0];
+
+    appDataSpy.getUserDataById$
+      .withArgs(userData[0].id).and.returnValue(of(userData[0]))
+      .withArgs(userData[1].id).and.returnValue(of(userData[1]));
+
+    appDataSpy.getTeamNameByTeamId$
+      .withArgs(argument.teamId).and.returnValue(of(teamNames[0]));
+
+    service["makeSeasonBetData$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedSeasonUserData[0]);
+        done();
+      }
+    );
+  });
+
+  it('makeSeasonBetData$, user data not available', (done: DoneFn) => {
+    const argument: SeasonBet = seasonBets[0];
+
+    appDataSpy.getUserDataById$
+      .withArgs(userData[0].id).and.returnValue(of())
+      .withArgs(userData[1].id).and.returnValue(of());
+
+    appDataSpy.getTeamNameByTeamId$
+      .withArgs(argument.teamId).and.returnValue(of(teamNames[0]))
+
+    const defaultSeasonUserValue: SeasonBetOverviewUserData = {
+      place: 0,
+      userName: "",
+      teamName: ""
+    };
+
+    service["makeSeasonBetData$"](argument).pipe(
+      defaultIfEmpty(defaultSeasonUserValue)).subscribe(
+        val => {
+          expect(val).toEqual(defaultSeasonUserValue);
+          done();
+        }
+      );
+  });
 });

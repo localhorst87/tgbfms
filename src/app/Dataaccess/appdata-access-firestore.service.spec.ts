@@ -114,197 +114,33 @@ describe('AppdataAccessFirestoreService', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // getSeasonBets$
+  // getSeasonBet$
   // ---------------------------------------------------------------------------
 
-  it("getSeasonBets$, data available", (done: DoneFn) => {
+  it("getSeasonBet$, data available", (done: DoneFn) => {
     const argument1: number = 2020;
-    const argument2: string = "test_user_id";
+    const argument2: number = 1;
+    const argument3: string = "test_user_id";
 
-    const targetBets: SeasonBet[] = [
-      {
-        documentId: "test_doc_id_0",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: -3,
-        teamId: 13,
-      },
-      {
-        documentId: "test_doc_id_1",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: -2,
-        teamId: 12,
-      },
-      {
-        documentId: "test_doc_id_2",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: -1,
-        teamId: 11,
-      },
-      {
-        documentId: "test_doc_id_3",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: 1,
-        teamId: 101,
-      },
-      {
-        documentId: "test_doc_id_4",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: 2,
-        teamId: 102,
-      }
-    ];
-
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of(targetBets)) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValues: SeasonBet[] = targetBets;
-
-    let i: number = 0;
-    service["getSeasonBets$"](argument1, argument2).subscribe(
-      val => {
-        expect(val).toEqual(expectedValues[i++]);
-        done();
-      }
-    );
-  });
-
-  it("getSeasonBets$, same dataset twice", (done: DoneFn) => {
-    const argument1: number = 2020;
-    const argument2: string = "test_user_id";
-
-    const targetBets: SeasonBet[] = [
-      {
-        documentId: "test_doc_id_0",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: -3,
-        teamId: 13
-      },
-      {
-        documentId: "test_doc_id_1",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: -2,
-        teamId: 12
-      },
-      {
-        documentId: "test_doc_id_2",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: -1,
-        teamId: 11
-      },
-      {
-        documentId: "test_doc_id_3",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: 1,
-        teamId: 101
-      },
-      {
-        documentId: "test_doc_id_4",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: 2,
-        teamId: 102
-      }
-    ];
-
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of(targetBets, targetBets)) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValues: SeasonBet[] = targetBets;
-
-    let i: number = 0;
-    service["getSeasonBets$"](argument1, argument2).subscribe(
-      val => {
-        expect(val).toEqual(expectedValues[i++]);
-        done();
-      }
-    );
-  });
-
-  it("getSeasonBets$, emitting twice", (done: DoneFn) => {
-    const argument1: number = 2020;
-    const argument2: string = "test_user_id";
-
-    const targetBets: SeasonBet[] = [
-      {
-        documentId: "test_doc_id_0",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: -3,
-        teamId: 13
-      },
-      {
-        documentId: "test_doc_id_1",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: -2,
-        teamId: 12
-      },
-      {
-        documentId: "test_doc_id_2",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: -1,
-        teamId: 11
-      },
-      {
-        documentId: "test_doc_id_3",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: 1,
-        teamId: 101
-      },
-      {
-        documentId: "test_doc_id_4",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: 2,
-        teamId: 102
-      }
-    ];
-
-    const collectionStub: any = {
-      valueChanges: jasmine.createSpy("valueChanges")
-        .and.returnValue(of(targetBets.concat(targetBets)))
+    const targetBet: SeasonBet = {
+      documentId: "test_doc_id_3",
+      season: argument1,
+      userId: argument3,
+      isFixed: true,
+      place: argument2,
+      teamId: 101,
     };
+
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetBet])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    const expectedValues: SeasonBet[] = targetBets;
+    const expectedValues: SeasonBet[] = [targetBet];
 
     let i: number = 0;
-    service["getSeasonBets$"](argument1, argument2).subscribe(
+    service["getSeasonBet$"](argument1, argument2, argument3).subscribe(
       val => {
         expect(val).toEqual(expectedValues[i++]);
         done();
@@ -312,17 +148,79 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonBets$, no dataset available", (done: DoneFn) => {
+  it("getSeasonBet$, same dataset twice", (done: DoneFn) => {
     const argument1: number = 2020;
-    const argument2: string = "test_user_id";
+    const argument2: number = 1;
+    const argument3: string = "test_user_id";
 
-    const defaultValue: SeasonBet =
-    {
+    const targetBet: SeasonBet = {
+      documentId: "test_doc_id_3",
+      season: argument1,
+      userId: argument3,
+      isFixed: true,
+      place: argument2,
+      teamId: 101,
+    };
+
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetBet, targetBet])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: SeasonBet[] = [targetBet];
+
+    let i: number = 0;
+    service["getSeasonBet$"](argument1, argument2, argument3).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getSeasonBet$, emitting twice", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 2;
+    const argument3: string = "test_user_id";
+
+    const targetBet: SeasonBet = {
+      documentId: "test_doc_id_3",
+      season: argument1,
+      userId: argument3,
+      isFixed: true,
+      place: argument2,
+      teamId: 101,
+    };
+
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetBet], [targetBet])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: SeasonBet[] = [targetBet];
+
+    let i: number = 0;
+    service["getSeasonBet$"](argument1, argument2, argument3).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getSeasonBet$, no dataset available", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = -2;
+    const argument3: string = "test_user_id";
+
+    const targetBet: SeasonBet = {
       documentId: "",
       season: argument1,
-      userId: argument2,
+      userId: argument3,
       isFixed: false,
-      place: 0,
+      place: argument2,
       teamId: -1
     };
 
@@ -332,65 +230,42 @@ describe('AppdataAccessFirestoreService', () => {
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    service["getSeasonBets$"](argument1, argument2).pipe(
-      defaultIfEmpty(defaultValue)).subscribe(
-        val => {
-          expect(val).toEqual(defaultValue);
-          done();
-        }
-      );
+    const expectedValues: SeasonBet[] = [targetBet];
+
+    let i: number = 0;
+    service["getSeasonBet$"](argument1, argument2, argument3).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
   });
 
   // ---------------------------------------------------------------------------
   // getSeasonResults$
   // ---------------------------------------------------------------------------
 
-  it("getSeasonResults$, data available", (done: DoneFn) => {
-    const argument: number = 2020;
+  it("getSeasonResult$, data available", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = -1;
 
-    const targetResults: SeasonResult[] = [
-      {
-        documentId: "test_doc_id_0",
-        season: argument,
-        place: -3,
-        teamId: 13,
-      },
-      {
-        documentId: "test_doc_id_1",
-        season: argument,
-        place: -2,
-        teamId: 12,
-      },
-      {
-        documentId: "test_doc_id_2",
-        season: argument,
-        place: -1,
-        teamId: 11,
-      },
-      {
-        documentId: "test_doc_id_3",
-        season: argument,
-        place: 1,
-        teamId: 101,
-      },
-      {
-        documentId: "test_doc_id_4",
-        season: argument,
-        place: 2,
-        teamId: 102,
-      }
-    ];
+    const targetResult: SeasonResult = {
+      documentId: "test_doc_id_2",
+      season: argument1,
+      place: argument2,
+      teamId: 11,
+    };
 
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of(targetResults)) };
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetResult])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    const expectedValues: SeasonResult[] = targetResults;
+    const expectedValues: SeasonResult[] = [targetResult];
 
     let i: number = 0;
-    service["getSeasonResults$"](argument).subscribe(
+    service["getSeasonResult$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValues[i++]);
         done();
@@ -398,52 +273,27 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonResults$, same data twice available", (done: DoneFn) => {
-    const argument: number = 2020;
+  it("getSeasonResult$, same data twice available", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = -1;
 
-    const targetResults: SeasonResult[] = [
-      {
-        documentId: "test_doc_id_0",
-        season: argument,
-        place: -3,
-        teamId: 13,
-      },
-      {
-        documentId: "test_doc_id_1",
-        season: argument,
-        place: -2,
-        teamId: 12,
-      },
-      {
-        documentId: "test_doc_id_2",
-        season: argument,
-        place: -1,
-        teamId: 11,
-      },
-      {
-        documentId: "test_doc_id_3",
-        season: argument,
-        place: 1,
-        teamId: 101,
-      },
-      {
-        documentId: "test_doc_id_4",
-        season: argument,
-        place: 2,
-        teamId: 102,
-      }
-    ];
+    const targetResult: SeasonResult = {
+      documentId: "test_doc_id_2",
+      season: argument1,
+      place: argument2,
+      teamId: 11,
+    };
 
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of(targetResults.concat(targetResults))) };
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetResult, targetResult])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    const expectedValues: SeasonResult[] = targetResults;
+    const expectedValues: SeasonResult[] = [targetResult];
 
     let i: number = 0;
-    service["getSeasonResults$"](argument).subscribe(
+    service["getSeasonResult$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValues[i++]);
         done();
@@ -451,52 +301,27 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonResults$, data emitted twice", (done: DoneFn) => {
-    const argument: number = 2020;
+  it("getSeasonResult$, data emitted twice", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = -1;
 
-    const targetResults: SeasonResult[] = [
-      {
-        documentId: "test_doc_id_0",
-        season: argument,
-        place: -3,
-        teamId: 13,
-      },
-      {
-        documentId: "test_doc_id_1",
-        season: argument,
-        place: -2,
-        teamId: 12,
-      },
-      {
-        documentId: "test_doc_id_2",
-        season: argument,
-        place: -1,
-        teamId: 11,
-      },
-      {
-        documentId: "test_doc_id_3",
-        season: argument,
-        place: 1,
-        teamId: 101,
-      },
-      {
-        documentId: "test_doc_id_4",
-        season: argument,
-        place: 2,
-        teamId: 102,
-      }
-    ];
+    const targetResult: SeasonResult = {
+      documentId: "test_doc_id_2",
+      season: argument1,
+      place: argument2,
+      teamId: 11,
+    };
 
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of(targetResults, targetResults)) };
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetResult], [targetResult])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    const expectedValues: SeasonResult[] = targetResults;
+    const expectedValues: SeasonResult[] = [targetResult];
 
     let i: number = 0;
-    service["getSeasonResults$"](argument).subscribe(
+    service["getSeasonResult$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValues[i++]);
         done();
@@ -504,15 +329,15 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonResults$, no data available", (done: DoneFn) => {
-    const argument: number = 2020;
+  it("getSeasonResult$, no data available", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = -1;
 
-    const defaultValue: SeasonResult =
-    {
+    const targetResult: SeasonResult = {
       documentId: "",
-      season: argument,
-      place: 0,
-      teamId: -1
+      season: argument1,
+      place: argument2,
+      teamId: -1,
     };
 
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
@@ -521,13 +346,15 @@ describe('AppdataAccessFirestoreService', () => {
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    service["getSeasonResults$"](argument).pipe(
-      defaultIfEmpty(defaultValue)).subscribe(
-        val => {
-          expect(val).toEqual(defaultValue);
-          done();
-        }
-      );
+    const expectedValues: SeasonResult[] = [targetResult];
+
+    let i: number = 0;
+    service["getSeasonResult$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
   });
 
   // ---------------------------------------------------------------------------

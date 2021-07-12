@@ -86,33 +86,41 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return match$;
   }
 
-  getSeasonBets$(season: number, userId: string): Observable<SeasonBet> {
-    // queries the SeasonBets with the given season and userId and returns
+  getSeasonBet$(season: number, place: number, userId: string): Observable<SeasonBet> {
+    // queries the SeasonBets with the given season, place + userId and returns
     // the corresponding Observable
 
     let betQuery$: Observable<SeasonBet[]> = this.firestore.collection<SeasonBet>(COLLECTION_NAME_SEASON_BETS, ref =>
-      ref.where("season", "==", season).where("userId", "==", userId))
+      ref.where("season", "==", season).where("place", "==", place).where("userId", "==", userId))
       .valueChanges({ idField: 'documentId' });
 
     return betQuery$.pipe(
       take(1),
-      switchMap(betArray => from(betArray)),
-      distinct()
+      map(betArray => {
+        if (betArray.length == 0) {
+          betArray.push(this.makeUnknownSeasonBet(season, place, userId));
+        }
+        return betArray[0];
+      })
     );
   }
 
-  getSeasonResults$(season: number): Observable<SeasonResult> {
-    // queries the SeasonResult with the given season and returns
+  getSeasonResult$(season: number, place: number): Observable<SeasonResult> {
+    // queries the SeasonResult with the given season + place and returns
     // the corresponding Observable
 
     let resultQuery$: Observable<SeasonResult[]> = this.firestore.collection<SeasonResult>(COLLECTION_NAME_SEASON_RESULTS, ref =>
-      ref.where("season", "==", season))
+      ref.where("season", "==", season).where("place", "==", place))
       .valueChanges({ idField: 'documentId' });
 
     return resultQuery$.pipe(
       take(1),
-      switchMap(resultArray => from(resultArray)),
-      distinct()
+      map(resultArray => {
+        if (resultArray.length == 0) {
+          resultArray.push(this.makeUnknownSeasonResult(season, place));
+        }
+        return resultArray[0];
+      })
     );
   }
 
@@ -511,7 +519,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     };
   }
 
-  private makeUnknownSeasonBet(season: number, userId: string): SeasonBet {
+  private makeUnknownSeasonBet(season: number, place: number, userId: string): SeasonBet {
     // returns an unknown dummy SeasonBet
 
     return {
@@ -519,7 +527,18 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       season: season,
       userId: userId,
       isFixed: false,
-      place: 0,
+      place: place,
+      teamId: -1
+    };
+  }
+
+  private makeUnknownSeasonResult(season: number, place: number): SeasonResult {
+    // returns an unknown dummy SeasonResult
+
+    return {
+      documentId: "",
+      season: season,
+      place: place,
       teamId: -1
     };
   }

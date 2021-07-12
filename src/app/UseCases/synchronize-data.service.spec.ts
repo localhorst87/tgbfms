@@ -15,7 +15,7 @@ describe('SynchronizeDataService', () => {
   let matchImportData: MatchImportData[];
 
   beforeEach(() => {
-    appDataSpy = jasmine.createSpyObj(["getMatch$", "addMatch", "updateMatch", "getResult$", "addResult", "updateResult", "getSeasonResults$", "addSeasonResult", "updateSeasonResult", "getLastUpdateTime$"]);
+    appDataSpy = jasmine.createSpyObj(["getMatch$", "addMatch", "updateMatch", "getResult$", "addResult", "updateResult", "getSeasonResult$", "addSeasonResult", "updateSeasonResult", "getLastUpdateTime$"]);
     matchDataSpy = jasmine.createSpyObj(["importMatchdata$", "importCurrentTeamRanking$", "getLastUpdateTime$"]);
 
     TestBed.configureTestingModule({
@@ -512,7 +512,7 @@ describe('SynchronizeDataService', () => {
   // syncSeasonResult
   // ---------------------------------------------------------------------------
 
-  it('syncSeasonResult, import data available, app data not available', () => {
+  it('syncSeasonResult, import data available, app data partly not available, partly different', () => {
     const argument1: number = 2020;
     const argument2: TeamRankingImportData[] = [
       {
@@ -620,7 +620,46 @@ describe('SynchronizeDataService', () => {
       }
     ];
 
-    appDataSpy.getSeasonResults$.and.returnValue(from([]));
+    const appdataResult: SeasonResult[] = [
+      {
+        documentId: "",
+        season: argument1,
+        place: 1,
+        teamId: -1
+      },
+      {
+        documentId: "doc_second_place",
+        season: argument1,
+        place: 2,
+        teamId: convertedResults[1].teamId
+      },
+      {
+        documentId: "doc_last_place",
+        season: argument1,
+        place: -1,
+        teamId: 99
+      },
+      {
+        documentId: "",
+        season: argument1,
+        place: -2,
+        teamId: -1
+      },
+      {
+        documentId: "",
+        season: argument1,
+        place: -3,
+        teamId: -1
+      }
+    ];
+
+    appDataSpy.getSeasonResult$
+      .withArgs(argument1, 1).and.returnValue(of(appdataResult[0]))
+      .withArgs(argument1, 2).and.returnValue(of(appdataResult[1]))
+      .withArgs(argument1, -3).and.returnValue(of(appdataResult[2]))
+      .withArgs(argument1, -2).and.returnValue(of(appdataResult[3]))
+      .withArgs(argument1, -1).and.returnValue(of(appdataResult[4]));
+
     appDataSpy.addSeasonResult.and.stub();
     appDataSpy.updateSeasonResult.and.stub();
 
@@ -632,8 +671,8 @@ describe('SynchronizeDataService', () => {
       .withArgs(argument1, -3, argument2[argument2.length - 3]).and.returnValue(convertedResults[4]);
 
     service["syncSeasonResult"](argument1, argument2);
-    expect(appDataSpy.addSeasonResult).toHaveBeenCalledTimes(5);
-    expect(appDataSpy.updateSeasonResult).not.toHaveBeenCalled();
+    expect(appDataSpy.addSeasonResult).toHaveBeenCalledTimes(3);
+    expect(appDataSpy.updateSeasonResult).toHaveBeenCalledTimes(1);
   });
 
   it('syncSeasonResult, import data and app data available, but different', () => {
@@ -777,7 +816,12 @@ describe('SynchronizeDataService', () => {
       }
     ];
 
-    appDataSpy.getSeasonResults$.and.returnValue(from(appdataResult));
+    appDataSpy.getSeasonResult$
+      .withArgs(argument1, 1).and.returnValue(of(appdataResult[0]))
+      .withArgs(argument1, 2).and.returnValue(of(appdataResult[1]))
+      .withArgs(argument1, -3).and.returnValue(of(appdataResult[4]))
+      .withArgs(argument1, -2).and.returnValue(of(appdataResult[3]))
+      .withArgs(argument1, -1).and.returnValue(of(appdataResult[1]));
     appDataSpy.addSeasonResult.and.stub();
     appDataSpy.updateSeasonResult.and.stub();
 
@@ -938,7 +982,12 @@ describe('SynchronizeDataService', () => {
       }
     ];
 
-    appDataSpy.getSeasonResults$.and.returnValue(from(appdataResult));
+    appDataSpy.getSeasonResult$
+      .withArgs(argument1, 1).and.returnValue(of(appdataResult[0]))
+      .withArgs(argument1, 2).and.returnValue(of(appdataResult[1]))
+      .withArgs(argument1, -3).and.returnValue(of(appdataResult[4]))
+      .withArgs(argument1, -2).and.returnValue(of(appdataResult[3]))
+      .withArgs(argument1, -1).and.returnValue(of(appdataResult[1]));
     appDataSpy.addSeasonResult.and.stub();
     appDataSpy.updateSeasonResult.and.stub();
 
@@ -980,7 +1029,7 @@ describe('SynchronizeDataService', () => {
     ];
 
     service["syncSeasonResult"](argument1, argument2);
-    expect(appDataSpy.getSeasonResults$).not.toHaveBeenCalled();
+    expect(appDataSpy.getSeasonResult$).not.toHaveBeenCalled();
     expect(appDataSpy.addSeasonResult).not.toHaveBeenCalled();
     expect(appDataSpy.updateSeasonResult).not.toHaveBeenCalled();
   });

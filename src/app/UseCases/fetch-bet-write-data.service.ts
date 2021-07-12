@@ -1,16 +1,24 @@
 import { Injectable } from '@angular/core';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { Observable, combineLatest } from 'rxjs';
-import { map, mergeMap, distinct } from 'rxjs/operators';
+import { Observable, combineLatest, concat, range } from 'rxjs';
+import { map, mergeMap, distinct, concatMap } from 'rxjs/operators';
 import { Bet, Match, Result, SeasonBet } from '../Businessrules/basic_datastructures';
 import { BetWriteData, SeasonBetWriteData } from './output_datastructures';
+import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FetchBetWriteDataService {
 
-  constructor(private appData: AppdataAccessService) { }
+  relevantPlaces$: Observable<number>;
+
+  constructor(private appData: AppdataAccessService) {
+    this.relevantPlaces$ = concat(
+      range(1, RELEVANT_FIRST_PLACES_COUNT),
+      range(-RELEVANT_LAST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT)
+    );
+  }
 
   public fetchDataByMatchday$(season: number, matchday: number, userId: string): Observable<BetWriteData> {
     // returns the required BetWriteData of the given matchday as Observable
@@ -34,10 +42,12 @@ export class FetchBetWriteDataService {
 
   public fetchSeasonData$(season: number, userId: string): Observable<SeasonBetWriteData> {
     // returns the required SeasonBetWriteData of the given season as Observable
+    // sorted by the first to the last place
 
-    return this.appData.getSeasonBets$(season, userId).pipe(
-      mergeMap((bet: SeasonBet) => this.makeSeasonBetWriteData$(bet)),
-      distinct(betWriteData => betWriteData.place) // prevents adding new form on changing a bet if real-time reading is active
+    return this.relevantPlaces$.pipe(
+      concatMap((place: number) => this.appData.getSeasonBet$(season, place, userId)),
+      concatMap((bet: SeasonBet) => this.makeSeasonBetWriteData$(bet)),
+      distinct((writeData: SeasonBetWriteData) => writeData.place) // prevents adding new form on changing a bet if real-time reading is active
     );
   }
 

@@ -1,18 +1,26 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, from, iif, combineLatest } from 'rxjs';
+import { Observable, of, from, iif, combineLatest, range, concat } from 'rxjs';
 import { map, concatMap, toArray, reduce, pluck, defaultIfEmpty } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
 import { Score, SeasonBet, SeasonResult, User } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot } from '../Dataaccess/import_datastructures';
 import { TableData } from './output_datastructures';
+import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FetchTableService {
 
-  constructor(private appData: AppdataAccessService, private statisticsCalculator: StatisticsCalculatorService) { }
+  relevantPlaces$: Observable<number>;
+
+  constructor(private appData: AppdataAccessService, private statisticsCalculator: StatisticsCalculatorService) {
+    this.relevantPlaces$ = concat(
+      range(1, RELEVANT_FIRST_PLACES_COUNT),
+      range(-RELEVANT_LAST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT)
+    );
+  }
 
   public fetchTableByMatchdays$(season: number, matchdays: number[], includeSeasonBets: boolean = false): Observable<TableData> {
     // fetches TableData according to the given season and the given matchdays
@@ -61,7 +69,9 @@ export class FetchTableService {
     // collects the SeasonBets of all active users and returns them as an array
 
     return this.appData.getActiveUserIds$().pipe(
-      concatMap((userId: string) => this.appData.getSeasonBets$(season, userId)),
+      concatMap((userId: string) => this.relevantPlaces$.pipe(
+        concatMap((place: number) => this.appData.getSeasonBet$(season, place, userId))
+      )),
       toArray()
     );
   }
@@ -69,7 +79,8 @@ export class FetchTableService {
   private fetchSeasonResultArray$(season: number): Observable<SeasonResult[]> {
     // collects the SeasonResult of the given season and returns it as an array
 
-    return this.appData.getSeasonResults$(season).pipe(
+    return this.relevantPlaces$.pipe(
+      concatMap((place: number) => this.appData.getSeasonResult$(season, place)),
       toArray()
     );
   }

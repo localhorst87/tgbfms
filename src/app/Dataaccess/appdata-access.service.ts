@@ -8,8 +8,8 @@ export abstract class AppdataAccessService {
   public abstract getBet$(matchId: number, userId: string): Observable<Bet>;
   public abstract getResult$(matchId: number): Observable<Result>
   public abstract getMatch$(matchId: number): Observable<Match>;
-  public abstract getSeasonBets$(season: number, userId: string): Observable<SeasonBet>;
-  public abstract getSeasonResults$(season: number): Observable<SeasonResult>;
+  public abstract getSeasonBet$(season: number, place: number, userId: string): Observable<SeasonBet>;
+  public abstract getSeasonResult$(season: number, place: number): Observable<SeasonResult>;
   public abstract getMatchesByMatchday$(season: number, matchday: number): Observable<Match>;
   public abstract getNextMatchesByTime$(nextDays: number): Observable<Match>;
   public abstract getMatchdayByMatchId$(matchId: number): Observable<number>;

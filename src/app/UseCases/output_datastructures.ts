@@ -22,11 +22,23 @@ export interface BetOverviewFrameData {
   isBetFixed: boolean;
 }
 
+export interface SeasonBetOverviewFrameData {
+  place: number;
+  resultTeamName: string;
+  isBetFixed: boolean;
+}
+
 export interface BetOverviewUserData {
   matchId: number;
   userName: string;
   betGoalsHome: number;
   betGoalsAway: number;
+}
+
+export interface SeasonBetOverviewUserData {
+  place: number;
+  userName: string;
+  teamName: string;
 }
 
 export interface SeasonBetWriteData {

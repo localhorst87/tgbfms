@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, combineLatest } from 'rxjs';
-import { take, toArray } from 'rxjs/operators';
+import { Observable, combineLatest, range, concat } from 'rxjs';
+import { take, toArray, concatMap } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { MatchImportData, TeamRankingImportData } from '../Dataaccess/import_datastructures';
@@ -12,7 +12,14 @@ import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Busi
 })
 export class SynchronizeDataService {
 
-  constructor(private appDataAccess: AppdataAccessService, private matchDataAccess: MatchdataAccessService) { }
+  relevantPlaces$: Observable<number>;
+
+  constructor(private appDataAccess: AppdataAccessService, private matchDataAccess: MatchdataAccessService) {
+    this.relevantPlaces$ = concat(
+      range(1, RELEVANT_FIRST_PLACES_COUNT),
+      range(-RELEVANT_LAST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT)
+    );
+  }
 
   public syncData(season: number, matchday: number): void {
     // performs synchronization of Match and Result data of the app data
@@ -104,48 +111,29 @@ export class SynchronizeDataService {
       return;
     }
 
-    this.appDataAccess.getSeasonResults$(season).pipe(toArray()).subscribe(
-      (appdataResults: SeasonResult[]) => {
+    this.relevantPlaces$.pipe(
+      concatMap((place: number) => this.appDataAccess.getSeasonResult$(season, place))
+    ).subscribe(
+      (appdataResult: SeasonResult) => {
+        let place: number = appdataResult.place; // place > 0 -> first places, place < 0 -> last places
+        let elImportData = (place > 0) ? place - 1 : place + nImports; // instruction which element to take from the imported data (from front or end)
 
-        // first places
-        for (let i = 1; i <= RELEVANT_FIRST_PLACES_COUNT; i++) {
+        let importedResult: SeasonResult = this.convertToSeasonResult(season, place, importedData[elImportData]);
 
-          let importedResult: SeasonResult = this.convertToSeasonResult(season, i, importedData[i - 1]);
-          let appdataResult: SeasonResult[] = appdataResults.filter(result => result.place == i);
-
-          if (appdataResult.length == 0) { // SeasonResult not availabe in app database
-            this.appDataAccess.addSeasonResult(importedResult);
-            continue;
-          }
-
-          if (!this.isSeasonResultEqual(appdataResult[0], importedResult)) { // available, but not up to date
-            this.appDataAccess.updateSeasonResult(appdataResult[0].documentId, importedResult);
-          }
+        if (appdataResult.teamId == -1) { // SeasonResult not availabe in app database
+          this.appDataAccess.addSeasonResult(importedResult);
+          return;
         }
 
-        // last places
-        for (let i = -1; i >= -RELEVANT_LAST_PLACES_COUNT; i--) {
-
-          // in case of 18 teams, -1 is the 18th place, -2 is the 17th place, ...
-          let importedResult: SeasonResult = this.convertToSeasonResult(season, i, importedData[i + nImports]);
-          let appdataResult: SeasonResult[] = appdataResults.filter(result => result.place == i);
-
-          if (appdataResult.length == 0) { // SeasonResult not availabe in app database
-            this.appDataAccess.addSeasonResult(importedResult);
-            continue;
-          }
-
-          if (!this.isSeasonResultEqual(appdataResult[0], importedResult)) { // available, but not up to date
-            this.appDataAccess.updateSeasonResult(appdataResult[0].documentId, importedResult);
-          }
+        if (!this.isSeasonResultEqual(appdataResult, importedResult)) { // available, but not up to date
+          this.appDataAccess.updateSeasonResult(appdataResult.documentId, importedResult);
         }
-
       }
     );
   }
 
-  private convertToSeasonResult(season: number, place: number, teamRankingRow: TeamRankingImportData) {
-    //
+  private convertToSeasonResult(season: number, place: number, teamRankingRow: TeamRankingImportData): SeasonResult {
+    // creates a new SeasonResult object from the given import data
 
     return {
       documentId: "",

@@ -15,7 +15,7 @@ describe('FetchTableService', () => {
   let statCalcSpy: jasmine.SpyObj<StatisticsCalculatorService>;
 
   beforeEach(() => {
-    appDataSpy = jasmine.createSpyObj(["getMatchdayScoreSnapshot$", "getActiveUserIds$", "getSeasonBets$", "getSeasonResults$", "getUserDataById$"]);
+    appDataSpy = jasmine.createSpyObj(["getMatchdayScoreSnapshot$", "getActiveUserIds$", "getSeasonBet$", "getSeasonResult$", "getUserDataById$"]);
     statCalcSpy = jasmine.createSpyObj(["addScoreArrays", "getSeasonScoreArray", "compareScores", "makePositions"]);
 
     TestBed.configureTestingModule({
@@ -464,7 +464,7 @@ describe('FetchTableService', () => {
         season: argument,
         userId: "test_user_id_0",
         isFixed: true,
-        place: -1,
+        place: -3,
         teamId: 10
       },
       {
@@ -480,7 +480,7 @@ describe('FetchTableService', () => {
         season: argument,
         userId: "test_user_id_0",
         isFixed: true,
-        place: -3,
+        place: -1,
         teamId: 67
       }
     ];
@@ -507,7 +507,7 @@ describe('FetchTableService', () => {
         season: argument,
         userId: "test_user_id_1",
         isFixed: true,
-        place: -1,
+        place: -3,
         teamId: 78
       },
       {
@@ -523,7 +523,7 @@ describe('FetchTableService', () => {
         season: argument,
         userId: "test_user_id_1",
         isFixed: true,
-        place: -3,
+        place: -1,
         teamId: 123
       }
     ];
@@ -550,7 +550,7 @@ describe('FetchTableService', () => {
         season: argument,
         userId: "test_user_id_2",
         isFixed: true,
-        place: -1,
+        place: -3,
         teamId: 10
       },
       {
@@ -566,7 +566,7 @@ describe('FetchTableService', () => {
         season: argument,
         userId: "test_user_id_2",
         isFixed: true,
-        place: -3,
+        place: -1,
         teamId: 56
       }
     ];
@@ -574,10 +574,22 @@ describe('FetchTableService', () => {
     const expectedValues: SeasonBet[] = seasonBetsUser0.concat(seasonBetsUser1).concat(seasonBetsUser2);
 
     appDataSpy.getActiveUserIds$.and.returnValue(of("test_user_id_0", "test_user_id_1", "test_user_id_2"));
-    appDataSpy.getSeasonBets$
-      .withArgs(argument, "test_user_id_0").and.returnValue(from(seasonBetsUser0))
-      .withArgs(argument, "test_user_id_1").and.returnValue(from(seasonBetsUser1))
-      .withArgs(argument, "test_user_id_2").and.returnValue(from(seasonBetsUser2));
+    appDataSpy.getSeasonBet$
+      .withArgs(argument, 1, "test_user_id_0").and.returnValue(of(seasonBetsUser0[0]))
+      .withArgs(argument, 2, "test_user_id_0").and.returnValue(of(seasonBetsUser0[1]))
+      .withArgs(argument, -3, "test_user_id_0").and.returnValue(of(seasonBetsUser0[2]))
+      .withArgs(argument, -2, "test_user_id_0").and.returnValue(of(seasonBetsUser0[3]))
+      .withArgs(argument, -1, "test_user_id_0").and.returnValue(of(seasonBetsUser0[4]))
+      .withArgs(argument, 1, "test_user_id_1").and.returnValue(of(seasonBetsUser1[0]))
+      .withArgs(argument, 2, "test_user_id_1").and.returnValue(of(seasonBetsUser1[1]))
+      .withArgs(argument, -3, "test_user_id_1").and.returnValue(of(seasonBetsUser1[2]))
+      .withArgs(argument, -2, "test_user_id_1").and.returnValue(of(seasonBetsUser1[3]))
+      .withArgs(argument, -1, "test_user_id_1").and.returnValue(of(seasonBetsUser1[4]))
+      .withArgs(argument, 1, "test_user_id_2").and.returnValue(of(seasonBetsUser2[0]))
+      .withArgs(argument, 2, "test_user_id_2").and.returnValue(of(seasonBetsUser2[1]))
+      .withArgs(argument, -3, "test_user_id_2").and.returnValue(of(seasonBetsUser2[2]))
+      .withArgs(argument, -2, "test_user_id_2").and.returnValue(of(seasonBetsUser2[3]))
+      .withArgs(argument, -1, "test_user_id_2").and.returnValue(of(seasonBetsUser2[4]));
 
     service["fetchSeasonBetArray$"](argument).subscribe(
       val => {
@@ -593,7 +605,6 @@ describe('FetchTableService', () => {
     const expectedValues: SeasonBet[] = [];
 
     appDataSpy.getActiveUserIds$.and.returnValue(from([]));
-    appDataSpy.getSeasonBets$.and.returnValue(from([]));
 
     service["fetchSeasonBetArray$"](argument).subscribe(
       val => {
@@ -643,23 +654,14 @@ describe('FetchTableService', () => {
       }
     ];
 
-    appDataSpy.getSeasonResults$.and.returnValue(from(seasonResults));
+    appDataSpy.getSeasonResult$
+      .withArgs(argument, 1).and.returnValue(of(seasonResults[0]))
+      .withArgs(argument, 2).and.returnValue(of(seasonResults[1]))
+      .withArgs(argument, -3).and.returnValue(of(seasonResults[2]))
+      .withArgs(argument, -2).and.returnValue(of(seasonResults[3]))
+      .withArgs(argument, -1).and.returnValue(of(seasonResults[4]));
 
     const expectedValues: SeasonResult[] = seasonResults;
-
-    service["fetchSeasonResultArray$"](argument).subscribe(
-      val => {
-        expect(val).toEqual(expectedValues);
-        done();
-      }
-    );
-  });
-
-  it('fetchSeasonResultArray$, data available', (done: DoneFn) => {
-    const argument: number = 2020;
-
-    appDataSpy.getSeasonResults$.and.returnValue(from([]));
-    const expectedValues: SeasonResult[] = [];
 
     service["fetchSeasonResultArray$"](argument).subscribe(
       val => {

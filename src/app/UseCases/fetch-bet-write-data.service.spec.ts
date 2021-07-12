@@ -14,7 +14,7 @@ describe('FetchBetWriteDataService', () => {
   let matches: Match[];
 
   beforeEach(() => {
-    appDataSpy = jasmine.createSpyObj(["getTeamNameByTeamId$", "getBet$", "getNextMatchesByTime$", "getMatchesByMatchday$", "getSeasonBets$"]);
+    appDataSpy = jasmine.createSpyObj(["getTeamNameByTeamId$", "getBet$", "getNextMatchesByTime$", "getMatchesByMatchday$", "getSeasonBet$"]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -101,8 +101,24 @@ describe('FetchBetWriteDataService', () => {
         documentId: "doc_id_2",
         season: argument1,
         userId: argument2,
+        isFixed: true,
+        place: -3,
+        teamId: 99
+      },
+      {
+        documentId: "doc_id_3",
+        season: argument1,
+        userId: argument2,
+        isFixed: true,
+        place: -2,
+        teamId: 111
+      },
+      {
+        documentId: "doc_id_4",
+        season: argument1,
+        userId: argument2,
         isFixed: false,
-        place: 18,
+        place: -1,
         teamId: 122
       }
     ];
@@ -110,6 +126,8 @@ describe('FetchBetWriteDataService', () => {
     const teamNames: string[] = [
       "team_name_45",
       "team_name_76",
+      "team_name_99",
+      "team_name_111",
       "team_name_122"
     ];
 
@@ -134,14 +152,36 @@ describe('FetchBetWriteDataService', () => {
         teamName: teamNames[2],
         isBetFixed: seasonBets[2].isFixed,
         betDocumentId: seasonBets[2].documentId
+      },
+      {
+        season: seasonBets[3].season,
+        place: seasonBets[3].place,
+        teamName: teamNames[3],
+        isBetFixed: seasonBets[3].isFixed,
+        betDocumentId: seasonBets[3].documentId
+      },
+      {
+        season: seasonBets[4].season,
+        place: seasonBets[4].place,
+        teamName: teamNames[4],
+        isBetFixed: seasonBets[4].isFixed,
+        betDocumentId: seasonBets[4].documentId
       }
     ];
 
-    appDataSpy.getSeasonBets$.and.returnValue(from(seasonBets));
+    appDataSpy.getSeasonBet$
+      .withArgs(argument1, 1, argument2).and.returnValue(of(seasonBets[0]))
+      .withArgs(argument1, 2, argument2).and.returnValue(of(seasonBets[1]))
+      .withArgs(argument1, -3, argument2).and.returnValue(of(seasonBets[2]))
+      .withArgs(argument1, -2, argument2).and.returnValue(of(seasonBets[3]))
+      .withArgs(argument1, -1, argument2).and.returnValue(of(seasonBets[4]));
+
     spyOn<any>(service, "makeSeasonBetWriteData$")
       .withArgs(seasonBets[0]).and.returnValue(of(expectedValues[0]))
       .withArgs(seasonBets[1]).and.returnValue(of(expectedValues[1]))
-      .withArgs(seasonBets[2]).and.returnValue(of(expectedValues[2]));
+      .withArgs(seasonBets[2]).and.returnValue(of(expectedValues[2]))
+      .withArgs(seasonBets[3]).and.returnValue(of(expectedValues[3]))
+      .withArgs(seasonBets[4]).and.returnValue(of(expectedValues[4]));
 
     let i: number = 0;
     service["fetchSeasonData$"](argument1, argument2).subscribe(
@@ -150,105 +190,6 @@ describe('FetchBetWriteDataService', () => {
         done();
       }
     );
-  });
-
-  it('fetchSeasonData$, emitting bets twice', (done: DoneFn) => {
-    const argument1: number = 2021;
-    const argument2: string = "test_user_id";
-
-    const seasonBets: SeasonBet[] = [
-      {
-        documentId: "doc_id_0",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: 1,
-        teamId: 45
-      },
-      {
-        documentId: "doc_id_1",
-        season: argument1,
-        userId: argument2,
-        isFixed: true,
-        place: 2,
-        teamId: 76
-      },
-      {
-        documentId: "doc_id_2",
-        season: argument1,
-        userId: argument2,
-        isFixed: false,
-        place: 18,
-        teamId: 122
-      }
-    ];
-
-    const teamNames: string[] = [
-      "team_name_45",
-      "team_name_76",
-      "team_name_122"
-    ];
-
-    const expectedValues: SeasonBetWriteData[] = [
-      {
-        season: seasonBets[0].season,
-        place: seasonBets[0].place,
-        teamName: teamNames[0],
-        isBetFixed: seasonBets[0].isFixed,
-        betDocumentId: seasonBets[0].documentId
-      },
-      {
-        season: seasonBets[1].season,
-        place: seasonBets[1].place,
-        teamName: teamNames[1],
-        isBetFixed: seasonBets[1].isFixed,
-        betDocumentId: seasonBets[1].documentId
-      },
-      {
-        season: seasonBets[2].season,
-        place: seasonBets[2].place,
-        teamName: teamNames[2],
-        isBetFixed: seasonBets[2].isFixed,
-        betDocumentId: seasonBets[2].documentId
-      }
-    ];
-
-    appDataSpy.getSeasonBets$.and.returnValue(from(seasonBets));
-    spyOn<any>(service, "makeSeasonBetWriteData$")
-      .withArgs(seasonBets[0]).and.returnValue(of(expectedValues[0], expectedValues[0]))
-      .withArgs(seasonBets[1]).and.returnValue(of(expectedValues[1], expectedValues[1]))
-      .withArgs(seasonBets[2]).and.returnValue(of(expectedValues[2], expectedValues[2]));
-
-    let i: number = 0;
-    service["fetchSeasonData$"](argument1, argument2).subscribe(
-      val => {
-        expect(val).toEqual(expectedValues[i++]);
-        done();
-      }
-    );
-  });
-
-  it('fetchSeasonData$, no data available', (done: DoneFn) => {
-    const argument1: number = 2021;
-    const argument2: string = "test_user_id";
-
-    let defaultValue: SeasonBetWriteData = {
-      season: -1,
-      place: 0,
-      teamName: "",
-      isBetFixed: false,
-      betDocumentId: ""
-    };
-
-    appDataSpy.getSeasonBets$.and.returnValue(from([]));
-
-    service["fetchSeasonData$"](argument1, argument2).pipe(
-      defaultIfEmpty(defaultValue)).subscribe(
-        val => {
-          expect(val).toEqual(defaultValue);
-          done();
-        }
-      );
   });
 
   // ---------------------------------------------------------------------------

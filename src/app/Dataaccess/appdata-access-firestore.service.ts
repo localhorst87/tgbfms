@@ -351,16 +351,18 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
+  setBet(documentId: string, bet: Bet): void {
+    let betToUpdate: any = bet;
+    delete betToUpdate.documentId;
+
+    let betDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_BETS + "/" + documentId);
+    betDocument.set(betToUpdate);
+  }
+
   addMatch(match: Match): void {
     let matchToWrite: any = match;
     delete matchToWrite.documentId;
     this.firestore.collection(COLLECTION_NAME_MATCHES).add(matchToWrite);
-  }
-
-  addBet(bet: Bet): void {
-    let betToWrite: any = bet;
-    delete betToWrite.documentId;
-    this.firestore.collection(COLLECTION_NAME_BETS).add(betToWrite);
   }
 
   addResult(result: Result): void {
@@ -401,14 +403,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     matchDocument.update(matchToUpdate);
   }
 
-  updateBet(documentId: string, bet: Bet): void {
-    let betToUpdate: any = bet;
-    delete betToUpdate.documentId;
-
-    let betDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_BETS + "/" + documentId);
-    betDocument.update(betToUpdate);
-  }
-
   updateResult(documentId: string, result: Result): void {
     let resultToUpdate: any = result;
     delete resultToUpdate.documentId;
@@ -447,6 +441,10 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let syncTimeDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_UPDATE_TIMES + "/" + documentId);
     syncTimeDocument.update(syncTimeToUpdate);
+  }
+
+  createDocumentId(): string {
+    return this.firestore.createId();
   }
 
   private makeUnknownMatch(matchId: number): Match {

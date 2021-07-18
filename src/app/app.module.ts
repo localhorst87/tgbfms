@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,10 +17,22 @@ import { AppdataAccessService } from './Dataaccess/appdata-access.service';
 import { AppdataAccessFirestoreService } from './Dataaccess/appdata-access-firestore.service';
 import { MatchdataAccessService } from './Dataaccess/matchdata-access.service';
 import { MatchdataAccessOpenligaService } from './Dataaccess/matchdata-access-openliga.service';
+import { PointCalculatorService } from './Businessrules/point-calculator.service';
+import { PointCalculatorTrendbasedService } from './Businessrules/point-calculator-trendbased.service';
+import { StatisticsCalculatorService } from './Businessrules/statistics-calculator.service';
+import { StatisticsCalculatorTrendbasedService } from './Businessrules/statistics-calculator-trendbased.service';
+import { BetWriteComponent } from './bet-write/bet-write.component';
+
+// Angular Material
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    BetWriteComponent
   ],
   imports: [
     BrowserModule,
@@ -28,11 +41,17 @@ import { MatchdataAccessOpenligaService } from './Dataaccess/matchdata-access-op
     ReactiveFormsModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAnalyticsModule,
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatInputModule,
+    MatIconModule
   ],
   providers: [
     { provide: AppdataAccessService, useClass: AppdataAccessFirestoreService },
-    { provide: MatchdataAccessService, useClass: MatchdataAccessOpenligaService }
+    { provide: MatchdataAccessService, useClass: MatchdataAccessOpenligaService },
+    { provide: PointCalculatorService, useClass: PointCalculatorTrendbasedService },
+    { provide: StatisticsCalculatorService, useClass: StatisticsCalculatorTrendbasedService }
   ],
   bootstrap: [AppComponent]
 })

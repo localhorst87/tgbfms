@@ -14,7 +14,7 @@ describe('FetchBetWriteDataService', () => {
   let matches: Match[];
 
   beforeEach(() => {
-    appDataSpy = jasmine.createSpyObj(["getTeamNameByTeamId$", "getBet$", "getNextMatchesByTime$", "getMatchesByMatchday$", "getSeasonBet$"]);
+    appDataSpy = jasmine.createSpyObj(["createDocumentId", "getTeamNameByTeamId$", "getBet$", "getNextMatchesByTime$", "getMatchesByMatchday$", "getSeasonBet$"]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -635,6 +635,48 @@ describe('FetchBetWriteDataService', () => {
     service["makeBetWriteData$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValues[0]);
+        done();
+      }
+    );
+  });
+
+  it('makeBetWriteData$, all services emitting, documentId empty', (done: DoneFn) => {
+    const argument1: Match = matches[0];
+    const argument2: string = "test_user_id";
+
+    const unknownBet: Bet = {
+      documentId: "",
+      matchId: 58815,
+      userId: "test_user_id",
+      isFixed: false,
+      goalsHome: -1,
+      goalsAway: -1,
+    };
+
+    const createdId: string = "created_test_id";
+
+    let expectedValue: BetWriteData = {
+      matchId: matches[0].matchId,
+      matchTimestamp: matches[0].timestamp,
+      isTopMatch: matches[0].isTopMatch,
+      teamNameHome: "home_team_name_0",
+      teamNameAway: "away_team_name_0",
+      betGoalsHome: unknownBet.goalsHome,
+      betGoalsAway: unknownBet.goalsAway,
+      isBetFixed: unknownBet.isFixed,
+      betDocumentId: createdId
+    };
+
+    appDataSpy.getTeamNameByTeamId$
+      .withArgs(matches[0].teamIdHome).and.returnValue(of(expectedValue.teamNameHome))
+      .withArgs(matches[0].teamIdAway).and.returnValue(of(expectedValue.teamNameAway));
+
+    appDataSpy.getBet$.and.returnValue(of(unknownBet));
+    appDataSpy.createDocumentId.and.returnValue(createdId);
+
+    service["makeBetWriteData$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
         done();
       }
     );

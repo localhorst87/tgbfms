@@ -75,6 +75,11 @@ export class FetchBetWriteDataService {
       this.appData.getTeamNameByTeamId$(match.teamIdAway),
       this.appData.getBet$(match.matchId, userId),
       (teamHome, teamAway, bet) => {
+
+        if (bet.documentId == "") {
+          bet.documentId = this.appData.createDocumentId();
+        }
+
         return {
           matchId: match.matchId,
           matchTimestamp: match.timestamp,

@@ -351,8 +351,9 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
-  setBet(documentId: string, bet: Bet): void {
+  setBet(bet: Bet): void {
     let betToUpdate: any = bet;
+    let documentId: string = bet.documentId;
     delete betToUpdate.documentId;
 
     let betDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_BETS + "/" + documentId);

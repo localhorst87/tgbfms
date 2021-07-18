@@ -1,12 +1,11 @@
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import '@angular/common/locales/global/de';
 
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
@@ -48,6 +47,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatIconModule
   ],
   providers: [
+    { provide: LOCALE_ID, useValue: 'de' },
     { provide: AppdataAccessService, useClass: AppdataAccessFirestoreService },
     { provide: MatchdataAccessService, useClass: MatchdataAccessOpenligaService },
     { provide: PointCalculatorService, useClass: PointCalculatorTrendbasedService },

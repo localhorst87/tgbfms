@@ -2,10 +2,14 @@ import { Observable } from 'rxjs';
 
 export interface BetWriteData {
   matchId: number;
-  matchTimestamp: number;
+  matchDate: Date;
   isTopMatch: boolean;
+  teamIdHome: number;
+  teamIdAway: number;
   teamNameHome: string;
   teamNameAway: string;
+  teamNameShortHome: string;
+  teamNameShortAway: string;
   betGoalsHome: number;
   betGoalsAway: number;
   isBetFixed: boolean;

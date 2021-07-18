@@ -204,7 +204,7 @@ describe('FetchBetWriteDataService', () => {
     let expectedValues: BetWriteData[] = [
       {
         matchId: matches[0].matchId,
-        matchTimestamp: matches[0].timestamp,
+        matchDate: new Date(matches[0].timestamp * 1000),
         isTopMatch: matches[0].isTopMatch,
         teamIdHome: matches[0].teamIdHome,
         teamIdAway: matches[0].teamIdAway,
@@ -219,7 +219,7 @@ describe('FetchBetWriteDataService', () => {
       },
       {
         matchId: matches[1].matchId,
-        matchTimestamp: matches[1].timestamp,
+        matchDate: new Date(matches[1].timestamp * 1000),
         isTopMatch: matches[1].isTopMatch,
         teamIdHome: matches[1].teamIdHome,
         teamIdAway: matches[1].teamIdAway,
@@ -256,7 +256,7 @@ describe('FetchBetWriteDataService', () => {
     let expectedValues: BetWriteData[] = [
       {
         matchId: matches[0].matchId,
-        matchTimestamp: matches[0].timestamp,
+        matchDate: new Date(matches[0].timestamp * 1000),
         isTopMatch: matches[0].isTopMatch,
         teamIdHome: matches[0].teamIdHome,
         teamIdAway: matches[0].teamIdAway,
@@ -271,7 +271,7 @@ describe('FetchBetWriteDataService', () => {
       },
       {
         matchId: matches[1].matchId,
-        matchTimestamp: matches[1].timestamp,
+        matchDate: new Date(matches[1].timestamp * 1000),
         isTopMatch: matches[1].isTopMatch,
         teamIdHome: matches[1].teamIdHome,
         teamIdAway: matches[1].teamIdAway,
@@ -307,7 +307,7 @@ describe('FetchBetWriteDataService', () => {
 
     let defaultValue: BetWriteData = {
       matchId: -1,
-      matchTimestamp: -1,
+      matchDate: new Date(0),
       isTopMatch: false,
       teamIdHome: -1,
       teamIdAway: -1,
@@ -343,7 +343,7 @@ describe('FetchBetWriteDataService', () => {
     let expectedValues: BetWriteData[] = [
       {
         matchId: matches[0].matchId,
-        matchTimestamp: matches[0].timestamp,
+        matchDate: new Date(matches[0].timestamp * 1000),
         isTopMatch: matches[0].isTopMatch,
         teamIdHome: matches[0].teamIdHome,
         teamIdAway: matches[0].teamIdAway,
@@ -358,7 +358,7 @@ describe('FetchBetWriteDataService', () => {
       },
       {
         matchId: matches[1].matchId,
-        matchTimestamp: matches[1].timestamp,
+        matchDate: new Date(matches[1].timestamp * 1000),
         isTopMatch: matches[1].isTopMatch,
         teamIdHome: matches[1].teamIdHome,
         teamIdAway: matches[1].teamIdAway,
@@ -394,7 +394,7 @@ describe('FetchBetWriteDataService', () => {
     let expectedValues: BetWriteData[] = [
       {
         matchId: matches[0].matchId,
-        matchTimestamp: matches[0].timestamp,
+        matchDate: new Date(matches[0].timestamp * 1000),
         isTopMatch: matches[0].isTopMatch,
         teamIdHome: matches[0].teamIdHome,
         teamIdAway: matches[0].teamIdAway,
@@ -409,7 +409,7 @@ describe('FetchBetWriteDataService', () => {
       },
       {
         matchId: matches[1].matchId,
-        matchTimestamp: matches[1].timestamp,
+        matchDate: new Date(matches[1].timestamp * 1000),
         isTopMatch: matches[1].isTopMatch,
         teamIdHome: matches[1].teamIdHome,
         teamIdAway: matches[1].teamIdAway,
@@ -445,7 +445,7 @@ describe('FetchBetWriteDataService', () => {
     let expectedValues: BetWriteData[] = [
       {
         matchId: matches[0].matchId,
-        matchTimestamp: matches[0].timestamp,
+        matchDate: new Date(matches[0].timestamp * 1000),
         isTopMatch: matches[0].isTopMatch,
         teamIdHome: matches[0].teamIdHome,
         teamIdAway: matches[0].teamIdAway,
@@ -460,7 +460,7 @@ describe('FetchBetWriteDataService', () => {
       },
       {
         matchId: matches[1].matchId,
-        matchTimestamp: matches[1].timestamp,
+        matchDate: new Date(matches[1].timestamp * 1000),
         isTopMatch: matches[1].isTopMatch,
         teamIdHome: matches[1].teamIdHome,
         teamIdAway: matches[1].teamIdAway,
@@ -495,7 +495,7 @@ describe('FetchBetWriteDataService', () => {
 
     let defaultValue: BetWriteData = {
       matchId: -1,
-      matchTimestamp: -1,
+      matchDate: new Date(0),
       isTopMatch: false,
       teamIdHome: -1,
       teamIdAway: -1,
@@ -651,7 +651,7 @@ describe('FetchBetWriteDataService', () => {
 
     let expectedValue: BetWriteData = {
       matchId: matches[0].matchId,
-      matchTimestamp: matches[0].timestamp,
+      matchDate: new Date(matches[0].timestamp * 1000),
       isTopMatch: matches[0].isTopMatch,
       teamIdHome: matches[0].teamIdHome,
       teamIdAway: matches[0].teamIdAway,
@@ -698,7 +698,7 @@ describe('FetchBetWriteDataService', () => {
 
     let expectedValue: BetWriteData = {
       matchId: matches[0].matchId,
-      matchTimestamp: matches[0].timestamp,
+      matchDate: new Date(matches[0].timestamp * 1000),
       isTopMatch: matches[0].isTopMatch,
       teamIdHome: matches[0].teamIdHome,
       teamIdAway: matches[0].teamIdAway,
@@ -735,7 +735,7 @@ describe('FetchBetWriteDataService', () => {
 
     let expectedValue: BetWriteData = {
       matchId: matches[0].matchId,
-      matchTimestamp: matches[0].timestamp,
+      matchDate: new Date(matches[0].timestamp * 1000),
       isTopMatch: matches[0].isTopMatch,
       teamIdHome: matches[0].teamIdHome,
       teamIdAway: matches[0].teamIdAway,
@@ -751,7 +751,7 @@ describe('FetchBetWriteDataService', () => {
 
     let defaultValue: BetWriteData = {
       matchId: -1,
-      matchTimestamp: -1,
+      matchDate: new Date(0),
       isTopMatch: false,
       teamIdHome: -1,
       teamIdAway: -1,
@@ -788,7 +788,7 @@ describe('FetchBetWriteDataService', () => {
 
     let expectedValue: BetWriteData = {
       matchId: matches[1].matchId,
-      matchTimestamp: matches[1].timestamp,
+      matchDate: new Date(matches[1].timestamp * 1000),
       isTopMatch: matches[1].isTopMatch,
       teamIdHome: matches[1].teamIdHome,
       teamIdAway: matches[1].teamIdAway,

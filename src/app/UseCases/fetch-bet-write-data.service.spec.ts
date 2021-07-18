@@ -206,8 +206,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[0].matchId,
         matchTimestamp: matches[0].timestamp,
         isTopMatch: matches[0].isTopMatch,
+        teamIdHome: matches[0].teamIdHome,
+        teamIdAway: matches[0].teamIdAway,
         teamNameHome: "home_team_name_0",
         teamNameAway: "away_team_name_0",
+        teamNameShortHome: "HT0",
+        teamNameShortAway: "AW0",
         betGoalsHome: bets[0].goalsHome,
         betGoalsAway: bets[0].goalsAway,
         isBetFixed: bets[0].isFixed,
@@ -217,8 +221,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[1].matchId,
         matchTimestamp: matches[1].timestamp,
         isTopMatch: matches[1].isTopMatch,
+        teamIdHome: matches[1].teamIdHome,
+        teamIdAway: matches[1].teamIdAway,
         teamNameHome: "home_team_name_1",
         teamNameAway: "away_team_name_1",
+        teamNameShortHome: "HT1",
+        teamNameShortAway: "AW1",
         betGoalsHome: bets[1].goalsHome,
         betGoalsAway: bets[1].goalsAway,
         isBetFixed: bets[1].isFixed,
@@ -250,8 +258,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[0].matchId,
         matchTimestamp: matches[0].timestamp,
         isTopMatch: matches[0].isTopMatch,
+        teamIdHome: matches[0].teamIdHome,
+        teamIdAway: matches[0].teamIdAway,
         teamNameHome: "home_team_name_0",
         teamNameAway: "away_team_name_0",
+        teamNameShortHome: "HT0",
+        teamNameShortAway: "AW0",
         betGoalsHome: bets[0].goalsHome,
         betGoalsAway: bets[0].goalsAway,
         isBetFixed: bets[0].isFixed,
@@ -261,8 +273,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[1].matchId,
         matchTimestamp: matches[1].timestamp,
         isTopMatch: matches[1].isTopMatch,
+        teamIdHome: matches[1].teamIdHome,
+        teamIdAway: matches[1].teamIdAway,
         teamNameHome: "home_team_name_1",
         teamNameAway: "away_team_name_1",
+        teamNameShortHome: "HT1",
+        teamNameShortAway: "AW1",
         betGoalsHome: bets[1].goalsHome,
         betGoalsAway: bets[1].goalsAway,
         isBetFixed: bets[1].isFixed,
@@ -293,8 +309,12 @@ describe('FetchBetWriteDataService', () => {
       matchId: -1,
       matchTimestamp: -1,
       isTopMatch: false,
+      teamIdHome: -1,
+      teamIdAway: -1,
       teamNameHome: "",
       teamNameAway: "",
+      teamNameShortHome: "",
+      teamNameShortAway: "",
       betGoalsHome: -1,
       betGoalsAway: -1,
       isBetFixed: false,
@@ -325,8 +345,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[0].matchId,
         matchTimestamp: matches[0].timestamp,
         isTopMatch: matches[0].isTopMatch,
+        teamIdHome: matches[0].teamIdHome,
+        teamIdAway: matches[0].teamIdAway,
         teamNameHome: "home_team_name_0",
         teamNameAway: "away_team_name_0",
+        teamNameShortHome: "HT0",
+        teamNameShortAway: "AW0",
         betGoalsHome: bets[0].goalsHome,
         betGoalsAway: bets[0].goalsAway,
         isBetFixed: bets[0].isFixed,
@@ -336,8 +360,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[1].matchId,
         matchTimestamp: matches[1].timestamp,
         isTopMatch: matches[1].isTopMatch,
+        teamIdHome: matches[1].teamIdHome,
+        teamIdAway: matches[1].teamIdAway,
         teamNameHome: "home_team_name_1",
         teamNameAway: "away_team_name_1",
+        teamNameShortHome: "HT1",
+        teamNameShortAway: "AW1",
         betGoalsHome: bets[1].goalsHome,
         betGoalsAway: bets[1].goalsAway,
         isBetFixed: bets[1].isFixed,
@@ -368,8 +396,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[0].matchId,
         matchTimestamp: matches[0].timestamp,
         isTopMatch: matches[0].isTopMatch,
+        teamIdHome: matches[0].teamIdHome,
+        teamIdAway: matches[0].teamIdAway,
         teamNameHome: "home_team_name_0",
         teamNameAway: "away_team_name_0",
+        teamNameShortHome: "HT0",
+        teamNameShortAway: "AW0",
         betGoalsHome: bets[0].goalsHome,
         betGoalsAway: bets[0].goalsAway,
         isBetFixed: bets[0].isFixed,
@@ -379,8 +411,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[1].matchId,
         matchTimestamp: matches[1].timestamp,
         isTopMatch: matches[1].isTopMatch,
+        teamIdHome: matches[1].teamIdHome,
+        teamIdAway: matches[1].teamIdAway,
         teamNameHome: "home_team_name_1",
         teamNameAway: "away_team_name_1",
+        teamNameShortHome: "HT1",
+        teamNameShortAway: "AW1",
         betGoalsHome: bets[1].goalsHome,
         betGoalsAway: bets[1].goalsAway,
         isBetFixed: bets[1].isFixed,
@@ -411,8 +447,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[0].matchId,
         matchTimestamp: matches[0].timestamp,
         isTopMatch: matches[0].isTopMatch,
+        teamIdHome: matches[0].teamIdHome,
+        teamIdAway: matches[0].teamIdAway,
         teamNameHome: "home_team_name_0",
         teamNameAway: "away_team_name_0",
+        teamNameShortHome: "HT0",
+        teamNameShortAway: "AW0",
         betGoalsHome: bets[0].goalsHome,
         betGoalsAway: bets[0].goalsAway,
         isBetFixed: bets[0].isFixed,
@@ -422,8 +462,12 @@ describe('FetchBetWriteDataService', () => {
         matchId: matches[1].matchId,
         matchTimestamp: matches[1].timestamp,
         isTopMatch: matches[1].isTopMatch,
+        teamIdHome: matches[1].teamIdHome,
+        teamIdAway: matches[1].teamIdAway,
         teamNameHome: "home_team_name_1",
         teamNameAway: "away_team_name_1",
+        teamNameShortHome: "HT1",
+        teamNameShortAway: "AW1",
         betGoalsHome: bets[1].goalsHome,
         betGoalsAway: bets[1].goalsAway,
         isBetFixed: bets[1].isFixed,
@@ -453,8 +497,12 @@ describe('FetchBetWriteDataService', () => {
       matchId: -1,
       matchTimestamp: -1,
       isTopMatch: false,
+      teamIdHome: -1,
+      teamIdAway: -1,
       teamNameHome: "",
       teamNameAway: "",
+      teamNameShortHome: "",
+      teamNameShortAway: "",
       betGoalsHome: -1,
       betGoalsAway: -1,
       isBetFixed: false,
@@ -601,40 +649,33 @@ describe('FetchBetWriteDataService', () => {
     const argument1: Match = matches[0];
     const argument2: string = "test_user_id";
 
-    let expectedValues: BetWriteData[] = [
-      {
-        matchId: matches[0].matchId,
-        matchTimestamp: matches[0].timestamp,
-        isTopMatch: matches[0].isTopMatch,
-        teamNameHome: "home_team_name_0",
-        teamNameAway: "away_team_name_0",
-        betGoalsHome: bets[0].goalsHome,
-        betGoalsAway: bets[0].goalsAway,
-        isBetFixed: bets[0].isFixed,
-        betDocumentId: bets[0].documentId
-      },
-      {
-        matchId: matches[1].matchId,
-        matchTimestamp: matches[1].timestamp,
-        isTopMatch: matches[1].isTopMatch,
-        teamNameHome: "home_team_name_1",
-        teamNameAway: "away_team_name_1",
-        betGoalsHome: bets[1].goalsHome,
-        betGoalsAway: bets[1].goalsAway,
-        isBetFixed: bets[1].isFixed,
-        betDocumentId: bets[1].documentId
-      }
-    ];
+    let expectedValue: BetWriteData = {
+      matchId: matches[0].matchId,
+      matchTimestamp: matches[0].timestamp,
+      isTopMatch: matches[0].isTopMatch,
+      teamIdHome: matches[0].teamIdHome,
+      teamIdAway: matches[0].teamIdAway,
+      teamNameHome: "home_team_name_0",
+      teamNameAway: "away_team_name_0",
+      teamNameShortHome: "HT0",
+      teamNameShortAway: "AW0",
+      betGoalsHome: bets[0].goalsHome,
+      betGoalsAway: bets[0].goalsAway,
+      isBetFixed: bets[0].isFixed,
+      betDocumentId: bets[0].documentId
+    };
 
     appDataSpy.getTeamNameByTeamId$
-      .withArgs(matches[0].teamIdHome).and.returnValue(of(expectedValues[0].teamNameHome))
-      .withArgs(matches[0].teamIdAway).and.returnValue(of(expectedValues[0].teamNameAway));
+      .withArgs(matches[0].teamIdHome).and.returnValue(of(expectedValue.teamNameHome))
+      .withArgs(matches[0].teamIdAway).and.returnValue(of(expectedValue.teamNameAway))
+      .withArgs(matches[0].teamIdHome, true).and.returnValue(of(expectedValue.teamNameShortHome))
+      .withArgs(matches[0].teamIdAway, true).and.returnValue(of(expectedValue.teamNameShortAway));
 
     appDataSpy.getBet$.and.returnValue(of(bets[0]));
 
     service["makeBetWriteData$"](argument1, argument2).subscribe(
       val => {
-        expect(val).toEqual(expectedValues[0]);
+        expect(val).toEqual(expectedValue);
         done();
       }
     );
@@ -659,8 +700,12 @@ describe('FetchBetWriteDataService', () => {
       matchId: matches[0].matchId,
       matchTimestamp: matches[0].timestamp,
       isTopMatch: matches[0].isTopMatch,
+      teamIdHome: matches[0].teamIdHome,
+      teamIdAway: matches[0].teamIdAway,
       teamNameHome: "home_team_name_0",
       teamNameAway: "away_team_name_0",
+      teamNameShortHome: "HT0",
+      teamNameShortAway: "AW0",
       betGoalsHome: unknownBet.goalsHome,
       betGoalsAway: unknownBet.goalsAway,
       isBetFixed: unknownBet.isFixed,
@@ -669,7 +714,9 @@ describe('FetchBetWriteDataService', () => {
 
     appDataSpy.getTeamNameByTeamId$
       .withArgs(matches[0].teamIdHome).and.returnValue(of(expectedValue.teamNameHome))
-      .withArgs(matches[0].teamIdAway).and.returnValue(of(expectedValue.teamNameAway));
+      .withArgs(matches[0].teamIdAway).and.returnValue(of(expectedValue.teamNameAway))
+      .withArgs(matches[0].teamIdHome, true).and.returnValue(of(expectedValue.teamNameShortHome))
+      .withArgs(matches[0].teamIdAway, true).and.returnValue(of(expectedValue.teamNameShortAway));
 
     appDataSpy.getBet$.and.returnValue(of(unknownBet));
     appDataSpy.createDocumentId.and.returnValue(createdId);
@@ -686,37 +733,32 @@ describe('FetchBetWriteDataService', () => {
     const argument1: Match = matches[0];
     const argument2: string = "test_user_id";
 
-    let expectedValues: BetWriteData[] = [
-      {
-        matchId: matches[0].matchId,
-        matchTimestamp: matches[0].timestamp,
-        isTopMatch: matches[0].isTopMatch,
-        teamNameHome: "home_team_name_0",
-        teamNameAway: "away_team_name_0",
-        betGoalsHome: bets[0].goalsHome,
-        betGoalsAway: bets[0].goalsAway,
-        isBetFixed: bets[0].isFixed,
-        betDocumentId: bets[0].documentId
-      },
-      {
-        matchId: matches[1].matchId,
-        matchTimestamp: matches[1].timestamp,
-        isTopMatch: matches[1].isTopMatch,
-        teamNameHome: "home_team_name_1",
-        teamNameAway: "away_team_name_1",
-        betGoalsHome: bets[1].goalsHome,
-        betGoalsAway: bets[1].goalsAway,
-        isBetFixed: bets[1].isFixed,
-        betDocumentId: bets[1].documentId
-      }
-    ];
+    let expectedValue: BetWriteData = {
+      matchId: matches[0].matchId,
+      matchTimestamp: matches[0].timestamp,
+      isTopMatch: matches[0].isTopMatch,
+      teamIdHome: matches[0].teamIdHome,
+      teamIdAway: matches[0].teamIdAway,
+      teamNameHome: "home_team_name_0",
+      teamNameAway: "away_team_name_0",
+      teamNameShortHome: "HT0",
+      teamNameShortAway: "AW0",
+      betGoalsHome: bets[0].goalsHome,
+      betGoalsAway: bets[0].goalsAway,
+      isBetFixed: bets[0].isFixed,
+      betDocumentId: bets[0].documentId
+    };
 
     let defaultValue: BetWriteData = {
       matchId: -1,
       matchTimestamp: -1,
       isTopMatch: false,
+      teamIdHome: -1,
+      teamIdAway: -1,
       teamNameHome: "",
       teamNameAway: "",
+      teamNameShortHome: "",
+      teamNameShortAway: "",
       betGoalsHome: -1,
       betGoalsAway: -1,
       isBetFixed: false,
@@ -724,8 +766,10 @@ describe('FetchBetWriteDataService', () => {
     };
 
     appDataSpy.getTeamNameByTeamId$
-      .withArgs(matches[0].teamIdHome).and.returnValue(of(expectedValues[0].teamNameHome))
-      .withArgs(matches[0].teamIdAway).and.returnValue(of(expectedValues[0].teamNameAway));
+      .withArgs(matches[0].teamIdHome).and.returnValue(of(expectedValue.teamNameHome))
+      .withArgs(matches[0].teamIdAway).and.returnValue(of(expectedValue.teamNameAway))
+      .withArgs(matches[0].teamIdHome, true).and.returnValue(of(expectedValue.teamNameShortHome))
+      .withArgs(matches[0].teamIdAway, true).and.returnValue(of(expectedValue.teamNameShortAway));
 
     appDataSpy.getBet$.and.returnValue(of());
 
@@ -739,43 +783,36 @@ describe('FetchBetWriteDataService', () => {
   });
 
   it('makeBetWriteData$, one service emitting multiple values', (done: DoneFn) => {
-    const argument1: Match = matches[0];
+    const argument1: Match = matches[1];
     const argument2: string = "test_user_id";
 
-    let expectedValues: BetWriteData[] = [
-      {
-        matchId: matches[0].matchId,
-        matchTimestamp: matches[0].timestamp,
-        isTopMatch: matches[0].isTopMatch,
-        teamNameHome: "home_team_name_0",
-        teamNameAway: "away_team_name_0",
-        betGoalsHome: bets[0].goalsHome,
-        betGoalsAway: bets[0].goalsAway,
-        isBetFixed: bets[0].isFixed,
-        betDocumentId: bets[0].documentId
-      },
-      {
-        matchId: matches[1].matchId,
-        matchTimestamp: matches[1].timestamp,
-        isTopMatch: matches[1].isTopMatch,
-        teamNameHome: "home_team_name_1",
-        teamNameAway: "away_team_name_1",
-        betGoalsHome: bets[1].goalsHome,
-        betGoalsAway: bets[1].goalsAway,
-        isBetFixed: bets[1].isFixed,
-        betDocumentId: bets[1].documentId
-      }
-    ];
+    let expectedValue: BetWriteData = {
+      matchId: matches[1].matchId,
+      matchTimestamp: matches[1].timestamp,
+      isTopMatch: matches[1].isTopMatch,
+      teamIdHome: matches[1].teamIdHome,
+      teamIdAway: matches[1].teamIdAway,
+      teamNameHome: "home_team_name_1",
+      teamNameAway: "away_team_name_1",
+      teamNameShortHome: "HT1",
+      teamNameShortAway: "AW1",
+      betGoalsHome: bets[1].goalsHome,
+      betGoalsAway: bets[1].goalsAway,
+      isBetFixed: bets[1].isFixed,
+      betDocumentId: bets[1].documentId
+    };
 
     appDataSpy.getTeamNameByTeamId$
-      .withArgs(matches[0].teamIdHome).and.returnValue(from([expectedValues[1].teamNameHome, expectedValues[0].teamNameHome]))
-      .withArgs(matches[0].teamIdAway).and.returnValue(of(expectedValues[0].teamNameAway));
+      .withArgs(matches[1].teamIdHome).and.returnValue(from([expectedValue.teamNameHome, expectedValue.teamNameHome]))
+      .withArgs(matches[1].teamIdAway).and.returnValue(of(expectedValue.teamNameAway))
+      .withArgs(matches[1].teamIdHome, true).and.returnValue(of(expectedValue.teamNameShortHome))
+      .withArgs(matches[1].teamIdAway, true).and.returnValue(of(expectedValue.teamNameShortAway));
 
-    appDataSpy.getBet$.and.returnValue(of(bets[0]));
+    appDataSpy.getBet$.and.returnValue(of(bets[1]));
 
     service["makeBetWriteData$"](argument1, argument2).subscribe(
       val => {
-        expect(val).toEqual(expectedValues[0]);
+        expect(val).toEqual(expectedValue);
         done();
       }
     );

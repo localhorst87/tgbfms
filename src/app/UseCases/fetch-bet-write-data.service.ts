@@ -73,8 +73,10 @@ export class FetchBetWriteDataService {
     return combineLatest(
       this.appData.getTeamNameByTeamId$(match.teamIdHome),
       this.appData.getTeamNameByTeamId$(match.teamIdAway),
+      this.appData.getTeamNameByTeamId$(match.teamIdHome, true),
+      this.appData.getTeamNameByTeamId$(match.teamIdAway, true),
       this.appData.getBet$(match.matchId, userId),
-      (teamHome, teamAway, bet) => {
+      (teamHome, teamAway, teamShortHome, teamShortAway, bet) => {
 
         if (bet.documentId == "") {
           bet.documentId = this.appData.createDocumentId();
@@ -84,8 +86,12 @@ export class FetchBetWriteDataService {
           matchId: match.matchId,
           matchTimestamp: match.timestamp,
           isTopMatch: match.isTopMatch,
+          teamIdHome: match.teamIdHome,
+          teamIdAway: match.teamIdAway,
           teamNameHome: teamHome,
           teamNameAway: teamAway,
+          teamNameShortHome: teamShortHome,
+          teamNameShortAway: teamShortAway,
           betGoalsHome: bet.goalsHome,
           betGoalsAway: bet.goalsAway,
           isBetFixed: bet.isFixed,

@@ -44,3 +44,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Legacy data integration
+/src/assets/bets.json
+/src/assets/match_assignments.json

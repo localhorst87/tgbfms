@@ -1,0 +1,24 @@
+.example-form {
+  min-width: 100px;
+  max-width: 200px;
+  width: 50%;
+}
+
+.match-selection-radio-group {
+  display: flex;
+  flex-direction: row;
+  margin: 15px 0;
+}
+
+.match-selection-radio-button {
+  margin-left: 10px;
+  margin-right: 15px;
+}
+
+.settings-panel {
+  width: 40%;
+}
+
+mat-slider {
+  width: 50%;
+}

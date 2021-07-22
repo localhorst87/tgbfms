@@ -270,6 +270,29 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return team$;
   }
 
+  getTeamByTeamId$(teamId: number): Observable<Team> {
+    // returns the team information of the team with the given teamId
+
+    let teamQuery$: Observable<Team[]> = this.firestore.collection<Team>(COLLECTION_NAME_TEAMS, ref =>
+      ref.where("id", "==", teamId))
+      .valueChanges({ idField: 'documentId' });
+
+    let team$: Observable<Team> = teamQuery$.pipe(
+      take(1),
+      map(teamArray => {
+        if (teamArray.length == 0) {
+          return this.makeUnknownTeam(teamId);
+        }
+        else {
+          return teamArray[0];
+        }
+      }),
+      distinct()
+    );
+
+    return team$;
+  }
+
   getActiveUserIds$(): Observable<string> {
     // returns the user IDs of all active users
 
@@ -539,6 +562,17 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       season: season,
       place: place,
       teamId: -1
+    };
+  }
+
+  private makeUnknownTeam(teamId: number): Team {
+    // return an unkown dummy Team
+
+    return {
+      documentId: "",
+      id: teamId,
+      nameLong: "unknown team",
+      nameShort: "???"
     };
   }
 

@@ -960,6 +960,35 @@ describe('AppdataAccessFirestoreService', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // getTeamByTeamId$
+  // ---------------------------------------------------------------------------
+
+  it("getTeamByTeamId$, dataset available", (done: DoneFn) => {
+    const argument: number = 10;
+    const requestedTeam: Team = {
+      documentId: "test_doc_id",
+      id: argument,
+      nameLong: "TSV Handorf",
+      nameShort: "TSV"
+    };
+
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([requestedTeam])) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValue: Team = requestedTeam;
+
+    service["getTeamByTeamId$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  // ---------------------------------------------------------------------------
   // getActiveUserIds$
   // ---------------------------------------------------------------------------
 

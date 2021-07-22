@@ -16,6 +16,7 @@ export abstract class AppdataAccessService {
   public abstract getNextMatch$(): Observable<Match>;
   public abstract getLastMatch$(): Observable<Match>;
   public abstract getTeamNameByTeamId$(teamId: number, shortName?: boolean): Observable<string>;
+  public abstract getTeamByTeamId$(teamId: number): Observable<Team>;
   public abstract getActiveUserIds$(): Observable<string>;
   public abstract getUserDataById$(userId: string): Observable<User>;
   public abstract getMatchdayScoreSnapshot$(season: number, matchday: number): Observable<MatchdayScoreSnapshot>;

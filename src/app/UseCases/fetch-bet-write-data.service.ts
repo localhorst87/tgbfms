@@ -59,6 +59,7 @@ export class FetchBetWriteDataService {
         return {
           season: bet.season,
           place: bet.place,
+          teamId: bet.teamId,
           teamName: teamName,
           isBetFixed: bet.isFixed,
           betDocumentId: bet.documentId

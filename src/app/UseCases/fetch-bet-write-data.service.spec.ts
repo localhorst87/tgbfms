@@ -135,6 +135,7 @@ describe('FetchBetWriteDataService', () => {
       {
         season: seasonBets[0].season,
         place: seasonBets[0].place,
+        teamId: seasonBets[0].teamId,
         teamName: teamNames[0],
         isBetFixed: seasonBets[0].isFixed,
         betDocumentId: seasonBets[0].documentId
@@ -142,6 +143,7 @@ describe('FetchBetWriteDataService', () => {
       {
         season: seasonBets[1].season,
         place: seasonBets[1].place,
+        teamId: seasonBets[1].teamId,
         teamName: teamNames[1],
         isBetFixed: seasonBets[1].isFixed,
         betDocumentId: seasonBets[1].documentId
@@ -149,6 +151,7 @@ describe('FetchBetWriteDataService', () => {
       {
         season: seasonBets[2].season,
         place: seasonBets[2].place,
+        teamId: seasonBets[2].teamId,
         teamName: teamNames[2],
         isBetFixed: seasonBets[2].isFixed,
         betDocumentId: seasonBets[2].documentId
@@ -156,6 +159,7 @@ describe('FetchBetWriteDataService', () => {
       {
         season: seasonBets[3].season,
         place: seasonBets[3].place,
+        teamId: seasonBets[3].teamId,
         teamName: teamNames[3],
         isBetFixed: seasonBets[3].isFixed,
         betDocumentId: seasonBets[3].documentId
@@ -163,6 +167,7 @@ describe('FetchBetWriteDataService', () => {
       {
         season: seasonBets[4].season,
         place: seasonBets[4].place,
+        teamId: seasonBets[4].teamId,
         teamName: teamNames[4],
         isBetFixed: seasonBets[4].isFixed,
         betDocumentId: seasonBets[4].documentId
@@ -564,6 +569,7 @@ describe('FetchBetWriteDataService', () => {
     {
       season: seasonBets[0].season,
       place: seasonBets[0].place,
+      teamId: seasonBets[0].teamId,
       teamName: teamNames[0],
       isBetFixed: seasonBets[0].isFixed,
       betDocumentId: seasonBets[0].documentId
@@ -622,6 +628,7 @@ describe('FetchBetWriteDataService', () => {
     {
       season: -1,
       place: 0,
+      teamId: -1,
       teamName: "",
       isBetFixed: false,
       betDocumentId: ""

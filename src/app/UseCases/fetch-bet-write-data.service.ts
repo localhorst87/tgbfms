@@ -56,6 +56,11 @@ export class FetchBetWriteDataService {
 
     return this.appData.getTeamNameByTeamId$(bet.teamId).pipe(
       map((teamName: string) => {
+
+        if (bet.documentId == "") {
+          bet.documentId = this.appData.createDocumentId();
+        }
+
         return {
           season: bet.season,
           place: bet.place,

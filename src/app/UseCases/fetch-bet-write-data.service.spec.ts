@@ -588,6 +588,41 @@ describe('FetchBetWriteDataService', () => {
     );
   });
 
+  it('makeSeasonBetWriteData$, service is emitting data, documentId empty', (done: DoneFn) => {
+    const argument: SeasonBet = {
+      documentId: "",
+      season: 2021,
+      userId: "test_user_id",
+      isFixed: false,
+      place: 1,
+      teamId: -1
+    };
+
+    const teamName: string = "unknown team";
+    const createdId: string = "created_test_id";
+
+    appDataSpy.createDocumentId.and.returnValue(createdId);
+
+    const expectedValue: SeasonBetWriteData =
+    {
+      season: argument.season,
+      place: argument.place,
+      teamId: argument.teamId,
+      teamName: teamName,
+      isBetFixed: argument.isFixed,
+      betDocumentId: createdId
+    };
+
+    appDataSpy.getTeamNameByTeamId$.withArgs(argument.teamId).and.returnValue(of(teamName));
+
+    service["makeSeasonBetWriteData$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
   it('makeSeasonBetWriteData$, service is not emitting data', (done: DoneFn) => {
     const seasonBets: SeasonBet[] = [
       {

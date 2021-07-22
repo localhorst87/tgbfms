@@ -383,6 +383,16 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     betDocument.set(betToUpdate);
   }
 
+  setSeasonBet(bet: SeasonBet): void {
+    let betToUpdate: any = bet;
+    let documentId: string = bet.documentId;
+    delete betToUpdate.documentId;
+
+    let betDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_SEASON_BETS + "/" + documentId);
+    betDocument.set(betToUpdate);
+    console.log(betToUpdate)
+  }
+
   addMatch(match: Match): void {
     let matchToWrite: any = match;
     delete matchToWrite.documentId;
@@ -393,12 +403,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     let resultToWrite: any = result;
     delete resultToWrite.documentId;
     this.firestore.collection(COLLECTION_NAME_RESULTS).add(resultToWrite);
-  }
-
-  addSeasonBet(bet: SeasonBet): void {
-    let betToWrite: any = bet;
-    delete betToWrite.documentId;
-    this.firestore.collection(COLLECTION_NAME_SEASON_BETS).add(betToWrite);
   }
 
   addSeasonResult(result: SeasonResult): void {
@@ -433,14 +437,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let resultDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_RESULTS + "/" + documentId);
     resultDocument.update(resultToUpdate);
-  }
-
-  updateSeasonBet(documentId: string, bet: SeasonBet): void {
-    let betToUpdate: any = bet;
-    delete betToUpdate.documentId;
-
-    let betDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_SEASON_BETS + "/" + documentId);
-    betDocument.update(betToUpdate);
   }
 
   updateSeasonResult(documentId: string, result: SeasonResult): void {

@@ -22,15 +22,14 @@ export abstract class AppdataAccessService {
   public abstract getMatchdayScoreSnapshot$(season: number, matchday: number): Observable<MatchdayScoreSnapshot>;
   public abstract getLastUpdateTime$(season: number, matchday: number): Observable<number>;
   public abstract setBet(bet: Bet): void;
+  public abstract setSeasonBet(bet: SeasonBet): void;
   public abstract addMatch(match: Match): void;
   public abstract addResult(result: Result): void;
-  public abstract addSeasonBet(bet: SeasonBet): void;
   public abstract addSeasonResult(result: SeasonResult): void;
   public abstract addMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void;
   public abstract addLastUpdateTime(syncTime: SyncTime): void;
   public abstract updateMatch(documentId: string, match: Match): void;
   public abstract updateResult(documentId: string, result: Result): void;
-  public abstract updateSeasonBet(documentId: string, bet: SeasonBet): void;
   public abstract updateSeasonResult(documentId: string, result: SeasonResult): void;
   public abstract updateMatchdayScoreSnapshot(documentId: string, snapshot: MatchdayScoreSnapshot): void;
   public abstract updateLastUpdateTime(documentId: string, syncTime: SyncTime): void;

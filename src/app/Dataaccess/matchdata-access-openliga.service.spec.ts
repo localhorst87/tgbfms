@@ -381,6 +381,78 @@ describe('MatchdataAccessOpenligaService', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // convertTeamJson$
+  // ---------------------------------------------------------------------------
+
+  it("convertTeamJson$, teams available", (done: DoneFn) => {
+    const argument: any[] = [
+      {
+        "ShortName": "Kölle",
+        "TeamGroupName": null,
+        "TeamIconUrl": "https://foo-bar-bla.de/logo_fc.png",
+        "TeamId": 65,
+        "TeamName": "1. FC Köln"
+      },
+      {
+        "ShortName": "Dortmund",
+        "TeamGroupName": null,
+        "TeamIconUrl": "https://foo-bar-bla.de/logo_bvb.png",
+        "TeamId": 7,
+        "TeamName": "BV Borussia Dortmund 09"
+      },
+      {
+        "ShortName": "Freiburch",
+        "TeamGroupName": null,
+        "TeamIconUrl": "https://foo-bar-bla.de/logo_scf.png",
+        "TeamId": 112,
+        "TeamName": "SC Freiburg"
+      }
+    ];
+
+    const expectedValues: number[] = [65, 7, 112];
+
+    let i: number = 0;
+    service["convertTeamJson$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("convertTeamJson$, no ranking available", (done: DoneFn) => {
+    const argument: any = [];
+    const defaultValue: number = -1;
+
+    let i: number = 0;
+    service["convertTeamJson$"](argument).pipe(
+      defaultIfEmpty(defaultValue)).subscribe(
+        val => {
+          expect(val).toEqual(defaultValue);
+          done();
+        }
+      );
+  });
+
+  it("convertTeamJson$, received http error as argument", (done: DoneFn) => {
+    const argument = new HttpErrorResponse({
+      error: 'test error',
+      status: 400,
+      statusText: 'bad request'
+    });
+    const defaultValue: number = -1;
+
+    let i: number = 0;
+    service["convertTeamJson$"](argument).pipe(
+      defaultIfEmpty(defaultValue)).subscribe(
+        val => {
+          expect(val).toEqual(defaultValue);
+          done();
+        }
+      );
+  });
+
+  // ---------------------------------------------------------------------------
   // convertRankingJson$
   // ---------------------------------------------------------------------------
 
@@ -714,6 +786,70 @@ describe('MatchdataAccessOpenligaService', () => {
 
     let i: number = 0;
     service["importCurrentTeamRanking$"](argument).pipe(
+      defaultIfEmpty(defaultValue)).subscribe(
+        val => {
+          expect(val).toEqual(defaultValue);
+          done();
+        }
+      );
+  });
+
+
+  // ---------------------------------------------------------------------------
+  // getActiveTeams$
+  // ---------------------------------------------------------------------------
+
+  it("getActiveTeams$, teams available", (done: DoneFn) => {
+    const argument: number = 2021;
+
+    const jsonArray: any[] = [
+      {
+        "ShortName": "Kölle",
+        "TeamGroupName": null,
+        "TeamIconUrl": "https://foo-bar-bla.de/logo_fc.png",
+        "TeamId": 65,
+        "TeamName": "1. FC Köln"
+      },
+      {
+        "ShortName": "Dortmund",
+        "TeamGroupName": null,
+        "TeamIconUrl": "https://foo-bar-bla.de/logo_bvb.png",
+        "TeamId": 7,
+        "TeamName": "BV Borussia Dortmund 09"
+      },
+      {
+        "ShortName": "Freiburch",
+        "TeamGroupName": null,
+        "TeamIconUrl": "https://foo-bar-bla.de/logo_scf.png",
+        "TeamId": 112,
+        "TeamName": "SC Freiburg"
+      }
+    ];
+
+    const expectedValues: number[] = [65, 7, 112];
+
+    httpClientSpy.get.and.returnValue(of(jsonArray));
+    spyOn<any>(service, "convertTeamJson$").withArgs(jsonArray).and.returnValue(from(expectedValues));
+
+    let i: number = 0;
+    service["getActiveTeams$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getActiveTeams$, teams not available", (done: DoneFn) => {
+    const argument: number = 2022;
+
+    const defaultValue: number = -1;
+
+    httpClientSpy.get.and.returnValue(of([]));
+    spyOn<any>(service, "convertRankingJson$").withArgs([]).and.returnValue(from([]));
+
+    let i: number = 0;
+    service["getActiveTeams$"](argument).pipe(
       defaultIfEmpty(defaultValue)).subscribe(
         val => {
           expect(val).toEqual(defaultValue);

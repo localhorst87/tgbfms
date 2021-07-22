@@ -7,6 +7,7 @@ import { MatchdataAccessService } from './matchdata-access.service';
 
 const URL_TRUNK_MATCHES: string = "https://www.openligadb.de/api/getmatchdata/bl1";
 const URL_TRUNK_RANKING: string = "https://www.openligadb.de/api/getbltable/bl1";
+const URL_TRUNK_TEAMS: string = "https://www.openligadb.de/api/getavailableteams/bl1"
 const URL_TRUNK_UPDATETIME: string = "https://www.openligadb.de/api/getlastchangedate/bl1";
 
 @Injectable()
@@ -29,6 +30,15 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     let fullUrl: string = URL_TRUNK_RANKING + "/" + String(season);
     return this.http.get(fullUrl, { responseType: 'json' }).pipe(
       switchMap(rankingData => this.convertRankingJson$(rankingData))
+    );
+  }
+
+  getActiveTeams$(season: number): Observable<number> {
+    // returns all the team IDs of the current campaign
+
+    let fullUrl: string = URL_TRUNK_TEAMS + "/" + String(season);
+    return this.http.get(fullUrl, { responseType: 'json' }).pipe(
+      switchMap(teamData => this.convertTeamJson$(teamData))
     );
   }
 
@@ -112,6 +122,23 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     }
 
     return of(convertedTimestamp);
+  }
+
+  private convertTeamJson$(teamDataJson: any): Observable<number> {
+    //
+
+    let teamIds: number[] = [];
+
+    if (!("error" in teamDataJson)) {
+      // http error throws object with error property
+      // error response will result in empty matchArray
+
+      for (let team of teamDataJson) {
+        teamIds.push(team.TeamId);
+      }
+    }
+
+    return from(teamIds);
   }
 
   private extractResult(matchJson: any): number[] {

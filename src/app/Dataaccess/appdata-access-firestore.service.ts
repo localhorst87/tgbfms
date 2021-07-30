@@ -185,14 +185,14 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return matchday$;
   }
 
-  getNextMatch$(): Observable<Match> {
+  getNextMatch$(season: number): Observable<Match> {
     // returns the next match that will take place. If no matches are left,
-    // the function returns null
+    // the function returns a dummy match
 
     let timestampNow: number = Math.floor((new Date()).getTime() / 1000);
 
     let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
-      ref.where("time", ">", timestampNow)
+      ref.where("time", ">", timestampNow).where("season", "==", season)
         .orderBy("time")
         .limit(1))
       .valueChanges({ idField: 'documentId' });
@@ -213,14 +213,14 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return match$;
   }
 
-  getLastMatch$(): Observable<Match> {
+  getLastMatch$(season: number): Observable<Match> {
     // returns the last match that took place. If no match has been played yet,
-    // the function returns null
+    // the function returns a dummy match
 
     let timestampNow: number = Math.floor((new Date()).getTime() / 1000);
 
     let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
-      ref.where("time", "<", timestampNow)
+      ref.where("time", "<", timestampNow).where("season", "==", season)
         .orderBy("time", "desc")
         .limit(1))
       .valueChanges({ idField: 'documentId' });
@@ -390,7 +390,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let betDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_SEASON_BETS + "/" + documentId);
     betDocument.set(betToUpdate);
-    console.log(betToUpdate)
   }
 
   addMatch(match: Match): void {

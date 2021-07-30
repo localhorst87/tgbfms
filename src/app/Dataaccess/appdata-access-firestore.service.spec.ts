@@ -726,6 +726,8 @@ describe('AppdataAccessFirestoreService', () => {
   // ---------------------------------------------------------------------------
 
   it("getNextMatch$, dataset available", (done: DoneFn) => {
+    const argument: number = 2020;
+
     const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetMatch])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
@@ -736,7 +738,7 @@ describe('AppdataAccessFirestoreService', () => {
     const expectedValue: Match[] = [targetMatch];
 
     let i: number = 0;
-    service["getNextMatch$"]().subscribe(
+    service["getNextMatch$"](argument).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();
@@ -745,6 +747,8 @@ describe('AppdataAccessFirestoreService', () => {
   });
 
   it("getNextMatch$, emitting twice", (done: DoneFn) => {
+    const argument: number = 2020;
+
     const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetMatch], [targetMatch])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
@@ -755,7 +759,7 @@ describe('AppdataAccessFirestoreService', () => {
     const expectedValue: Match[] = [targetMatch];
 
     let i: number = 0;
-    service["getNextMatch$"]().subscribe(
+    service["getNextMatch$"](argument).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();
@@ -764,6 +768,8 @@ describe('AppdataAccessFirestoreService', () => {
   });
 
   it("getNextMatch$, no dataset available", (done: DoneFn) => {
+    const argument: number = 2020;
+
     const unknownMatch: Match = { documentId: "", season: -1, matchday: -1, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
@@ -774,7 +780,7 @@ describe('AppdataAccessFirestoreService', () => {
     const expectedValue: Match[] = [unknownMatch];
 
     let i: number = 0;
-    service["getNextMatch$"]().subscribe(
+    service["getNextMatch$"](argument).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();
@@ -787,6 +793,8 @@ describe('AppdataAccessFirestoreService', () => {
   // ---------------------------------------------------------------------------
 
   it("getLastMatch$, dataset available", (done: DoneFn) => {
+    const argument: number = 2020;
+
     const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetMatch])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
@@ -797,7 +805,7 @@ describe('AppdataAccessFirestoreService', () => {
     const expectedValue: Match[] = [targetMatch];
 
     let i: number = 0;
-    service["getLastMatch$"]().subscribe(
+    service["getLastMatch$"](argument).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();
@@ -806,6 +814,8 @@ describe('AppdataAccessFirestoreService', () => {
   });
 
   it("getLastMatch$, emitting twice", (done: DoneFn) => {
+    const argument: number = 2020;
+
     const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetMatch], [targetMatch])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
@@ -816,7 +826,7 @@ describe('AppdataAccessFirestoreService', () => {
     const expectedValue: Match[] = [targetMatch];
 
     let i: number = 0;
-    service["getLastMatch$"]().subscribe(
+    service["getLastMatch$"](argument).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();
@@ -825,6 +835,8 @@ describe('AppdataAccessFirestoreService', () => {
   });
 
   it("getLastMatch$, no dataset available", (done: DoneFn) => {
+    const argument: number = 2020;
+
     const unknownMatch: Match = { documentId: "", season: -1, matchday: -1, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
@@ -835,7 +847,7 @@ describe('AppdataAccessFirestoreService', () => {
     const expectedValue: Match[] = [unknownMatch];
 
     let i: number = 0;
-    service["getLastMatch$"]().subscribe(
+    service["getLastMatch$"](argument).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();

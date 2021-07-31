@@ -192,8 +192,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     let timestampNow: number = Math.floor((new Date()).getTime() / 1000);
 
     let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
-      ref.where("time", ">", timestampNow).where("season", "==", season)
-        .orderBy("time")
+      ref.where("timestamp", ">", timestampNow).where("season", "==", season)
+        .orderBy("timestamp")
         .limit(1))
       .valueChanges({ idField: 'documentId' });
 
@@ -220,8 +220,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     let timestampNow: number = Math.floor((new Date()).getTime() / 1000);
 
     let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
-      ref.where("time", "<", timestampNow).where("season", "==", season)
-        .orderBy("time", "desc")
+      ref.where("timestamp", "<", timestampNow).where("season", "==", season)
+        .orderBy("timestamp", "desc")
         .limit(1))
       .valueChanges({ idField: 'documentId' });
 

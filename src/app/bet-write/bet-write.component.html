@@ -9,7 +9,7 @@
       Spiele wählen
     </mat-panel-title>
     <mat-panel-description *ngIf="selectedDisplayMethod=='matchday'">
-      Spieltag {{ selectedMatchday }}
+      Spieltag {{ selectedMatchday > 0 ? selectedMatchday : "" }}
     </mat-panel-description>
     <mat-panel-description *ngIf="selectedDisplayMethod=='duration'">
       nächste {{ selectedDuration }} Tage

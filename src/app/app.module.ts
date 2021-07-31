@@ -21,17 +21,24 @@ import { PointCalculatorTrendbasedService } from './Businessrules/point-calculat
 import { StatisticsCalculatorService } from './Businessrules/statistics-calculator.service';
 import { StatisticsCalculatorTrendbasedService } from './Businessrules/statistics-calculator-trendbased.service';
 import { BetWriteComponent } from './bet-write/bet-write.component';
+import { HomeComponent } from './home/home.component';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
   declarations: [
     AppComponent,
-    BetWriteComponent
+    BetWriteComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +51,13 @@ import { MatIconModule } from '@angular/material/icon';
     BrowserAnimationsModule,
     MatButtonModule,
     MatInputModule,
-    MatIconModule
+    MatIconModule,
+    MatRadioModule,
+    MatSliderModule,
+    MatExpansionModule,
+    MatSelectModule,
+    MatSidenavModule,
+    MatToolbarModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },

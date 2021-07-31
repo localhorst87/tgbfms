@@ -133,7 +133,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
     this.bets.push(matchForm);
   }
 
-  subscribeToBetChanges(form: FormGroup, betData: BetWriteData) {
+  subscribeToBetChanges(form: FormGroup, betData: BetWriteData): void {
     // refreshes the Bet in the App Database upon checking the values
 
     form.valueChanges.subscribe(value => {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
 import { FetchBetWriteDataService } from '../UseCases/fetch-bet-write-data.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
@@ -24,7 +24,8 @@ export class BetWriteComponent implements OnInit, OnChanges {
   displayMethodForm: FormControl; // option field (matchday, duration, season)
   selectedDisplayMethod: string; // identifier of selected option
   matchdayForm: FormControl; // slider which matchday to load
-  @Input() selectedMatchday: number; // pre allocated with next matchday
+  @Input() selectedMatchday: number; // (will be pre allocated with next matchday)
+  @Output() selectMatchdayEvent = new EventEmitter<number>(); // directs selected matchday to home component
   durationForm: FormControl; // slider of future days matches to load
   selectedDuration: number; // pre allocated with 7 days
   betForm: FormGroup; // formular for setting bets
@@ -39,7 +40,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
     this.userId = "";
     this.nTeams = NUMBER_OF_TEAMS;
     this.nMatchdays = MATCHDAYS_PER_SEASON;
-    this.selectedMatchday = 1;
+    this.selectedMatchday = -1;
     this.matches = [];
     this.seasonBets = [];
     this.betForm = this.formBuilder.group({
@@ -51,7 +52,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
     this.displayMethodForm = this.formBuilder.control("matchday");
     this.isPanelExpanded = false;
     this.selectedDisplayMethod = "matchday";
-    this.matchdayForm = this.formBuilder.control(this.selectedMatchday);
+    this.matchdayForm = this.formBuilder.control(1);
     this.selectedDuration = 7;
     this.durationForm = this.formBuilder.control(this.selectedDuration);
     this.activeTeams = [];
@@ -89,6 +90,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
     );
     this.isPanelExpanded = false;
     this.selectedMatchday = this.matchdayForm.value;
+    this.selectMatchdayEvent.emit(this.matchdayForm.value);
     this.selectedDisplayMethod = this.displayMethodForm.value;
   }
 
@@ -279,12 +281,13 @@ export class BetWriteComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-
   }
 
   ngOnChanges(): void {
-    this.matchdayForm.setValue(this.selectedMatchday);
-    this.showMatchesByMatchday(this.selectedMatchday);
+    if (this.selectedMatchday > 0) {
+      this.matchdayForm.setValue(this.selectedMatchday);
+      this.showMatchesByMatchday(this.selectedMatchday);
+    }
   }
 
 }

@@ -10,12 +10,15 @@ import { SEASON } from '../Businessrules/rule_defined_values';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+  selectedPage: string;
   authId: string;
   matchdayNextMatch: number;
   matchdayLastMatch: number;
   matchdayUserSelection: number;
 
+
   constructor(private appData: AppdataAccessService) {
+    this.selectedPage = "news";
     this.authId = "Mauri";
     this.matchdayNextMatch = -1;
     this.matchdayLastMatch = -1;
@@ -64,6 +67,10 @@ export class HomeComponent implements OnInit {
 
   changeMatchdayOnUserSelection(matchday: number): void {
     this.matchdayUserSelection = matchday;
+  }
+
+  changeView(targetPage: string): void {
+    this.selectedPage = targetPage;
   }
 
   ngOnInit(): void {

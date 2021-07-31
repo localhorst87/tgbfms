@@ -68,7 +68,7 @@
 <br>
 
 <!-- matchdays to display -->
-<form [formGroup]="dForm">
+<form [formGroup]="betForm">
   <table>
     <tr formArrayName="bets" *ngFor="let match of matches; let i = index">
       <td [formGroupName]="i">

@@ -108,6 +108,28 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     return score;
   }
 
+  getPotentialOutsiderPoints(betArray: Bet[], betUser: Bet): number {
+    // returns the potentially (!) added points for outsider bets (two or only one
+    // user per tendency) for the given bet of the user
+
+    let nTendency: number[] = this.countTendencies(betArray);
+    let tendencyUser = this.getTendency(betUser);
+
+    if (tendencyUser == -1) {
+      return 0;
+    }
+
+    if (nTendency[tendencyUser] == 2) { // only 1 other user has set this bet
+      return POINTS_ADDED_OUTSIDER_TWO;
+    }
+    else if (nTendency[tendencyUser] == 1) { // users bet is unique
+      return POINTS_ADDED_OUTSIDER_ONE;
+    }
+    else {
+      return 0;
+    }
+  }
+
   private isTendencyCorrect(bet: Bet, result: Result): boolean {
     // returns true if the tendency of bet and result are the same
 
@@ -127,28 +149,6 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     }
     else {
       return bet.goalsHome == result.goalsHome && bet.goalsAway == result.goalsAway;
-    }
-  }
-
-  private getPotentialOutsiderPoints(betArray: Bet[], betUser: Bet): number {
-    // returns the potentially (!) added points for outsider bets (two or only one
-    // user per tendency) for the given bet of the user
-
-    let nTendency: number[] = this.countTendencies(betArray);
-    let tendencyUser = this.getTendency(betUser);
-
-    if (tendencyUser == -1) {
-      return 0;
-    }
-
-    if (nTendency[tendencyUser] == 2) { // only 1 other user has set this bet
-      return POINTS_ADDED_OUTSIDER_TWO;
-    }
-    else if (nTendency[tendencyUser] == 1) { // users bet is unique
-      return POINTS_ADDED_OUTSIDER_ONE;
-    }
-    else {
-      return 0;
     }
   }
 

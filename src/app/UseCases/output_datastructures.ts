@@ -22,6 +22,8 @@ export interface BetOverviewFrameData {
   isTopMatch: boolean;
   teamNameHome: string;
   teamNameAway: string;
+  teamNameShortHome: string;
+  teamNameShortAway: string;
   resultGoalsHome: number;
   resultGoalsAway: number;
   isBetFixed: boolean;

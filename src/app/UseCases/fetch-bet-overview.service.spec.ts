@@ -4,7 +4,7 @@ import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { PointCalculatorService } from '../Businessrules/point-calculator.service';
 import { FetchBetOverviewService } from './fetch-bet-overview.service';
 import { BetOverviewFrameData, BetOverviewUserData, SeasonBetOverviewUserData, SeasonBetOverviewFrameData } from './output_datastructures';
-import { Bet, Match, Result, SeasonBet, SeasonResult, User } from '../Businessrules/basic_datastructures';
+import { Bet, Match, Result, SeasonBet, SeasonResult, User, Team } from '../Businessrules/basic_datastructures';
 import { POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE } from '../Businessrules/rule_defined_values';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
@@ -21,6 +21,7 @@ describe('FetchBetOverviewService', () => {
   let seasonBets: SeasonBet[];
   let seasonResults: SeasonResult[];
   let teamNames: string[];
+  let teams: Team[];
   let expectedFrameValues: BetOverviewFrameData[];
   let expectedUserValues: BetOverviewUserData[];
   let expectedSeasonFrameValues: SeasonBetOverviewFrameData[];
@@ -29,7 +30,7 @@ describe('FetchBetOverviewService', () => {
   let defaultUserValue: BetOverviewUserData;
 
   beforeEach(() => {
-    appDataSpy = jasmine.createSpyObj(["getActiveUserIds$", "getUserDataById$", "getResult$", "getBet$", "getTeamNameByTeamId$", "getMatchesByMatchday$", "getSeasonBet$", "getSeasonResult$"]);
+    appDataSpy = jasmine.createSpyObj(["getActiveUserIds$", "getUserDataById$", "getResult$", "getBet$", "getTeamNameByTeamId$", "getTeamByTeamId$", "getMatchesByMatchday$", "getSeasonBet$", "getSeasonResult$"]);
     pointCalcSpy = jasmine.createSpyObj(["getPotentialOutsiderPoints"]);
     TestBed.configureTestingModule({
       providers: [
@@ -202,17 +203,91 @@ describe('FetchBetOverviewService', () => {
       },
     ];
 
-    teamNames = [
-      "team_name_45",
-      "team_name_76",
-      "team_name_122",
-      "team_name_70",
-      "team_name_99",
-      "team_name_32",
-      "team_name_3",
-      "team_name_23",
-      "team_name_87",
-      "team_name_199"
+    teams = [
+      {
+        documentId: "doc_0",
+        id: 45,
+        nameLong: "team_name_45",
+        nameShort: "T00"
+      },
+      {
+        documentId: "doc_1",
+        id: 76,
+        nameLong: "team_name_76",
+        nameShort: "T01"
+      },
+      {
+        documentId: "doc_2",
+        id: 122,
+        nameLong: "team_name_122",
+        nameShort: "T02"
+      },
+      {
+        documentId: "doc_3",
+        id: 70,
+        nameLong: "team_name_70",
+        nameShort: "T03"
+      },
+      {
+        documentId: "doc_4",
+        id: 99,
+        nameLong: "team_name_99",
+        nameShort: "T04"
+      },
+      {
+        documentId: "doc_5",
+        id: 32,
+        nameLong: "team_name_32",
+        nameShort: "T05"
+      },
+      {
+        documentId: "doc_6",
+        id: 3,
+        nameLong: "team_name_3",
+        nameShort: "T06"
+      },
+      {
+        documentId: "doc_7",
+        id: 23,
+        nameLong: "team_name_23",
+        nameShort: "T07"
+      },
+      {
+        documentId: "doc_8",
+        id: 87,
+        nameLong: "team_name_87",
+        nameShort: "T08"
+      },
+      {
+        documentId: "doc_9",
+        id: 199,
+        nameLong: "team_name_199",
+        nameShort: "T09"
+      },
+      {
+        documentId: "doc_10",
+        id: 211,
+        nameLong: "team_name_211",
+        nameShort: "T10"
+      },
+      {
+        documentId: "doc_11",
+        id: 93,
+        nameLong: "team_name_93",
+        nameShort: "T11"
+      },
+      {
+        documentId: "doc_12",
+        id: 13,
+        nameLong: "team_name_13",
+        nameShort: "T12"
+      },
+      {
+        documentId: "doc_13",
+        id: 6,
+        nameLong: "team_name_6",
+        nameShort: "T13"
+      },
     ];
 
     results = [
@@ -269,8 +344,10 @@ describe('FetchBetOverviewService', () => {
         matchId: matches[0].matchId,
         matchDate: new Date(matches[0].timestamp * 1000),
         isTopMatch: matches[0].isTopMatch,
-        teamNameHome: "team_name_211",
-        teamNameAway: "team_name_93",
+        teamNameHome: teams[10].nameLong,
+        teamNameAway: teams[11].nameLong,
+        teamNameShortHome: teams[10].nameShort,
+        teamNameShortAway: teams[11].nameShort,
         resultGoalsHome: results[0].goalsHome,
         resultGoalsAway: results[0].goalsAway,
         isBetFixed: false
@@ -279,8 +356,10 @@ describe('FetchBetOverviewService', () => {
         matchId: matches[1].matchId,
         matchDate: new Date(matches[1].timestamp * 1000),
         isTopMatch: matches[1].isTopMatch,
-        teamNameHome: "team_name_13",
-        teamNameAway: "team_name_6",
+        teamNameHome: teams[12].nameLong,
+        teamNameAway: teams[13].nameLong,
+        teamNameShortHome: teams[12].nameShort,
+        teamNameShortAway: teams[13].nameShort,
         resultGoalsHome: results[1].goalsHome,
         resultGoalsAway: results[1].goalsAway,
         isBetFixed: true
@@ -350,52 +429,52 @@ describe('FetchBetOverviewService', () => {
       {
         place: seasonBets[0].place,
         userName: userData[0].displayName,
-        teamName: teamNames[0]
+        teamName: teams[0].nameLong
       },
       {
         place: seasonBets[1].place,
         userName: userData[0].displayName,
-        teamName: teamNames[1]
+        teamName: teams[1].nameLong
       },
       {
         place: seasonBets[2].place,
         userName: userData[0].displayName,
-        teamName: teamNames[2]
+        teamName: teams[2].nameLong
       },
       {
         place: seasonBets[3].place,
         userName: userData[0].displayName,
-        teamName: teamNames[3]
+        teamName: teams[3].nameLong
       },
       {
         place: seasonBets[4].place,
         userName: userData[0].displayName,
-        teamName: teamNames[4]
+        teamName: teams[4].nameLong
       },
       {
         place: seasonBets[5].place,
         userName: userData[1].displayName,
-        teamName: teamNames[5]
+        teamName: teams[5].nameLong
       },
       {
         place: seasonBets[6].place,
         userName: userData[1].displayName,
-        teamName: teamNames[6]
+        teamName: teams[6].nameLong
       },
       {
         place: seasonBets[7].place,
         userName: userData[1].displayName,
-        teamName: teamNames[7]
+        teamName: teams[7].nameLong
       },
       {
         place: seasonBets[8].place,
         userName: userData[1].displayName,
-        teamName: teamNames[8]
+        teamName: teams[8].nameLong
       },
       {
         place: seasonBets[9].place,
         userName: userData[1].displayName,
-        teamName: teamNames[9]
+        teamName: teams[9].nameLong
       }
     ];
 
@@ -405,6 +484,8 @@ describe('FetchBetOverviewService', () => {
       isTopMatch: false,
       teamNameHome: "",
       teamNameAway: "",
+      teamNameShortHome: "",
+      teamNameShortAway: "",
       resultGoalsHome: -1,
       resultGoalsAway: -1,
       isBetFixed: false
@@ -633,11 +714,11 @@ describe('FetchBetOverviewService', () => {
     const argument1: Match = matches[0]; // match 58815
     const argument2: string = bets[1].userId; // user 2
 
-    appDataSpy.getTeamNameByTeamId$
-      .withArgs(211).and.returnValue(of("team_name_211"))
-      .withArgs(93).and.returnValue(of("team_name_93"))
-      .withArgs(13).and.returnValue(of("team_name_13"))
-      .withArgs(6).and.returnValue(of("team_name_6"));
+    appDataSpy.getTeamByTeamId$
+      .withArgs(211).and.returnValue(of(teams[10]))
+      .withArgs(93).and.returnValue(of(teams[11]))
+      .withArgs(13).and.returnValue(of(teams[12]))
+      .withArgs(6).and.returnValue(of(teams[13]));
 
     appDataSpy.getBet$
       .withArgs(bets[0].matchId, bets[0].userId).and.returnValue(of(bets[0]))
@@ -661,11 +742,11 @@ describe('FetchBetOverviewService', () => {
     const argument1: Match = matches[0]; // match 58815
     const argument2: string = bets[1].userId; // user 2
 
-    appDataSpy.getTeamNameByTeamId$
-      .withArgs(211).and.returnValue(of("team_name_211", "team_name_211"))
-      .withArgs(93).and.returnValue(of("team_name_93", "team_name_93", "team_name_93"))
-      .withArgs(13).and.returnValue(of("team_name_13", "team_name_13"))
-      .withArgs(6).and.returnValue(of("team_name_6", "team_name_6", "team_name_6"));
+    appDataSpy.getTeamByTeamId$
+      .withArgs(211).and.returnValue(of(teams[10], teams[10]))
+      .withArgs(93).and.returnValue(of(teams[11], teams[11]))
+      .withArgs(13).and.returnValue(of(teams[12], teams[12]))
+      .withArgs(6).and.returnValue(of(teams[13], teams[13]));
 
     appDataSpy.getBet$
       .withArgs(bets[0].matchId, bets[0].userId).and.returnValue(of(bets[1], bets[0]))
@@ -689,10 +770,10 @@ describe('FetchBetOverviewService', () => {
     const argument1: Match = matches[0]; // match 58815
     const argument2: string = bets[1].userId; // user 2
 
-    appDataSpy.getTeamNameByTeamId$
+    appDataSpy.getTeamByTeamId$
       .withArgs(211).and.returnValue(of())
-      .withArgs(93).and.returnValue(of("team_name_93"))
-      .withArgs(13).and.returnValue(of("team_name_13"))
+      .withArgs(93).and.returnValue(of(teams[11]))
+      .withArgs(13).and.returnValue(of(teams[12]))
       .withArgs(6).and.returnValue(of());
 
     appDataSpy.getBet$
@@ -995,7 +1076,7 @@ describe('FetchBetOverviewService', () => {
       .withArgs(userData[1].id).and.returnValue(of(userData[1]));
 
     appDataSpy.getTeamNameByTeamId$
-      .withArgs(argument.teamId).and.returnValue(of(teamNames[0]));
+      .withArgs(argument.teamId).and.returnValue(of(teams[0].nameLong));
 
     service["makeSeasonBetData$"](argument).subscribe(
       val => {
@@ -1013,7 +1094,7 @@ describe('FetchBetOverviewService', () => {
       .withArgs(userData[1].id).and.returnValue(of());
 
     appDataSpy.getTeamNameByTeamId$
-      .withArgs(argument.teamId).and.returnValue(of(teamNames[0]))
+      .withArgs(argument.teamId).and.returnValue(of(teams[0].nameLong))
 
     const defaultSeasonUserValue: SeasonBetOverviewUserData = {
       place: 0,

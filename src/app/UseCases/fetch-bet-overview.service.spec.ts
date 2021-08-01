@@ -1,15 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
+import { PointCalculatorService } from '../Businessrules/point-calculator.service';
 import { FetchBetOverviewService } from './fetch-bet-overview.service';
 import { BetOverviewFrameData, BetOverviewUserData, SeasonBetOverviewUserData, SeasonBetOverviewFrameData } from './output_datastructures';
 import { Bet, Match, Result, SeasonBet, SeasonResult, User } from '../Businessrules/basic_datastructures';
+import { POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE } from '../Businessrules/rule_defined_values';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 
 describe('FetchBetOverviewService', () => {
   let service: FetchBetOverviewService;
   let appDataSpy: jasmine.SpyObj<AppdataAccessService>;
+  let pointCalcSpy: jasmine.SpyObj<PointCalculatorService>;
 
   let userData: User[];
   let bets: Bet[];
@@ -27,10 +30,12 @@ describe('FetchBetOverviewService', () => {
 
   beforeEach(() => {
     appDataSpy = jasmine.createSpyObj(["getActiveUserIds$", "getUserDataById$", "getResult$", "getBet$", "getTeamNameByTeamId$", "getMatchesByMatchday$", "getSeasonBet$", "getSeasonResult$"]);
-
+    pointCalcSpy = jasmine.createSpyObj(["getPotentialOutsiderPoints"]);
     TestBed.configureTestingModule({
       providers: [
-        FetchBetOverviewService, { provide: AppdataAccessService, useValue: appDataSpy }
+        FetchBetOverviewService,
+        { provide: AppdataAccessService, useValue: appDataSpy },
+        { provide: PointCalculatorService, useValue: pointCalcSpy },
       ]
     });
     service = TestBed.inject(FetchBetOverviewService);
@@ -262,6 +267,7 @@ describe('FetchBetOverviewService', () => {
       // for user 2
       {
         matchId: matches[0].matchId,
+        matchDate: new Date(matches[0].timestamp * 1000),
         isTopMatch: matches[0].isTopMatch,
         teamNameHome: "team_name_211",
         teamNameAway: "team_name_93",
@@ -271,6 +277,7 @@ describe('FetchBetOverviewService', () => {
       },
       {
         matchId: matches[1].matchId,
+        matchDate: new Date(matches[1].timestamp * 1000),
         isTopMatch: matches[1].isTopMatch,
         teamNameHome: "team_name_13",
         teamNameAway: "team_name_6",
@@ -313,25 +320,29 @@ describe('FetchBetOverviewService', () => {
         matchId: matches[0].matchId,
         userName: userData[0].displayName,
         betGoalsHome: bets[0].goalsHome,
-        betGoalsAway: bets[0].goalsAway
+        betGoalsAway: bets[0].goalsAway,
+        possibleOutsiderPoints: POINTS_ADDED_OUTSIDER_ONE
       }, // match 58815, user 1
       {
         matchId: matches[0].matchId,
         userName: userData[1].displayName,
         betGoalsHome: bets[1].goalsHome,
-        betGoalsAway: bets[1].goalsAway
+        betGoalsAway: bets[1].goalsAway,
+        possibleOutsiderPoints: POINTS_ADDED_OUTSIDER_ONE
       }, // match 58815, user 2
       {
         matchId: matches[1].matchId,
         userName: userData[0].displayName,
         betGoalsHome: bets[2].goalsHome,
-        betGoalsAway: bets[2].goalsAway
+        betGoalsAway: bets[2].goalsAway,
+        possibleOutsiderPoints: POINTS_ADDED_OUTSIDER_TWO
       }, // match 58817, user 1
       {
         matchId: matches[1].matchId,
         userName: userData[1].displayName,
         betGoalsHome: bets[3].goalsHome,
-        betGoalsAway: bets[3].goalsAway
+        betGoalsAway: bets[3].goalsAway,
+        possibleOutsiderPoints: POINTS_ADDED_OUTSIDER_TWO
       } // match 58817, user 2
     ];
 
@@ -390,6 +401,7 @@ describe('FetchBetOverviewService', () => {
 
     defaultFrameValue = {
       matchId: -1,
+      matchDate: new Date(-1),
       isTopMatch: false,
       teamNameHome: "",
       teamNameAway: "",
@@ -402,7 +414,8 @@ describe('FetchBetOverviewService', () => {
       matchId: -1,
       userName: "",
       betGoalsHome: -1,
-      betGoalsAway: -1
+      betGoalsAway: -1,
+      possibleOutsiderPoints: -1
     };
 
   });
@@ -552,10 +565,7 @@ describe('FetchBetOverviewService', () => {
 
     spyOn<any>(service, "getAllUserBets$").and.returnValues(from(bets));
     spyOn<any>(service, "makeBetData$")
-      .withArgs(bets[0]).and.returnValue(of(expectedUserValues[0]))
-      .withArgs(bets[1]).and.returnValue(of(expectedUserValues[1]))
-      .withArgs(bets[2]).and.returnValue(of(expectedUserValues[2]))
-      .withArgs(bets[3]).and.returnValue(of(expectedUserValues[3]));
+      .withArgs(bets).and.returnValue(from(expectedUserValues));
 
     let i: number = 0;
     service["fetchUserBetDataByMatchday$"](argument).subscribe(
@@ -571,10 +581,7 @@ describe('FetchBetOverviewService', () => {
 
     spyOn<any>(service, "getAllUserBets$").and.returnValues(from(bets));
     spyOn<any>(service, "makeBetData$")
-      .withArgs(bets[0]).and.returnValue(of(expectedUserValues[0]))
-      .withArgs(bets[1]).and.returnValue(of(expectedUserValues[1]))
-      .withArgs(bets[2]).and.returnValue(of(expectedUserValues[2]))
-      .withArgs(bets[3]).and.returnValue(of(expectedUserValues[3]));
+      .withArgs(bets).and.returnValue(from(expectedUserValues));
 
     let i: number = 0;
     service["fetchUserBetDataByMatchday$"](argument).subscribe(
@@ -889,22 +896,29 @@ describe('FetchBetOverviewService', () => {
   // ---------------------------------------------------------------------------
 
   it('makeBetData$, data available', (done: DoneFn) => {
-    const argument: Bet = bets[3];
+    const argument: Bet[] = bets;
 
     appDataSpy.getUserDataById$
       .withArgs(userData[0].id).and.returnValue(of(userData[0]))
       .withArgs(userData[1].id).and.returnValue(of(userData[1]));
 
+    pointCalcSpy.getPotentialOutsiderPoints
+      .withArgs(argument, bets[0]).and.returnValue(POINTS_ADDED_OUTSIDER_ONE)
+      .withArgs(argument, bets[1]).and.returnValue(POINTS_ADDED_OUTSIDER_ONE)
+      .withArgs(argument, bets[2]).and.returnValue(POINTS_ADDED_OUTSIDER_TWO)
+      .withArgs(argument, bets[3]).and.returnValue(POINTS_ADDED_OUTSIDER_TWO);
+
+    let i: number = 0;
     service["makeBetData$"](argument).subscribe(
       val => {
-        expect(val).toEqual(expectedUserValues[3]);
+        expect(val).toEqual(expectedUserValues[i++]);
         done();
       }
     );
   });
 
   it('makeBetData$, data not available', (done: DoneFn) => {
-    const argument: Bet = bets[3];
+    const argument: Bet[] = bets;
 
     appDataSpy.getUserDataById$
       .withArgs(userData[0].id).and.returnValue(of())

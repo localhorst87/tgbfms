@@ -18,6 +18,7 @@ export interface BetWriteData {
 
 export interface BetOverviewFrameData {
   matchId: number;
+  matchDate: Date;
   isTopMatch: boolean;
   teamNameHome: string;
   teamNameAway: string;
@@ -37,6 +38,7 @@ export interface BetOverviewUserData {
   userName: string;
   betGoalsHome: number;
   betGoalsAway: number;
+  possibleOutsiderPoints: number;
 }
 
 export interface SeasonBetOverviewUserData {

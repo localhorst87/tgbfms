@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, combineLatest, range, concat } from 'rxjs';
-import { map, mergeMap, concatMap, distinct } from 'rxjs/operators';
+import { Observable, combineLatest, range, concat, from } from 'rxjs';
+import { map, mergeMap, concatMap, distinct, toArray } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
+import { PointCalculatorService } from '../Businessrules/point-calculator.service';
 import { Bet, Match, Result, SeasonBet, SeasonResult, User } from '../Businessrules/basic_datastructures';
 import { BetOverviewFrameData, BetOverviewUserData, SeasonBetOverviewUserData, SeasonBetOverviewFrameData } from './output_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';
@@ -13,7 +14,7 @@ export class FetchBetOverviewService {
 
   relevantPlaces$: Observable<number>;
 
-  constructor(private appData: AppdataAccessService) {
+  constructor(private appData: AppdataAccessService, private pointCalc: PointCalculatorService) {
     this.relevantPlaces$ = concat(
       range(1, RELEVANT_FIRST_PLACES_COUNT),
       range(-RELEVANT_LAST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT)
@@ -33,7 +34,8 @@ export class FetchBetOverviewService {
     // returns the requested bet data of all users as Observable
 
     return this.getAllUserBets$(matchId).pipe(
-      mergeMap((bet: Bet) => this.makeBetData$(bet)),
+      toArray(),
+      mergeMap((betArray: Bet[]) => this.makeBetData$(betArray)),
       distinct()
     );
   }
@@ -68,6 +70,7 @@ export class FetchBetOverviewService {
       (teamHome: string, teamAway: string, betUser: Bet, result: Result) => {
         return {
           matchId: match.matchId,
+          matchDate: new Date(match.timestamp * 1000),
           isTopMatch: match.isTopMatch,
           teamNameHome: teamHome,
           teamNameAway: teamAway,
@@ -118,18 +121,21 @@ export class FetchBetOverviewService {
     );
   }
 
-  private makeBetData$(bet: Bet): Observable<BetOverviewUserData> {
+  private makeBetData$(betArray: Bet[]): Observable<BetOverviewUserData> {
     // creates BetOverviewUserData from a user bet
 
-    return this.appData.getUserDataById$(bet.userId).pipe(
-      map((userData: User) => {
-        return {
-          matchId: bet.matchId,
-          userName: userData.displayName,
-          betGoalsHome: bet.goalsHome,
-          betGoalsAway: bet.goalsAway
-        };
-      })
+    return from(betArray).pipe(
+      concatMap((bet: Bet) => this.appData.getUserDataById$(bet.userId).pipe(
+        map((userData: User) => {
+          return {
+            matchId: bet.matchId,
+            userName: userData.displayName,
+            betGoalsHome: bet.goalsHome,
+            betGoalsAway: bet.goalsAway,
+            possibleOutsiderPoints: this.pointCalc.getPotentialOutsiderPoints(betArray, bet)
+          };
+        })
+      ))
     )
   }
 

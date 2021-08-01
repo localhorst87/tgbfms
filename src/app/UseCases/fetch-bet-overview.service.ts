@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, combineLatest, range, concat, from } from 'rxjs';
+import { Observable, combineLatest, range, concat, from, of } from 'rxjs';
 import { map, mergeMap, concatMap, distinct, toArray } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { PointCalculatorService } from '../Businessrules/point-calculator.service';
@@ -30,10 +30,12 @@ export class FetchBetOverviewService {
     );
   }
 
-  public fetchUserBetDataByMatchday$(matchId: number): Observable<BetOverviewUserData> {
+  public fetchUserBetDataByMatchday$(matchId: number, dummyExceptUserId?: string): Observable<BetOverviewUserData> {
     // returns the requested bet data of all users as Observable
+    // if a user ID in dummyExceptUserId is given, a dummy Bet will be returned
+    // for all user Bets, except the given ID in dummyExceptUserId
 
-    return this.getAllUserBets$(matchId).pipe(
+    return this.getAllUserBets$(matchId, dummyExceptUserId).pipe(
       toArray(),
       mergeMap((betArray: Bet[]) => this.makeBetData$(betArray)),
       distinct()
@@ -101,11 +103,21 @@ export class FetchBetOverviewService {
     );
   }
 
-  private getAllUserBets$(matchId: number): Observable<Bet> {
-    // returns the bet of all active users
+  private getAllUserBets$(matchId: number, dummyExceptUserId?: string): Observable<Bet> {
+    // returns the bet of all active users. If dummyExceptUserId is given, only
+    // the Bet with this user ID will be retrieved, for the other users, a dummy
+    // Bet (secret bet) will be returned --> saves database volume, in case the
+    // Bet is not accessible for the user
 
     return this.appData.getActiveUserIds$().pipe(
-      concatMap((userId: string) => this.appData.getBet$(matchId, userId)),
+      concatMap((userId: string) => {
+        if (dummyExceptUserId && userId != dummyExceptUserId) {
+          return this.makeDummyBet$(matchId, userId);
+        }
+        else {
+          return this.appData.getBet$(matchId, userId);
+        }
+      }),
       distinct()
     );
   }
@@ -154,5 +166,18 @@ export class FetchBetOverviewService {
         };
       }
     );
+  }
+
+  private makeDummyBet$(matchId: number, userId: string): Observable<Bet> {
+    // creates a dummy Bet with the given match und user ID
+
+    return of({
+      documentId: "",
+      matchId: matchId,
+      userId: userId,
+      isFixed: false,
+      goalsHome: -1,
+      goalsAway: -1
+    });
   }
 }

@@ -560,17 +560,36 @@ describe('FetchBetOverviewService', () => {
   // fetchUserBetDataByMatchday$
   // ---------------------------------------------------------------------------
 
-  it('fetchUserBetDataByMatchday$, bets available', (done: DoneFn) => {
-    const argument: number = matches[0].matchId;
+  it('fetchUserBetDataByMatchday$, bets available, argument2 not given', (done: DoneFn) => {
+    const argument1: number = matches[0].matchId;
 
     spyOn<any>(service, "getAllUserBets$").and.returnValues(from(bets));
     spyOn<any>(service, "makeBetData$")
       .withArgs(bets).and.returnValue(from(expectedUserValues));
 
     let i: number = 0;
-    service["fetchUserBetDataByMatchday$"](argument).subscribe(
+    service["fetchUserBetDataByMatchday$"](argument1).subscribe(
       val => {
         expect(val).toEqual(expectedUserValues[i++]);
+        expect(service["getAllUserBets$"]).toHaveBeenCalledWith(argument1, undefined);
+        done();
+      }
+    );
+  });
+
+  it('fetchUserBetDataByMatchday$, bets available, argument2 given', (done: DoneFn) => {
+    const argument1: number = matches[0].matchId;
+    const arugment2: string = "test_user_id_1";
+
+    spyOn<any>(service, "getAllUserBets$").and.returnValues(from(bets));
+    spyOn<any>(service, "makeBetData$")
+      .withArgs(bets).and.returnValue(from(expectedUserValues));
+
+    let i: number = 0;
+    service["fetchUserBetDataByMatchday$"](argument1, arugment2).subscribe(
+      val => {
+        expect(val).toEqual(expectedUserValues[i++]);
+        expect(service["getAllUserBets$"]).toHaveBeenCalledWith(argument1, arugment2);
         done();
       }
     );
@@ -728,8 +747,8 @@ describe('FetchBetOverviewService', () => {
   // getAllUserBets$
   // ---------------------------------------------------------------------------
 
-  it('getAllUserBets$, bets available', (done: DoneFn) => {
-    const argument: number = matches[0].matchId;
+  it('getAllUserBets$, bets available, second argument not given', (done: DoneFn) => {
+    const argument1: number = matches[0].matchId;
 
     appDataSpy.getActiveUserIds$.and.returnValue(of(userData[0].id, userData[1].id));
     appDataSpy.getBet$
@@ -741,7 +760,38 @@ describe('FetchBetOverviewService', () => {
     const expectedValues: Bet[] = [bets[0], bets[1]];
 
     let i: number = 0;
-    service["getAllUserBets$"](argument).subscribe(
+    service["getAllUserBets$"](argument1).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it('getAllUserBets$, bets available, second argument given', (done: DoneFn) => {
+    const argument1: number = matches[0].matchId;
+    const argument2: string = userData[0].id;
+
+    appDataSpy.getActiveUserIds$.and.returnValue(of(userData[0].id, userData[1].id));
+    appDataSpy.getBet$
+      .withArgs(matches[0].matchId, userData[0].id).and.returnValue(of(bets[0]))
+      .withArgs(matches[0].matchId, userData[1].id).and.returnValue(of(bets[1]))
+      .withArgs(matches[1].matchId, userData[0].id).and.returnValue(of(bets[2]))
+      .withArgs(matches[1].matchId, userData[1].id).and.returnValue(of(bets[3]));
+
+    const dummyBet: Bet = {
+      documentId: "",
+      matchId: argument1,
+      userId: userData[1].id,
+      isFixed: false,
+      goalsHome: -1,
+      goalsAway: -1
+    };
+
+    const expectedValues: Bet[] = [bets[0], dummyBet];
+
+    let i: number = 0;
+    service["getAllUserBets$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValues[i++]);
         done();

@@ -51,10 +51,10 @@ export class FetchBetOverviewService {
     );
   }
 
-  public fetchUserSeasonBetData$(season: number, place: number): Observable<SeasonBetOverviewUserData> {
+  public fetchUserSeasonBetData$(season: number, place: number, dummyExceptUserId?: string): Observable<SeasonBetOverviewUserData> {
     // returns the request season bet data of all users for the bet overview
 
-    return this.getAllUserSeasonBets$(season, place).pipe(
+    return this.getAllUserSeasonBets$(season, place, dummyExceptUserId).pipe(
       mergeMap((bet: SeasonBet) => this.makeSeasonBetData$(bet)),
       distinct()
     );
@@ -124,11 +124,18 @@ export class FetchBetOverviewService {
     );
   }
 
-  private getAllUserSeasonBets$(season: number, place: number): Observable<SeasonBet> {
+  private getAllUserSeasonBets$(season: number, place: number, dummyExceptUserId?: string): Observable<SeasonBet> {
     // returns the SeasonBet of all active users for the given place
 
     return this.appData.getActiveUserIds$().pipe(
-      concatMap((userId: string) => this.appData.getSeasonBet$(season, place, userId)),
+      concatMap((userId: string) => {
+        if (dummyExceptUserId && userId != dummyExceptUserId) {
+          return this.makeDummySeasonBet$(season, place, userId);
+        }
+        else {
+          return this.appData.getSeasonBet$(season, place, userId);
+        }
+      }),
       distinct()
     );
   }
@@ -180,6 +187,19 @@ export class FetchBetOverviewService {
       isFixed: false,
       goalsHome: -1,
       goalsAway: -1
+    });
+  }
+
+  private makeDummySeasonBet$(season: number, place: number, userId: string): Observable<SeasonBet> {
+    // creates a ummy SeasonBet with the given data
+
+    return of({
+      documentId: "",
+      season: season,
+      userId: userId,
+      isFixed: false,
+      place: place,
+      teamId: -1
     });
   }
 }

@@ -606,16 +606,16 @@ describe('FetchBetOverviewService', () => {
   // fetchUserSeasonBetData$
   // ---------------------------------------------------------------------------
 
-  it('fetchUserSeasonBetData$, bets available', (done: DoneFn) => {
+  it('fetchUserSeasonBetData$, bets available, no userId argument given', (done: DoneFn) => {
     const argument1: number = 2021;
     const argument2: number = 1;
 
     spyOn<any>(service, "getAllUserSeasonBets$")
-      .withArgs(argument1, 1).and.returnValues(of(seasonBets[0], seasonBets[5]))
-      .withArgs(argument1, 2).and.returnValues(of(seasonBets[1], seasonBets[6]))
-      .withArgs(argument1, -3).and.returnValues(of(seasonBets[2], seasonBets[7]))
-      .withArgs(argument1, -2).and.returnValues(of(seasonBets[3], seasonBets[8]))
-      .withArgs(argument1, -1).and.returnValues(of(seasonBets[4], seasonBets[9]));
+      .withArgs(argument1, 1, undefined).and.returnValues(of(seasonBets[0], seasonBets[5]))
+      .withArgs(argument1, 2, undefined).and.returnValues(of(seasonBets[1], seasonBets[6]))
+      .withArgs(argument1, -3, undefined).and.returnValues(of(seasonBets[2], seasonBets[7]))
+      .withArgs(argument1, -2, undefined).and.returnValues(of(seasonBets[3], seasonBets[8]))
+      .withArgs(argument1, -1, undefined).and.returnValues(of(seasonBets[4], seasonBets[9]));
 
     spyOn<any>(service, "makeSeasonBetData$")
       .withArgs(seasonBets[0]).and.returnValue(of(expectedSeasonUserData[0]))
@@ -636,6 +636,61 @@ describe('FetchBetOverviewService', () => {
 
     let i: number = 0;
     service["fetchUserSeasonBetData$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it('fetchUserSeasonBetData$, bets available, dummy userId argument given', (done: DoneFn) => {
+    const argument1: number = 2021;
+    const argument2: number = 1;
+    const argument3: string = userData[0].id;
+
+    const expectedDummyValue: SeasonBetOverviewUserData = {
+      place: argument2,
+      userName: userData[1].id,
+      teamName: "unknown team",
+      isBetFixed: false
+    };
+
+    const dummyBet: SeasonBet = {
+      documentId: "",
+      season: argument1,
+      userId: userData[1].id,
+      isFixed: false,
+      place: argument2,
+      teamId: -1
+    }
+
+    spyOn<any>(service, "getAllUserSeasonBets$")
+      .withArgs(argument1, 1, argument3).and.returnValues(of(seasonBets[0], dummyBet))
+      .withArgs(argument1, 2, argument3).and.returnValues(of(seasonBets[1], dummyBet))
+      .withArgs(argument1, -3, argument3).and.returnValues(of(seasonBets[2], dummyBet))
+      .withArgs(argument1, -2, argument3).and.returnValues(of(seasonBets[3], dummyBet))
+      .withArgs(argument1, -1, argument3).and.returnValues(of(seasonBets[4], dummyBet));
+
+    spyOn<any>(service, "makeSeasonBetData$")
+      .withArgs(seasonBets[0]).and.returnValue(of(expectedSeasonUserData[0]))
+      .withArgs(seasonBets[1]).and.returnValue(of(expectedSeasonUserData[1]))
+      .withArgs(seasonBets[2]).and.returnValue(of(expectedSeasonUserData[2]))
+      .withArgs(seasonBets[3]).and.returnValue(of(expectedSeasonUserData[3]))
+      .withArgs(seasonBets[4]).and.returnValue(of(expectedSeasonUserData[4]))
+      .withArgs(seasonBets[5]).and.returnValue(of(expectedSeasonUserData[5]))
+      .withArgs(seasonBets[6]).and.returnValue(of(expectedSeasonUserData[6]))
+      .withArgs(seasonBets[7]).and.returnValue(of(expectedSeasonUserData[7]))
+      .withArgs(seasonBets[8]).and.returnValue(of(expectedSeasonUserData[8]))
+      .withArgs(seasonBets[9]).and.returnValue(of(expectedSeasonUserData[9]))
+      .withArgs(dummyBet).and.returnValue(of(expectedDummyValue));
+
+    const expectedValues: SeasonBetOverviewUserData[] = [
+      expectedSeasonUserData[0],
+      expectedDummyValue
+    ];
+
+    let i: number = 0;
+    service["fetchUserSeasonBetData$"](argument1, argument2, argument3).subscribe(
       val => {
         expect(val).toEqual(expectedValues[i++]);
         done();
@@ -689,17 +744,17 @@ describe('FetchBetOverviewService', () => {
 
   it('fetchUserBetDataByMatchday$, bets available, argument2 given', (done: DoneFn) => {
     const argument1: number = matches[0].matchId;
-    const arugment2: string = "test_user_id_1";
+    const argument2: string = "test_user_id_1";
 
     spyOn<any>(service, "getAllUserBets$").and.returnValues(from(bets));
     spyOn<any>(service, "makeBetData$")
       .withArgs(bets).and.returnValue(from(expectedUserValues));
 
     let i: number = 0;
-    service["fetchUserBetDataByMatchday$"](argument1, arugment2).subscribe(
+    service["fetchUserBetDataByMatchday$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedUserValues[i++]);
-        expect(service["getAllUserBets$"]).toHaveBeenCalledWith(argument1, arugment2);
+        expect(service["getAllUserBets$"]).toHaveBeenCalledWith(argument1, argument2);
         done();
       }
     );
@@ -962,7 +1017,7 @@ describe('FetchBetOverviewService', () => {
   // getAllUserSeasonBets$
   // ---------------------------------------------------------------------------
 
-  it('getAllUserSeasonBets$, bets available', (done: DoneFn) => {
+  it('getAllUserSeasonBets$, bets available, dummy userId argument not given', (done: DoneFn) => {
     const argument1: number = 2021;
     const argument2: number = -3;
 
@@ -981,6 +1036,44 @@ describe('FetchBetOverviewService', () => {
 
 
     const expectedValues: SeasonBet[] = [seasonBets[2], seasonBets[7]];
+
+    let i: number = 0;
+    service["getAllUserSeasonBets$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
+        done();
+      }
+    );
+  });
+
+  it('getAllUserSeasonBets$, bets available, dummy userId argument given', (done: DoneFn) => {
+    const argument1: number = 2021;
+    const argument2: number = -3;
+    const argument3: string = userData[0].id;
+
+    const dummySeasonBet: SeasonBet = {
+      documentId: "",
+      season: argument1,
+      userId: userData[1].id,
+      isFixed: false,
+      place: argument2,
+      teamId: -1
+    }
+
+    appDataSpy.getActiveUserIds$.and.returnValue(of(userData[0].id, userData[1].id));
+    appDataSpy.getSeasonBet$
+      .withArgs(argument1, 1, userData[0].id).and.returnValue(of(seasonBets[0]))
+      .withArgs(argument1, 2, userData[0].id).and.returnValue(of(seasonBets[1]))
+      .withArgs(argument1, -3, userData[0].id).and.returnValue(of(seasonBets[2]))
+      .withArgs(argument1, -2, userData[0].id).and.returnValue(of(seasonBets[3]))
+      .withArgs(argument1, -1, userData[0].id).and.returnValue(of(seasonBets[4]))
+      .withArgs(argument1, 1, userData[1].id).and.returnValue(of(dummySeasonBet))
+      .withArgs(argument1, 2, userData[1].id).and.returnValue(of(dummySeasonBet))
+      .withArgs(argument1, -3, userData[1].id).and.returnValue(of(dummySeasonBet))
+      .withArgs(argument1, -2, userData[1].id).and.returnValue(of(dummySeasonBet))
+      .withArgs(argument1, -1, userData[1].id).and.returnValue(of(dummySeasonBet));
+
+    const expectedValues: SeasonBet[] = [seasonBets[2], dummySeasonBet];
 
     let i: number = 0;
     service["getAllUserSeasonBets$"](argument1, argument2).subscribe(

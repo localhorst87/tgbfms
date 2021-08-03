@@ -51,10 +51,10 @@ export class FetchBetOverviewService {
     );
   }
 
-  public fetchUserSeasonBetData$(season: number): Observable<SeasonBetOverviewUserData> {
+  public fetchUserSeasonBetData$(season: number, place: number): Observable<SeasonBetOverviewUserData> {
     // returns the request season bet data of all users for the bet overview
 
-    return this.getAllUserSeasonBets$(season).pipe(
+    return this.getAllUserSeasonBets$(season, place).pipe(
       mergeMap((bet: SeasonBet) => this.makeSeasonBetData$(bet)),
       distinct()
     );
@@ -124,13 +124,11 @@ export class FetchBetOverviewService {
     );
   }
 
-  private getAllUserSeasonBets$(season: number): Observable<SeasonBet> {
-    // returns the SeasonBet of all active users
+  private getAllUserSeasonBets$(season: number, place: number): Observable<SeasonBet> {
+    // returns the SeasonBet of all active users for the given place
 
     return this.appData.getActiveUserIds$().pipe(
-      concatMap((userId: string) => this.relevantPlaces$.pipe(
-        concatMap((place: number) => this.appData.getSeasonBet$(season, place, userId))
-      )),
+      concatMap((userId: string) => this.appData.getSeasonBet$(season, place, userId)),
       distinct()
     );
   }

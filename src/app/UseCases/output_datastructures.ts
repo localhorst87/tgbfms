@@ -40,6 +40,7 @@ export interface BetOverviewUserData {
   userName: string;
   betGoalsHome: number;
   betGoalsAway: number;
+  isBetFixed: boolean;
   possibleOutsiderPoints: number;
 }
 
@@ -47,6 +48,7 @@ export interface SeasonBetOverviewUserData {
   place: number;
   userName: string;
   teamName: string;
+  isBetFixed: boolean;
 }
 
 export interface SeasonBetWriteData {

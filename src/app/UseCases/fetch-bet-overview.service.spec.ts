@@ -400,6 +400,7 @@ describe('FetchBetOverviewService', () => {
         userName: userData[0].displayName,
         betGoalsHome: bets[0].goalsHome,
         betGoalsAway: bets[0].goalsAway,
+        isBetFixed: bets[0].isFixed,
         possibleOutsiderPoints: POINTS_ADDED_OUTSIDER_ONE
       }, // match 58815, user 1
       {
@@ -407,6 +408,7 @@ describe('FetchBetOverviewService', () => {
         userName: userData[1].displayName,
         betGoalsHome: bets[1].goalsHome,
         betGoalsAway: bets[1].goalsAway,
+        isBetFixed: bets[1].isFixed,
         possibleOutsiderPoints: POINTS_ADDED_OUTSIDER_ONE
       }, // match 58815, user 2
       {
@@ -414,6 +416,7 @@ describe('FetchBetOverviewService', () => {
         userName: userData[0].displayName,
         betGoalsHome: bets[2].goalsHome,
         betGoalsAway: bets[2].goalsAway,
+        isBetFixed: bets[2].isFixed,
         possibleOutsiderPoints: POINTS_ADDED_OUTSIDER_TWO
       }, // match 58817, user 1
       {
@@ -421,6 +424,7 @@ describe('FetchBetOverviewService', () => {
         userName: userData[1].displayName,
         betGoalsHome: bets[3].goalsHome,
         betGoalsAway: bets[3].goalsAway,
+        isBetFixed: bets[3].isFixed,
         possibleOutsiderPoints: POINTS_ADDED_OUTSIDER_TWO
       } // match 58817, user 2
     ];
@@ -429,52 +433,62 @@ describe('FetchBetOverviewService', () => {
       {
         place: seasonBets[0].place,
         userName: userData[0].displayName,
-        teamName: teams[0].nameLong
+        teamName: teams[0].nameLong,
+        isBetFixed: seasonBets[0].isFixed,
       },
       {
         place: seasonBets[1].place,
         userName: userData[0].displayName,
-        teamName: teams[1].nameLong
+        teamName: teams[1].nameLong,
+        isBetFixed: seasonBets[1].isFixed,
       },
       {
         place: seasonBets[2].place,
         userName: userData[0].displayName,
-        teamName: teams[2].nameLong
+        teamName: teams[2].nameLong,
+        isBetFixed: seasonBets[2].isFixed,
       },
       {
         place: seasonBets[3].place,
         userName: userData[0].displayName,
-        teamName: teams[3].nameLong
+        teamName: teams[3].nameLong,
+        isBetFixed: seasonBets[3].isFixed,
       },
       {
         place: seasonBets[4].place,
         userName: userData[0].displayName,
-        teamName: teams[4].nameLong
+        teamName: teams[4].nameLong,
+        isBetFixed: seasonBets[4].isFixed,
       },
       {
         place: seasonBets[5].place,
         userName: userData[1].displayName,
-        teamName: teams[5].nameLong
+        teamName: teams[5].nameLong,
+        isBetFixed: seasonBets[5].isFixed,
       },
       {
         place: seasonBets[6].place,
         userName: userData[1].displayName,
-        teamName: teams[6].nameLong
+        teamName: teams[6].nameLong,
+        isBetFixed: seasonBets[6].isFixed,
       },
       {
         place: seasonBets[7].place,
         userName: userData[1].displayName,
-        teamName: teams[7].nameLong
+        teamName: teams[7].nameLong,
+        isBetFixed: seasonBets[7].isFixed,
       },
       {
         place: seasonBets[8].place,
         userName: userData[1].displayName,
-        teamName: teams[8].nameLong
+        teamName: teams[8].nameLong,
+        isBetFixed: seasonBets[8].isFixed,
       },
       {
         place: seasonBets[9].place,
         userName: userData[1].displayName,
-        teamName: teams[9].nameLong
+        teamName: teams[9].nameLong,
+        isBetFixed: seasonBets[9].isFixed,
       }
     ];
 
@@ -496,6 +510,7 @@ describe('FetchBetOverviewService', () => {
       userName: "",
       betGoalsHome: -1,
       betGoalsAway: -1,
+      isBetFixed: false,
       possibleOutsiderPoints: -1
     };
 
@@ -624,7 +639,8 @@ describe('FetchBetOverviewService', () => {
     const defaultSeasonUserValue: SeasonBetOverviewUserData = {
       place: 0,
       userName: "",
-      teamName: ""
+      teamName: "",
+      isBetFixed: false
     };
 
     service["fetchUserSeasonBetData$"](argument).pipe(
@@ -1099,7 +1115,8 @@ describe('FetchBetOverviewService', () => {
     const defaultSeasonUserValue: SeasonBetOverviewUserData = {
       place: 0,
       userName: "",
-      teamName: ""
+      teamName: "",
+      isBetFixed: false
     };
 
     service["makeSeasonBetData$"](argument).pipe(

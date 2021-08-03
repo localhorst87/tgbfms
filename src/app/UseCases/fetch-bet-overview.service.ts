@@ -146,6 +146,7 @@ export class FetchBetOverviewService {
             userName: userData.displayName,
             betGoalsHome: bet.goalsHome,
             betGoalsAway: bet.goalsAway,
+            isBetFixed: bet.isFixed,
             possibleOutsiderPoints: this.pointCalc.getPotentialOutsiderPoints(betArray, bet)
           };
         })
@@ -164,7 +165,8 @@ export class FetchBetOverviewService {
         return {
           place: bet.place,
           userName: userData.displayName,
-          teamName: teamName
+          teamName: teamName,
+          isBetFixed: bet.isFixed
         };
       }
     );

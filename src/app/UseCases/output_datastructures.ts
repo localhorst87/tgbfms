@@ -37,6 +37,7 @@ export interface SeasonBetOverviewFrameData {
 
 export interface BetOverviewUserData {
   matchId: number;
+  userId: string;
   userName: string;
   betGoalsHome: number;
   betGoalsAway: number;
@@ -46,6 +47,7 @@ export interface BetOverviewUserData {
 
 export interface SeasonBetOverviewUserData {
   place: number;
+  userId: string;
   userName: string;
   teamName: string;
   isBetFixed: boolean;

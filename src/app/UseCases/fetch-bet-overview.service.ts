@@ -148,6 +148,7 @@ export class FetchBetOverviewService {
         map((userData: User) => {
           return {
             matchId: bet.matchId,
+            userId: userData.id,
             userName: userData.displayName,
             betGoalsHome: bet.goalsHome,
             betGoalsAway: bet.goalsAway,
@@ -169,6 +170,7 @@ export class FetchBetOverviewService {
       (userData: User, teamName: string) => {
         return {
           place: bet.place,
+          userId: userData.id,
           userName: userData.displayName,
           teamName: teamName,
           isBetFixed: bet.isFixed

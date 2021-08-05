@@ -1,3 +1,5 @@
-.content {
-  height: 600px // just working example, to be changed
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 999
 }

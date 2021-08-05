@@ -21,6 +21,7 @@ import { PointCalculatorTrendbasedService } from './Businessrules/point-calculat
 import { StatisticsCalculatorService } from './Businessrules/statistics-calculator.service';
 import { StatisticsCalculatorTrendbasedService } from './Businessrules/statistics-calculator-trendbased.service';
 import { BetWriteComponent } from './bet-write/bet-write.component';
+import { BetOverviewComponent } from './bet-overview/bet-overview.component';
 import { HomeComponent } from './home/home.component';
 
 // Angular Material
@@ -33,12 +34,17 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @NgModule({
   declarations: [
     AppComponent,
     BetWriteComponent,
-    HomeComponent
+    HomeComponent,
+    BetOverviewComponent
   ],
   imports: [
     BrowserModule,
@@ -57,7 +63,11 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatExpansionModule,
     MatSelectModule,
     MatSidenavModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatTabsModule,
+    MatCardModule,
+    MatBadgeModule,
+    MatProgressBarModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },

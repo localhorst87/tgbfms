@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable, combineLatest } from 'rxjs';
 import { switchMap, pluck } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
+import { User } from '../Businessrules/basic_datastructures';
 import { SEASON } from '../Businessrules/rule_defined_values';
 
 @Component({
@@ -11,15 +12,23 @@ import { SEASON } from '../Businessrules/rule_defined_values';
 })
 export class HomeComponent implements OnInit {
   selectedPage: string;
-  authId: string;
+  loggedUser: User;
   matchdayNextMatch: number;
   matchdayLastMatch: number;
   matchdayUserSelection: number;
 
 
   constructor(private appData: AppdataAccessService) {
-    this.selectedPage = "news";
-    this.authId = "Mauri";
+
+    this.loggedUser = { // dummy
+      documentId: "dummy_id",
+      id: "Mauri",
+      email: "dummy@mail.com",
+      displayName: "Mauri",
+      isAdmin: true,
+      isActive: true
+    };
+    this.selectedPage = "view";
     this.matchdayNextMatch = -1;
     this.matchdayLastMatch = -1;
     this.matchdayUserSelection = -1;

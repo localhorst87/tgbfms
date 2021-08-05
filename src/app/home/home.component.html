@@ -1,37 +1,50 @@
-<mat-toolbar>
+<mat-toolbar class="toolbar">
   <button mat-icon-button (click)="sidenav.toggle()">
     <mat-icon>menu</mat-icon>
   </button>
   <span>TGBFMS</span>
+  <span class="toolbar-spacer"></span>
+    <button mat-icon-button>
+      <mat-icon>settings</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>logout</mat-icon>
+    </button>
 </mat-toolbar>
 
 <mat-sidenav-container hasBackdrop=false>
 
-  <mat-sidenav #sidenav mode="side">
-    <button mat-mini-fab (click)="changeView('write')">
+  <mat-sidenav #sidenav mode="over">
+    <button mat-mini-fab (click)="changeView('write');sidenav.close()">
       <mat-icon>edit</mat-icon>
     </button>
     <span> TIPPABGABE</span>
     <br><br>
-    <button mat-mini-fab (click)="changeView('view')">
+    <button mat-mini-fab (click)="changeView('view');sidenav.close()">
       <mat-icon>search</mat-icon>
     </button>
     <span> ALLE TIPPS</span>
     <br><br>
-    <button mat-mini-fab (click)="changeView('table')">
+    <button mat-mini-fab (click)="changeView('table');sidenav.close()">
       <mat-icon>emoji_events</mat-icon>
     </button>
     <span> TABELLE</span>
   </mat-sidenav>
 
-  <mat-sidenav-content class="content">
+  <mat-sidenav-content>
 
     <app-bet-write
       *ngIf = "selectedPage == 'write'"
-      [userId] = "authId"
+      [userId] = "loggedUser.id"
       [selectedMatchday] = "matchdayNextMatch"
       (selectMatchdayEvent) = "changeMatchdayOnUserSelection($event)">
     </app-bet-write>
+
+    <app-bet-overview
+      *ngIf = "selectedPage == 'view'"
+      [userId] = "loggedUser.id"
+      [selectedMatchday] = "matchdayLastMatch">
+    </app-bet-overview>
 
   </mat-sidenav-content>
 

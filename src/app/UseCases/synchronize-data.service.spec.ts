@@ -15,7 +15,7 @@ describe('SynchronizeDataService', () => {
   let matchImportData: MatchImportData[];
 
   beforeEach(() => {
-    appDataSpy = jasmine.createSpyObj(["getMatch$", "addMatch", "updateMatch", "getResult$", "addResult", "updateResult", "getSeasonResult$", "addSeasonResult", "updateSeasonResult", "getLastUpdateTime$"]);
+    appDataSpy = jasmine.createSpyObj(["getMatch$", "addMatch", "updateMatch", "getResult$", "addResult", "updateResult", "getSeasonResult$", "addSeasonResult", "updateSeasonResult", "getSyncTime$"]);
     matchDataSpy = jasmine.createSpyObj(["importMatchdata$", "importCurrentTeamRanking$", "getLastUpdateTime$"]);
 
     TestBed.configureTestingModule({
@@ -103,6 +103,7 @@ describe('SynchronizeDataService', () => {
     spyOn<any>(service, "syncMatch").and.stub();
     spyOn<any>(service, "syncResult").and.stub();
     spyOn<any>(service, "syncSeasonResult").and.stub();
+    spyOn<any>(service, "refreshUpdateTime").and.stub();
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).toHaveBeenCalledWith(argument1, matchImportData[0]);
@@ -112,6 +113,7 @@ describe('SynchronizeDataService', () => {
     expect(service["syncResult"]).toHaveBeenCalledWith(matchImportData[1]);
     expect(service["syncResult"]).toHaveBeenCalledWith(matchImportData[2]);
     expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, rankingImportData);
+    expect(service["refreshUpdateTime"]).toHaveBeenCalled();
   });
 
   it('syncData, import required but no match data available', () => {
@@ -147,11 +149,13 @@ describe('SynchronizeDataService', () => {
     spyOn<any>(service, "syncMatch").and.stub();
     spyOn<any>(service, "syncResult").and.stub();
     spyOn<any>(service, "syncSeasonResult").and.stub();
+    spyOn<any>(service, "refreshUpdateTime").and.stub();
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).not.toHaveBeenCalled();
     expect(service["syncResult"]).not.toHaveBeenCalled();
     expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, rankingImportData);
+    expect(service["refreshUpdateTime"]).toHaveBeenCalled();
   });
 
   it('syncData, import required but no match data available', () => {
@@ -187,11 +191,13 @@ describe('SynchronizeDataService', () => {
     spyOn<any>(service, "syncMatch").and.stub();
     spyOn<any>(service, "syncResult").and.stub();
     spyOn<any>(service, "syncSeasonResult").and.stub();
+    spyOn<any>(service, "refreshUpdateTime").and.stub();
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).not.toHaveBeenCalled();
     expect(service["syncResult"]).not.toHaveBeenCalled();
     expect(service["syncSeasonResult"]).not.toHaveBeenCalled();
+    expect(service["refreshUpdateTime"]).not.toHaveBeenCalled();
   });
 
   // ---------------------------------------------------------------------------
@@ -203,8 +209,7 @@ describe('SynchronizeDataService', () => {
     const argument2: number = 33;
 
     matchDataSpy.getLastUpdateTime$.and.returnValue(of(1620890000));
-    appDataSpy.getLastUpdateTime$.and.returnValue(of(1620840000));
-
+    appDataSpy.getSyncTime$.and.returnValue(of({ documentId: "test_doc", season: argument1, matchday: argument2, timestamp: 1620840000 }));
     const expectedValue: boolean = true;
 
     service["isSyncNeeded$"](argument1, argument2).subscribe(
@@ -220,7 +225,7 @@ describe('SynchronizeDataService', () => {
     const argument2: number = 33;
 
     matchDataSpy.getLastUpdateTime$.and.returnValue(of(1620790000));
-    appDataSpy.getLastUpdateTime$.and.returnValue(of(1620790000));
+    appDataSpy.getSyncTime$.and.returnValue(of({ documentId: "test_doc", season: argument1, matchday: argument2, timestamp: 1620790000 }));
 
     const expectedValue: boolean = false;
 

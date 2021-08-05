@@ -3,7 +3,7 @@ import { Observable, combineLatest, range, concat } from 'rxjs';
 import { take, toArray, concatMap } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
-import { MatchImportData, TeamRankingImportData } from '../Dataaccess/import_datastructures';
+import { MatchImportData, TeamRankingImportData, SyncTime } from '../Dataaccess/import_datastructures';
 import { Bet, Match, Result, Team, SeasonResult } from '../Businessrules/basic_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';
 
@@ -42,6 +42,7 @@ export class SynchronizeDataService {
             }
           );
 
+          this.refreshUpdateTime(season, matchday);
         }
       }
     );
@@ -51,10 +52,10 @@ export class SynchronizeDataService {
     // checks if a synchronization  for the given season and matchday is needed
 
     return combineLatest(
-      this.appDataAccess.getLastUpdateTime$(season, matchday),
+      this.appDataAccess.getSyncTime$(season, matchday),
       this.matchDataAccess.getLastUpdateTime$(season, matchday),
-      (updateTimeAppData: number, updateTimeMatchData: number) => {
-        return updateTimeMatchData > updateTimeAppData;
+      (updateTimeAppData: SyncTime, updateTimeMatchData: number) => {
+        return updateTimeMatchData > updateTimeAppData.timestamp;
       }
     );
   }
@@ -128,6 +129,20 @@ export class SynchronizeDataService {
         if (!this.isSeasonResultEqual(appdataResult, importedResult)) { // available, but not up to date
           this.appDataAccess.updateSeasonResult(appdataResult.documentId, importedResult);
         }
+      }
+    );
+  }
+
+  private refreshUpdateTime(season: number, matchday: number): void {
+    // updates the new snyc time in the app database
+
+    this.appDataAccess.getSyncTime$(season, matchday).subscribe(
+      (syncTime: SyncTime) => {
+        if (syncTime.documentId == "") {
+          syncTime.documentId = this.appDataAccess.createDocumentId();
+        }
+        syncTime.timestamp = Math.floor((new Date()).getTime() / 1000); // new timestamp
+        this.appDataAccess.setSyncTime(syncTime);
       }
     );
   }

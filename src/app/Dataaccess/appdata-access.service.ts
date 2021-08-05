@@ -20,7 +20,7 @@ export abstract class AppdataAccessService {
   public abstract getActiveUserIds$(): Observable<string>;
   public abstract getUserDataById$(userId: string): Observable<User>;
   public abstract getMatchdayScoreSnapshot$(season: number, matchday: number): Observable<MatchdayScoreSnapshot>;
-  public abstract getLastUpdateTime$(season: number, matchday: number): Observable<number>;
+  public abstract getSyncTime$(season: number, matchday: number): Observable<SyncTime>;
   public abstract setBet(bet: Bet): void;
   public abstract setSeasonBet(bet: SeasonBet): void;
   public abstract addMatch(match: Match): void;
@@ -32,6 +32,6 @@ export abstract class AppdataAccessService {
   public abstract updateResult(documentId: string, result: Result): void;
   public abstract updateSeasonResult(documentId: string, result: SeasonResult): void;
   public abstract updateMatchdayScoreSnapshot(documentId: string, snapshot: MatchdayScoreSnapshot): void;
-  public abstract updateLastUpdateTime(documentId: string, syncTime: SyncTime): void;
+  public abstract setSyncTime(syncTime: SyncTime): void;
   public abstract createDocumentId(): string;
 }

@@ -1316,10 +1316,10 @@ describe('AppdataAccessFirestoreService', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // getLastUpdateTime$
+  // getSyncTime$
   // ---------------------------------------------------------------------------
 
-  it("getLastUpdateTime$, one dataset", (done: DoneFn) => {
+  it("getSyncTime$, one dataset", (done: DoneFn) => {
     const argument1: number = 2020;
     const argument2: number = 23;
 
@@ -1336,10 +1336,10 @@ describe('AppdataAccessFirestoreService', () => {
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    const expectedValue: number[] = [targetSyncTime.timestamp];
+    const expectedValue: SyncTime[] = [targetSyncTime];
 
     let i: number = 0;
-    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+    service["getSyncTime$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();
@@ -1347,7 +1347,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getLastUpdateTime$, more than one dataset", (done: DoneFn) => {
+  it("getSyncTime$, more than one dataset", (done: DoneFn) => {
     const argument1: number = 2020;
     const argument2: number = 23;
 
@@ -1363,10 +1363,10 @@ describe('AppdataAccessFirestoreService', () => {
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    const expectedValue: number[] = [targetSyncTime.timestamp];
+    const expectedValue: SyncTime[] = [targetSyncTime];
 
     let i: number = 0;
-    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+    service["getSyncTime$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();
@@ -1374,7 +1374,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getLastUpdateTime$, emitting twice", (done: DoneFn) => {
+  it("getSyncTime$, emitting twice", (done: DoneFn) => {
     const argument1: number = 2020;
     const argument2: number = 23;
 
@@ -1390,10 +1390,10 @@ describe('AppdataAccessFirestoreService', () => {
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    const expectedValue: number[] = [targetSyncTime.timestamp];
+    const expectedValue: SyncTime[] = [targetSyncTime];
 
     let i: number = 0;
-    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+    service["getSyncTime$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();
@@ -1401,7 +1401,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getLastUpdateTime$, no dataset available", (done: DoneFn) => {
+  it("getSyncTime$, no dataset available", (done: DoneFn) => {
     const argument: string = "test_user";
 
     const argument1: number = 2020;
@@ -1413,10 +1413,10 @@ describe('AppdataAccessFirestoreService', () => {
     TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
     service = TestBed.inject(AppdataAccessFirestoreService);
 
-    const expectedValue: number[] = [-1];
+    const expectedValue: SyncTime[] = [{ documentId: "", season: argument1, matchday: argument2, timestamp: -1 }];
 
     let i: number = 0;
-    service["getLastUpdateTime$"](argument1, argument2).subscribe(
+    service["getSyncTime$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
         done();

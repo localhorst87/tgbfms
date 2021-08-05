@@ -352,9 +352,10 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
-  getLastUpdateTime$(season: number, matchday: number): Observable<number> {
-    // returns the last time as unix timestamp of when the last change in the
-    // app database was made with respect to the given season and matchday
+  getSyncTime$(season: number, matchday: number): Observable<SyncTime> {
+    // returns the last time as unix timestamp (wrapped as SyncTime object)
+    // of when the last change in the app database was made with respect to
+    // the given season and matchday
 
     let timeQuery$: Observable<SyncTime[]> = this.firestore.collection<SyncTime>(COLLECTION_NAME_UPDATE_TIMES, ref =>
       ref.where("season", "==", season).where("matchday", "==", matchday))
@@ -364,10 +365,10 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       take(1),
       map((syncTimeArray: SyncTime[]) => {
         if (syncTimeArray.length == 0) {
-          return -1;
+          return this.makeUnknownSyncTime(season, matchday);
         }
         else {
-          return syncTimeArray[0].timestamp;
+          return syncTimeArray[0];
         }
       }),
       distinct()
@@ -454,12 +455,13 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     snapshotDocument.update(snapshotToUpdate);
   }
 
-  updateLastUpdateTime(documentId: string, syncTime: SyncTime): void {
+  setSyncTime(syncTime: SyncTime): void {
     let syncTimeToUpdate: any = syncTime;
+    let documentId: string = syncTime.documentId;
     delete syncTimeToUpdate.documentId;
 
     let syncTimeDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_UPDATE_TIMES + "/" + documentId);
-    syncTimeDocument.update(syncTimeToUpdate);
+    syncTimeDocument.set(syncTimeToUpdate);
   }
 
   createDocumentId(): string {
@@ -568,6 +570,17 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       id: teamId,
       nameLong: "unknown team",
       nameShort: "???"
+    };
+  }
+
+  private makeUnknownSyncTime(season: number, matchday: number): SyncTime {
+    // returns an unknown SyncTime struct
+
+    return {
+      documentId: "",
+      season: season,
+      matchday: matchday,
+      timestamp: -1
     };
   }
 

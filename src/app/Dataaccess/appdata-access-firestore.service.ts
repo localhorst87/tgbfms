@@ -38,7 +38,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
           betArray.push(this.makeUnknownBet(matchId, userId));
         }
         return betArray[0];
-      })
+      }),
+      distinct()
     );
 
     return bet$;
@@ -59,7 +60,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
           resultArray.push(this.makeUnknownResult(matchId));
         }
         return resultArray[0];
-      })
+      }),
+      distinct()
     );
 
     return result$;
@@ -80,7 +82,8 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
           matchArray.push(this.makeUnknownMatch(matchId));
         }
         return matchArray[0];
-      })
+      }),
+      distinct()
     );
 
     return match$;
@@ -135,7 +138,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     let matches$: Observable<Match> = matchQuery$.pipe(
       take(1),
       switchMap(matchArray => from(matchArray)),
-      distinct()
+      distinct(match => match.matchId)
     );
 
     return matches$;
@@ -411,18 +414,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     this.firestore.collection(COLLECTION_NAME_SEASON_RESULTS).add(resultToWrite);
   }
 
-  addMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void {
-    let snapshotToWrite: any = snapshot;
-    delete snapshotToWrite.documentId;
-    this.firestore.collection(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT).add(snapshotToWrite);
-  }
-
-  addLastUpdateTime(syncTime: SyncTime): void {
-    let syncTimeToWrite: any = syncTime;
-    delete syncTimeToWrite.documentId;
-    this.firestore.collection(COLLECTION_NAME_UPDATE_TIMES).add(syncTimeToWrite);
-  }
-
   updateMatch(documentId: string, match: Match): void {
     let matchToUpdate: any = match;
     delete matchToUpdate.documentId;
@@ -447,12 +438,13 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     resultDocument.update(resultToUpdate);
   }
 
-  updateMatchdayScoreSnapshot(documentId: string, snapshot: MatchdayScoreSnapshot): void {
+  setMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void {
     let snapshotToUpdate: any = snapshot;
+    let documentId: string = snapshot.documentId;
     delete snapshotToUpdate.documentId;
 
     let snapshotDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT + "/" + documentId);
-    snapshotDocument.update(snapshotToUpdate);
+    snapshotDocument.set(snapshotToUpdate);
   }
 
   setSyncTime(syncTime: SyncTime): void {

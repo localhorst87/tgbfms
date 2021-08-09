@@ -26,12 +26,10 @@ export abstract class AppdataAccessService {
   public abstract addMatch(match: Match): void;
   public abstract addResult(result: Result): void;
   public abstract addSeasonResult(result: SeasonResult): void;
-  public abstract addMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void;
-  public abstract addLastUpdateTime(syncTime: SyncTime): void;
   public abstract updateMatch(documentId: string, match: Match): void;
   public abstract updateResult(documentId: string, result: Result): void;
   public abstract updateSeasonResult(documentId: string, result: SeasonResult): void;
-  public abstract updateMatchdayScoreSnapshot(documentId: string, snapshot: MatchdayScoreSnapshot): void;
+  public abstract setMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void;
   public abstract setSyncTime(syncTime: SyncTime): void;
   public abstract createDocumentId(): string;
 }

@@ -38,7 +38,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
       score.points += POINTS_ADDED_RESULT;
     }
     if (match.isTopMatch) {
-      score.extraTop += score.points * FACTOR_TOP_MATCH;
+      score.extraTop += score.points * (FACTOR_TOP_MATCH - 1);
       score.points *= FACTOR_TOP_MATCH;
     }
     if (score.points > 0) {

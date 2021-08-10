@@ -694,7 +694,7 @@ describe("PointCalculatorTrendbasedService", () => {
       points: FACTOR_TOP_MATCH * POINTS_TENDENCY,
       matches: 1,
       results: 0,
-      extraTop: FACTOR_TOP_MATCH * POINTS_TENDENCY,
+      extraTop: (FACTOR_TOP_MATCH - 1) * POINTS_TENDENCY,
       extraOutsider: 0,
       extraSeason: 0
     };
@@ -902,7 +902,7 @@ describe("PointCalculatorTrendbasedService", () => {
       points: FACTOR_TOP_MATCH * POINTS_TENDENCY + POINTS_ADDED_OUTSIDER_ONE,
       matches: 1,
       results: 0,
-      extraTop: FACTOR_TOP_MATCH * POINTS_TENDENCY,
+      extraTop: (FACTOR_TOP_MATCH - 1) * POINTS_TENDENCY,
       extraOutsider: POINTS_ADDED_OUTSIDER_ONE,
       extraSeason: 0
     };
@@ -972,7 +972,7 @@ describe("PointCalculatorTrendbasedService", () => {
       points: FACTOR_TOP_MATCH * (POINTS_TENDENCY + POINTS_ADDED_RESULT) + POINTS_ADDED_OUTSIDER_ONE,
       matches: 1,
       results: 1,
-      extraTop: FACTOR_TOP_MATCH * (POINTS_TENDENCY + POINTS_ADDED_RESULT),
+      extraTop: (FACTOR_TOP_MATCH - 1) * (POINTS_TENDENCY + POINTS_ADDED_RESULT),
       extraOutsider: POINTS_ADDED_OUTSIDER_ONE,
       extraSeason: 0
     };

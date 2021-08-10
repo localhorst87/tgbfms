@@ -378,6 +378,20 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
+  getOpenBets$(matchId: number): Observable<Bet> {
+    // returns all the Bets with the given match ID that are not fixed
+
+    let betQuery$: Observable<Bet[]> = this.firestore.collection<Bet>(COLLECTION_NAME_BETS, ref =>
+      ref.where("matchId", "==", matchId).where("isFixed", "==", false))
+      .valueChanges({ idField: "documentId" });
+
+    return betQuery$.pipe(
+      take(1),
+      switchMap((betArray: Bet[]) => from(betArray)),
+      distinct((bet: Bet) => bet.userId)
+    );
+  }
+
   setBet(bet: Bet): void {
     let betToUpdate: any = bet;
     let documentId: string = bet.documentId;

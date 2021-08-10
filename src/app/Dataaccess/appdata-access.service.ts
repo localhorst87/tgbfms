@@ -21,6 +21,7 @@ export abstract class AppdataAccessService {
   public abstract getUserDataById$(userId: string): Observable<User>;
   public abstract getMatchdayScoreSnapshot$(season: number, matchday: number): Observable<MatchdayScoreSnapshot>;
   public abstract getSyncTime$(season: number, matchday: number): Observable<SyncTime>;
+  public abstract getOpenBets$(matchId: number): Observable<Bet>;
   public abstract setBet(bet: Bet): void;
   public abstract setSeasonBet(bet: SeasonBet): void;
   public abstract addMatch(match: Match): void;

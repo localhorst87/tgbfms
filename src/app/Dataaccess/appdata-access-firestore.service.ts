@@ -388,7 +388,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return betQuery$.pipe(
       take(1),
       switchMap((betArray: Bet[]) => from(betArray)),
-      distinct((bet: Bet) => bet.userId)
+      distinct((bet: Bet) => bet.userId),
     );
   }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { Observable, combineLatest, concat, range } from 'rxjs';
-import { map, mergeMap, distinct, concatMap } from 'rxjs/operators';
+import { Observable, combineLatest, concat, range, from } from 'rxjs';
+import { map, mergeMap, distinct, concatMap, toArray, defaultIfEmpty, first } from 'rxjs/operators';
 import { Bet, Match, Result, SeasonBet } from '../Businessrules/basic_datastructures';
 import { BetWriteData, SeasonBetWriteData } from './output_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';
@@ -54,22 +54,25 @@ export class FetchBetWriteDataService {
   private makeSeasonBetWriteData$(bet: SeasonBet): Observable<SeasonBetWriteData> {
     // converts SeasonBet into the output data structure SeasonBetWriteData
 
-    return this.appData.getTeamNameByTeamId$(bet.teamId).pipe(
-      map((teamName: string) => {
+    return combineLatest(
+      this.appData.getTeamNameByTeamId$(bet.teamId),
+      this.getFirstMatchTimestamp$(bet.season).pipe(defaultIfEmpty(-1)),
+      (teamName: string, firstTimestamp: number) => {
 
         if (bet.documentId == "") {
           bet.documentId = this.appData.createDocumentId();
         }
 
         return {
+          betDocumentId: bet.documentId,
           season: bet.season,
           place: bet.place,
           teamId: bet.teamId,
           teamName: teamName,
           isBetFixed: bet.isFixed,
-          betDocumentId: bet.documentId
+          dueDate: new Date(firstTimestamp * 1000)
         };
-      })
+      }
     );
   }
 
@@ -104,6 +107,18 @@ export class FetchBetWriteDataService {
           betDocumentId: bet.documentId
         };
       });
+  }
+
+  private getFirstMatchTimestamp$(season: number): Observable<number> {
+    // returns the timestamp of the
+
+    return this.appData.getMatchesByMatchday$(season, 1).pipe(
+      toArray(),
+      map((matchArray: Match[]) => matchArray.sort((a, b) => a.timestamp - b.timestamp)),
+      concatMap((sortedMatchArray: Match[]) => from(sortedMatchArray)),
+      map((match: Match) => match.timestamp),
+      first()
+    );
   }
 
 }

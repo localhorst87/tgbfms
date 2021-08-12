@@ -54,12 +54,13 @@ export interface SeasonBetOverviewUserData {
 }
 
 export interface SeasonBetWriteData {
+  betDocumentId: string;
   season: number;
   place: number;
   teamId: number;
   teamName: string;
   isBetFixed: boolean;
-  betDocumentId: string;
+  dueDate: Date;
 }
 
 export interface TableData {

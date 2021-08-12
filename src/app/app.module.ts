@@ -38,13 +38,16 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { TableComponent } from './table/table.component';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
   declarations: [
     AppComponent,
     BetWriteComponent,
     HomeComponent,
-    BetOverviewComponent
+    BetOverviewComponent,
+    TableComponent
   ],
   imports: [
     BrowserModule,
@@ -67,7 +70,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatTabsModule,
     MatCardModule,
     MatBadgeModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTableModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },

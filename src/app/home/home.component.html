@@ -18,7 +18,7 @@
     <button mat-mini-fab (click)="changeView('write');sidenav.close()">
       <mat-icon>edit</mat-icon>
     </button>
-    <span> TIPPABGABE</span>
+    <span> TIPPEN</span>
     <br><br>
     <button mat-mini-fab (click)="changeView('view');sidenav.close()">
       <mat-icon>search</mat-icon>
@@ -26,7 +26,7 @@
     <span> ALLE TIPPS</span>
     <br><br>
     <button mat-mini-fab (click)="changeView('table');sidenav.close()">
-      <mat-icon>emoji_events</mat-icon>
+      <mat-icon>leaderboard</mat-icon>
     </button>
     <span> TABELLE</span>
   </mat-sidenav>
@@ -37,6 +37,7 @@
       *ngIf = "selectedPage == 'write'"
       [userId] = "loggedUser.id"
       [selectedMatchday] = "matchdayNextMatch"
+      [lastUpdateTime] = "betsUpdateTime"
       (selectMatchdayEvent) = "changeMatchdayOnUserSelection($event)">
     </app-bet-write>
 
@@ -45,6 +46,12 @@
       [userId] = "loggedUser.id"
       [selectedMatchday] = "matchdayLastMatch">
     </app-bet-overview>
+
+    <app-table
+      *ngIf = "selectedPage == 'table'"
+      [userId] = "loggedUser.id"
+      [currentMatchday] = "matchdayLastMatch">
+    </app-table>
 
   </mat-sidenav-content>
 

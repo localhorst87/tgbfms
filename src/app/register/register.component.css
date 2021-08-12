@@ -1,0 +1,25 @@
+.container-element{
+  position: relative;
+  display: block;
+  margin : 0 auto;
+}
+
+mat-form-field{
+  width:100%;
+}
+
+.login-container{
+  position:absolute;
+  width:50%;
+  top: 30%;
+  left: 25%;
+  transform: translate(0, -67%)
+}
+
+button {
+  width: 100%;
+}
+
+p {
+  text-align: center;
+}

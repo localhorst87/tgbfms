@@ -4,6 +4,7 @@ import { switchMap, pluck } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { SynchronizeDataService } from '../UseCases/synchronize-data.service';
+import { AuthenticationService } from '../UseCases/authentication.service';
 import { Bet, SeasonBet, User } from '../Businessrules/basic_datastructures';
 import { SEASON, MATCHDAYS_PER_SEASON } from '../Businessrules/rule_defined_values';
 
@@ -29,17 +30,19 @@ export class HomeComponent implements OnInit {
   constructor(
     private appData: AppdataAccessService,
     private fetchBasicService: FetchBasicDataService,
-    private syncService: SynchronizeDataService) {
+    private syncService: SynchronizeDataService,
+    private authenticator: AuthenticationService) {
 
-    this.loggedUser = { // dummy
-      documentId: "dummy_id",
-      id: "Mauri",
-      email: "dummy@mail.com",
-      displayName: "Mauri",
-      isAdmin: true,
-      isActive: true
+    this.loggedUser = {
+      documentId: "",
+      id: "",
+      email: "",
+      displayName: "",
+      isAdmin: false,
+      isActive: false
     };
-    this.selectedPage = "table";
+
+    this.selectedPage = "write";
     this.matchdayNextMatch = -1;
     this.matchdayLastMatch = -1;
     this.matchdayUserSelection = -1;
@@ -55,6 +58,10 @@ export class HomeComponent implements OnInit {
 
   changeMatchdayOnUserSelection(matchday: number): void {
     this.matchdayUserSelection = matchday;
+  }
+
+  logout(): void {
+    this.authenticator.logout();
   }
 
   setMatchdays(): void {
@@ -147,7 +154,6 @@ export class HomeComponent implements OnInit {
       );
 
       if (matchday == 1) { // no matter what match, if matchday 1 has begun, fix SeasonBets
-        console.log("called fix");
         this.fetchBasicService.fetchOpenOverdueSeasonBets$(SEASON).subscribe(
           (seasonBet: SeasonBet) => {
             console.log(seasonBet);
@@ -165,6 +171,21 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    // set logged user as property
+    this.authenticator.getLoggedUser$().subscribe(
+      (user: any) => {
+        if (user) {
+          this.appData.getUserDataById$(user.uid).subscribe(
+            (userProfile: User) => {
+              this.loggedUser = userProfile;
+              this.loggedUser.isActive = user.emailVerified;
+            }
+          );
+        }
+      }
+    );
+
     this.fixBetEvent.subscribe(
       (matchday: number) => this.fixOpenOverdueBets(matchday)
     );

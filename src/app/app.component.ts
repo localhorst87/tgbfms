@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { AngularFireAuth } from '@angular/fire/auth';
+import { SynchronizeDataService } from './UseCases/synchronize-data.service';
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +9,17 @@ import { AngularFireAuth } from '@angular/fire/auth';
 })
 export class AppComponent {
 
-  constructor() { }
+  constructor(private syncService: SynchronizeDataService) { }
 
   ngOnInit() {
+    let synctimer: any = interval(1000).subscribe(
+      (i: number) => {
+        let matchday: number = i + 1;
+        this.syncService.syncData(2021, matchday);
+        if (matchday == 34) {
+          synctimer.unsubscribe();
+        }
+      }
+    );
   }
-
 }

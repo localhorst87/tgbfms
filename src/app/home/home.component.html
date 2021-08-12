@@ -7,7 +7,7 @@
     <button mat-icon-button>
       <mat-icon>settings</mat-icon>
     </button>
-    <button mat-icon-button>
+    <button mat-icon-button (click)="logout()">
       <mat-icon>logout</mat-icon>
     </button>
 </mat-toolbar>
@@ -33,25 +33,34 @@
 
   <mat-sidenav-content>
 
-    <app-bet-write
-      *ngIf = "selectedPage == 'write'"
-      [userId] = "loggedUser.id"
-      [selectedMatchday] = "matchdayNextMatch"
-      [lastUpdateTime] = "betsUpdateTime"
-      (selectMatchdayEvent) = "changeMatchdayOnUserSelection($event)">
-    </app-bet-write>
+    <!-- directive einbauen, wenn Email noch nicht validiert ist -->
+    <ng-container *ngIf="loggedUser.isActive; else notVerified">
+      <app-bet-write
+        *ngIf = "selectedPage == 'write'"
+        [userId] = "loggedUser.id"
+        [selectedMatchday] = "matchdayNextMatch"
+        [lastUpdateTime] = "betsUpdateTime"
+        (selectMatchdayEvent) = "changeMatchdayOnUserSelection($event)">
+      </app-bet-write>
 
-    <app-bet-overview
-      *ngIf = "selectedPage == 'view'"
-      [userId] = "loggedUser.id"
-      [selectedMatchday] = "matchdayLastMatch">
-    </app-bet-overview>
+      <app-bet-overview
+        *ngIf = "selectedPage == 'view'"
+        [userId] = "loggedUser.id"
+        [selectedMatchday] = "matchdayLastMatch">
+      </app-bet-overview>
 
-    <app-table
-      *ngIf = "selectedPage == 'table'"
-      [userId] = "loggedUser.id"
-      [currentMatchday] = "matchdayLastMatch">
-    </app-table>
+      <app-table
+        *ngIf = "selectedPage == 'table'"
+        [userId] = "loggedUser.id"
+        [currentMatchday] = "matchdayLastMatch">
+      </app-table>
+    </ng-container>
+
+    <ng-template #notVerified>
+      Bitte verifiziere deinen Account per Email. Du hast eine Email mit einem Link bekommen!
+      Vorher gibt es hier nichts zu sehen :)
+      Nach der Verifizierung bitte neu einloggen.
+    </ng-template>
 
   </mat-sidenav-content>
 

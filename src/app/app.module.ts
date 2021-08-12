@@ -23,6 +23,8 @@ import { StatisticsCalculatorTrendbasedService } from './Businessrules/statistic
 import { BetWriteComponent } from './bet-write/bet-write.component';
 import { BetOverviewComponent } from './bet-overview/bet-overview.component';
 import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
@@ -40,6 +42,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TableComponent } from './table/table.component';
 import { MatTableModule } from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
@@ -47,7 +50,9 @@ import { MatTableModule } from '@angular/material/table';
     BetWriteComponent,
     HomeComponent,
     BetOverviewComponent,
-    TableComponent
+    TableComponent,
+    LoginComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,
@@ -71,7 +76,8 @@ import { MatTableModule } from '@angular/material/table';
     MatCardModule,
     MatBadgeModule,
     MatProgressBarModule,
-    MatTableModule
+    MatTableModule,
+    MatFormFieldModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },

@@ -1,0 +1,29 @@
+<div class="login-container">
+
+  <p class="mat-display-1"> TGBFMS 2021/2022 </p>
+
+  <div class="container-element">
+    <mat-form-field appearance="outline">
+      <mat-label>Email-Adresse</mat-label>
+      <input matInput placeholder="pat@example.de" [formControl]="email" required>
+      <mat-error *ngIf="email.invalid">{{getEmailErrorMessage()}}</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="container-element">
+    <mat-form-field appearance="outline">
+      <mat-label>Passwort</mat-label>
+      <input matInput [type]="hidePassword ? 'password' : 'text'" [formControl]="password">
+      <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+        <mat-icon>{{hidePassword? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+
+  <div class="container-element">
+    <button mat-raised-button (click)="login()" class="login-button">
+      login
+    </button>
+  </div>
+
+</div>

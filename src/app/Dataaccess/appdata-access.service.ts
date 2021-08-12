@@ -24,6 +24,7 @@ export abstract class AppdataAccessService {
   public abstract getOpenBets$(matchId: number): Observable<Bet>;
   public abstract setBet(bet: Bet): void;
   public abstract setSeasonBet(bet: SeasonBet): void;
+  public abstract setUser(user: User): void;
   public abstract addMatch(match: Match): void;
   public abstract addResult(result: Result): void;
   public abstract addSeasonResult(result: SeasonResult): void;

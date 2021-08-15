@@ -129,8 +129,8 @@ export class BetWriteComponent implements OnInit, OnChanges {
     // adds the BetWriteData to the Form
 
     let matchForm: FormGroup = this.formBuilder.group({
-      betHome: [{ value: betWriteData.betGoalsHome < 0 ? '' : betWriteData.betGoalsHome, disabled: betWriteData.isBetFixed || this.currentDate > betWriteData.matchDate }, Validators.min(0)],
-      betAway: [{ value: betWriteData.betGoalsAway < 0 ? '' : betWriteData.betGoalsAway, disabled: betWriteData.isBetFixed || this.currentDate > betWriteData.matchDate }, Validators.min(0)]
+      betHome: [{ value: betWriteData.betGoalsHome < 0 ? null : betWriteData.betGoalsHome, disabled: betWriteData.isBetFixed || this.currentDate > betWriteData.matchDate }, Validators.min(0)],
+      betAway: [{ value: betWriteData.betGoalsAway < 0 ? null : betWriteData.betGoalsAway, disabled: betWriteData.isBetFixed || this.currentDate > betWriteData.matchDate }, Validators.min(0)]
     });
 
     this.subscribeCorrectingBetValues(matchForm);

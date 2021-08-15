@@ -1,17 +1,11 @@
-.example-form {
-  min-width: 100px;
-  max-width: 200px;
-  width: 50%;
-}
-
 .settings-panel {
-  width: 40%;
+  width: 100%;
 }
 
 mat-slider {
-  width: 50%;
+  width: 60%;
 }
 
 table {
-  width: 50%;
+  width: 100%;
 }

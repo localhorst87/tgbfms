@@ -10,11 +10,11 @@
 }
 
 .settings-panel {
-  width: 40%;
+  width: 100%;
 }
 
 mat-slider {
-  width: 50%;
+  width: 75%;
 }
 
 .bet-card {

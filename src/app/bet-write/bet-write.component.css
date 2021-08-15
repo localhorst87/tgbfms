@@ -1,7 +1,7 @@
 .example-form {
-  min-width: 100px;
-  max-width: 200px;
-  width: 50%;
+  min-width: 80px;
+  max-width: 135px;
+  width: 45%;
 }
 
 .match-selection-radio-group {
@@ -16,9 +16,9 @@
 }
 
 .settings-panel {
-  width: 40%;
+  width: 100%;
 }
 
 mat-slider {
-  width: 50%;
+  width: 75%;
 }

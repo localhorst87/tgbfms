@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { Observable, combineLatest, range, concat, from } from 'rxjs';
 import { tap, map, take, toArray, concatMap, distinct } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
@@ -8,6 +8,9 @@ import { MatchImportData, TeamRankingImportData, MatchdayScoreSnapshot, SyncTime
 import { Bet, Match, Result, Team, SeasonResult, Score } from '../Businessrules/basic_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT, NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
 
+const MATCHES_PER_MATCHDAY: number = Math.floor(NUMBER_OF_TEAMS / 2);
+export const REQUIRED_UPDATES_PER_MATCHDAY: number = 2 * MATCHES_PER_MATCHDAY + 2; // all matches, results (= 2*nMatchtes) one season result, one score snapshots
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,6 +19,7 @@ export class SynchronizeDataService {
   matchCounter: any; // Map<matchday: number, counter: number>
   syncCounter: any; // Map<matchday: number, counter: number>
   relevantPlaces$: Observable<number>;
+  counterEvent: EventEmitter<void>;
 
   constructor(
     private appDataAccess: AppdataAccessService,
@@ -27,6 +31,7 @@ export class SynchronizeDataService {
     );
     this.matchCounter = new Map();
     this.syncCounter = new Map();
+    this.counterEvent = new EventEmitter();
   }
 
   public syncData(season: number, matchday: number): void {
@@ -57,7 +62,7 @@ export class SynchronizeDataService {
     );
   }
 
-  private isSyncNeeded$(season: number, matchday: number): Observable<boolean> {
+  public isSyncNeeded$(season: number, matchday: number): Observable<boolean> {
     // checks if a synchronization  for the given season and matchday is needed
 
     return combineLatest(
@@ -94,6 +99,7 @@ export class SynchronizeDataService {
         let currentSyncCounter = this.syncCounter.get(matchday);
         this.matchCounter.set(matchday, currentMatchCounter + 1);
         this.syncCounter.set(matchday, currentSyncCounter + 1);
+        this.counterEvent.emit();
         this.checkCounters(season, matchday);
       }
     );
@@ -126,6 +132,7 @@ export class SynchronizeDataService {
         let currentSyncCounter = this.syncCounter.get(matchday);
         this.matchCounter.set(matchday, currentMatchCounter + 1);
         this.syncCounter.set(matchday, currentSyncCounter + 1);
+        this.counterEvent.emit();
         this.checkCounters(season, matchday);
       }
     );
@@ -163,6 +170,7 @@ export class SynchronizeDataService {
       () => {
         let currentSyncCounter = this.syncCounter.get(matchday);
         this.syncCounter.set(matchday, currentSyncCounter + 1);
+        this.counterEvent.emit();
         this.checkCounters(season, matchday);
       }
     );
@@ -173,17 +181,12 @@ export class SynchronizeDataService {
     // checks if both updates have been done for each match and if this is the
     // case it triggers the updating of the MatchdayScoreSnapshot
 
-    let nMatchesPerMatchday: number = Math.floor(NUMBER_OF_TEAMS / 2);
-
-    // all matches, results (= 2*nMatchtes) one season result, one score snapshots
-    let requiredUpdates: number = 2 * nMatchesPerMatchday + 2
-
-    if (this.matchCounter.get(matchday) == 2 * nMatchesPerMatchday) {
+    if (this.matchCounter.get(matchday) == 2 * MATCHES_PER_MATCHDAY) {
       this.updateScoreSnapshot(season, matchday); // triggers update of Score data
       this.matchCounter.set(matchday, 0);
     }
 
-    if (this.syncCounter.get(matchday) == requiredUpdates) {
+    if (this.syncCounter.get(matchday) == REQUIRED_UPDATES_PER_MATCHDAY) {
       this.refreshUpdateTime(season, matchday); // refreshes update time in app data
       this.syncCounter.set(matchday, 0);
     }
@@ -214,6 +217,7 @@ export class SynchronizeDataService {
       () => {
         let currentSyncCounter = this.syncCounter.get(matchday);
         this.syncCounter.set(matchday, currentSyncCounter + 1);
+        this.counterEvent.emit();
         this.checkCounters(season, matchday);
       }
     );

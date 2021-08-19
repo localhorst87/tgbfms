@@ -33,34 +33,25 @@
 
   <mat-sidenav-content>
 
-    <!-- directive einbauen, wenn Email noch nicht validiert ist -->
-    <ng-container *ngIf="loggedUser.isActive; else notVerified">
-      <app-bet-write
-        *ngIf = "selectedPage == 'write'"
-        [userId] = "loggedUser.id"
-        [selectedMatchday] = "matchdayNextMatch"
-        [lastUpdateTime] = "betsUpdateTime"
-        (selectMatchdayEvent) = "changeMatchdayOnUserSelection($event)">
-      </app-bet-write>
+    <app-bet-write
+      *ngIf = "selectedPage == 'write'"
+      [userId] = "loggedUser.id"
+      [selectedMatchday] = "matchdayNextMatch"
+      [lastUpdateTime] = "betsUpdateTime"
+      (selectMatchdayEvent) = "changeMatchdayOnUserSelection($event)">
+    </app-bet-write>
 
-      <app-bet-overview
-        *ngIf = "selectedPage == 'view'"
-        [userId] = "loggedUser.id"
-        [selectedMatchday] = "matchdayLastMatch">
-      </app-bet-overview>
+    <app-bet-overview
+      *ngIf = "selectedPage == 'view'"
+      [userId] = "loggedUser.id"
+      [selectedMatchday] = "matchdayLastMatch">
+    </app-bet-overview>
 
-      <app-table
-        *ngIf = "selectedPage == 'table'"
-        [userId] = "loggedUser.id"
-        [currentMatchday] = "matchdayLastMatch">
-      </app-table>
-    </ng-container>
-
-    <ng-template #notVerified>
-      Bitte verifiziere deinen Account per Email. Du hast eine Email mit einem Link bekommen!
-      Vorher gibt es hier nichts zu sehen :)
-      Nach der Verifizierung bitte neu einloggen.
-    </ng-template>
+    <app-table
+      *ngIf = "selectedPage == 'table'"
+      [userId] = "loggedUser.id"
+      [currentMatchday] = "matchdayLastMatch">
+    </app-table>
 
   </mat-sidenav-content>
 

@@ -25,6 +25,7 @@ import { BetOverviewComponent } from './bet-overview/bet-overview.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { SyncDialogComponent } from './sync-dialog/sync-dialog.component';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
@@ -40,9 +41,12 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TableComponent } from './table/table.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -52,7 +56,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     BetOverviewComponent,
     TableComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    SyncDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -76,8 +81,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatCardModule,
     MatBadgeModule,
     MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatTableModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatSnackBarModule,
+    MatDialogModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },

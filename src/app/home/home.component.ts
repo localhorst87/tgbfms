@@ -1,14 +1,18 @@
 import { Component, OnInit, EventEmitter } from '@angular/core';
-import { Observable, combineLatest, interval } from 'rxjs';
-import { switchMap, pluck } from 'rxjs/operators';
+import { Observable, Subscription, combineLatest, timer, from, of } from 'rxjs';
+import { switchMap, mergeMap, pluck, delay, filter, map, tap } from 'rxjs/operators';
+import { MatSnackBar, MatSnackBarRef, SimpleSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { SynchronizeDataService } from '../UseCases/synchronize-data.service';
 import { AuthenticationService } from '../UseCases/authentication.service';
+import { SyncDialogComponent } from '../sync-dialog/sync-dialog.component';
 import { Bet, SeasonBet, User } from '../Businessrules/basic_datastructures';
 import { SEASON, MATCHDAYS_PER_SEASON } from '../Businessrules/rule_defined_values';
 
 const BET_FIX_CYCLE: number = 60 * 1000; // cycle time in [ms] that is used to check if Bets needs to be fixed
+const SYNC_CYCLE: number = 5 * 60 * 1000; // cycle time in [ms] that is used to check if new Data to synchronize is available
 
 @Component({
   selector: 'app-home',
@@ -24,14 +28,17 @@ export class HomeComponent implements OnInit {
   matchdayUserSelection: number;
   nextFixTimestamp: number; // next time point to check if all Bets are fixed
   betsUpdateTime: number;
+  matchdaysToSync: number[];
   fixBetEvent: EventEmitter<number>;
-  syncDataEvent: EventEmitter<void>;
+  syncNeededEvent: EventEmitter<void>;
 
   constructor(
     private appData: AppdataAccessService,
     private fetchBasicService: FetchBasicDataService,
-    private syncService: SynchronizeDataService,
-    private authenticator: AuthenticationService) {
+    public syncService: SynchronizeDataService,
+    private authenticator: AuthenticationService,
+    private snackbar: MatSnackBar,
+    private dialog: MatDialog) {
 
     this.loggedUser = {
       documentId: "",
@@ -48,8 +55,9 @@ export class HomeComponent implements OnInit {
     this.matchdayUserSelection = -1;
     this.nextFixTimestamp = -1;
     this.betsUpdateTime = -1;
+    this.matchdaysToSync = [];
     this.fixBetEvent = new EventEmitter();
-    this.syncDataEvent = new EventEmitter();
+    this.syncNeededEvent = new EventEmitter();
   }
 
   changeView(targetPage: string): void {
@@ -62,6 +70,42 @@ export class HomeComponent implements OnInit {
 
   logout(): void {
     this.authenticator.logout();
+  }
+
+  openSyncDialog(): void {
+    //
+
+    let dialogRef: MatDialogRef<SyncDialogComponent> = this.dialog.open(SyncDialogComponent, { minWidth: "60vw", data: { matchdaysToSync: this.matchdaysToSync } });
+  }
+
+  subscribeToSyncCheck(matchdayLastMatch: number): void {
+    // if the corresponding matchday has new data to sync, it inserts the
+    // matchday into the matchdaysToSync array and notifies via event
+
+    timer(0, SYNC_CYCLE)
+      .pipe(
+        switchMap(() => of(matchdayLastMatch, matchdayLastMatch + 1)),
+        filter((matchday: number) => matchday >= 1 && matchday <= MATCHDAYS_PER_SEASON),
+        mergeMap((matchday: number) => this.syncService.isSyncNeeded$(SEASON, matchday).pipe(
+          map((isNeeded: boolean) => {
+            if (isNeeded) {
+              return matchday;
+            }
+            else {
+              return -1;
+            }
+          }),
+          filter((matchday: number) => matchday > 0)
+        ))
+      )
+      .subscribe(
+        (matchdayToSync: number) => {
+          if (!this.matchdaysToSync.includes(matchdayToSync)) {
+            this.matchdaysToSync.push(matchdayToSync);
+            this.syncNeededEvent.emit();
+          }
+        }
+      );
   }
 
   setMatchdays(): void {
@@ -92,7 +136,7 @@ export class HomeComponent implements OnInit {
         // of Bets for the matchday of the last match. This is only called once
         // in the beginning on ngOnInit
         this.fixBetEvent.emit(this.matchdayLastMatch);
-        this.syncDataEvent.emit();
+        this.subscribeToSyncCheck(this.matchdayLastMatch);
       }
     );
   }
@@ -130,7 +174,7 @@ export class HomeComponent implements OnInit {
     // checks each circle if Bets need to be fixed and calls the method to
     // fix bet if this is the case
 
-    interval(BET_FIX_CYCLE).pipe(
+    timer(0, BET_FIX_CYCLE).pipe(
       switchMap(() => this.fetchBasicService.getCurrentTimestamp$())
     ).subscribe(
       (currentTimestamp: number) => {
@@ -156,7 +200,6 @@ export class HomeComponent implements OnInit {
       if (matchday == 1) { // no matter what match, if matchday 1 has begun, fix SeasonBets
         this.fetchBasicService.fetchOpenOverdueSeasonBets$(SEASON).subscribe(
           (seasonBet: SeasonBet) => {
-            console.log(seasonBet);
             seasonBet.isFixed = true;
             this.appData.setSeasonBet(seasonBet);
           }
@@ -190,30 +233,21 @@ export class HomeComponent implements OnInit {
       (matchday: number) => this.fixOpenOverdueBets(matchday)
     );
 
-    this.syncDataEvent.subscribe(
+    this.syncNeededEvent.subscribe(
       () => {
-        let currentMatchday: number = this.matchdayLastMatch;
+        let message: string = "Neue Daten verfügbar";
+        let action: string = "abrufen";
+        let config: MatSnackBarConfig<any> = {
+          horizontalPosition: "center",
+          verticalPosition: "bottom"
+        };
 
-        if (currentMatchday > 0) {
-          // use timer to avoid errors in retrieving data due to parallel read
-          // operations this usually happens on unexpected high loads on read
-          // operations in Firestore
-          let timerSubsc = interval(2500).subscribe(
-            i => {
-              // start with last completed matchday
-              let matchdayToSync: number = currentMatchday + i - 1;
-
-              if (matchdayToSync >= 1 && matchdayToSync <= MATCHDAYS_PER_SEASON) {
-                this.syncService.syncData(SEASON, matchdayToSync);
-              }
-
-              // end with next matchday
-              if (i == 2) {
-                timerSubsc.unsubscribe();
-              }
-            }
-          );
-        }
+        let syncNotificationBar: MatSnackBarRef<any> = this.snackbar.open(message, action, config);
+        syncNotificationBar.onAction().subscribe(
+          () => {
+            this.openSyncDialog();
+          }
+        );
       }
     );
 

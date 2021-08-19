@@ -44,7 +44,7 @@
     <app-bet-overview
       *ngIf = "selectedPage == 'view'"
       [userId] = "loggedUser.id"
-      [selectedMatchday] = "matchdayLastMatch">
+      [selectedMatchday] = "matchdayClosestMatch">
     </app-bet-overview>
 
     <app-table

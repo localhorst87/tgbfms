@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit {
   loggedUser: User;
   matchdayNextMatch: number;
   matchdayLastMatch: number;
+  matchdayClosestMatch: number;
   matchdayUserSelection: number;
   nextFixTimestamp: number; // next time point to check if all Bets are fixed
   betsUpdateTime: number;
@@ -52,6 +53,7 @@ export class HomeComponent implements OnInit {
     this.selectedPage = "write";
     this.matchdayNextMatch = -1;
     this.matchdayLastMatch = -1;
+    this.matchdayClosestMatch = -1;
     this.matchdayUserSelection = -1;
     this.nextFixTimestamp = -1;
     this.betsUpdateTime = -1;
@@ -111,23 +113,31 @@ export class HomeComponent implements OnInit {
   setMatchdays(): void {
     // sets next and last matchday including a plausiblity check
 
-    combineLatest(this.getMatchdayOfLastMatch$(), this.getMatchdayOfNextMatch$()).subscribe(
-      ([matchdayLast, matchdayNext]) => {
+    combineLatest(
+      this.getMatchdayOfLastMatch$(),
+      this.getMatchdayOfNextMatch$(),
+      this.fetchBasicService.getClosestMatchday$()
+    ).subscribe(
+      ([matchdayLast, matchdayNext, matchdayClosest]) => {
         if (matchdayLast == -1 && matchdayNext == -1) { // no matches available
           this.matchdayLastMatch = 1;
           this.matchdayNextMatch = 1;
+          this.matchdayClosestMatch = 1;
         }
         else if (matchdayLast > 0 && matchdayNext == -1) { // all matches played
-          this.matchdayLastMatch = 1; //matchdayLast;
+          this.matchdayLastMatch = matchdayLast; //matchdayLast;
           this.matchdayNextMatch = matchdayLast;
+          this.matchdayClosestMatch = matchdayLast;
         }
         else if (matchdayLast == -1 && matchdayNext > 0) { // no matches played yet
-          this.matchdayLastMatch = 1; //matchdayNext;
+          this.matchdayLastMatch = matchdayNext; //matchdayNext;
           this.matchdayNextMatch = matchdayNext;
+          this.matchdayClosestMatch = matchdayNext;
         }
         else {
-          this.matchdayLastMatch = 1; //matchdayLast;
+          this.matchdayLastMatch = matchdayLast; //matchdayLast;
           this.matchdayNextMatch = matchdayNext;
+          this.matchdayClosestMatch = matchdayClosest;
         }
       },
       err => { },

@@ -4,7 +4,7 @@ import { tap, map, mergeMap, concatMap, pluck, distinct, filter, first, toArray 
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { Bet, Match, Team, SeasonBet } from '../Businessrules/basic_datastructures';
-import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';
+import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT, SEASON } from '../Businessrules/rule_defined_values';
 
 @Injectable({
   providedIn: 'root'
@@ -71,6 +71,21 @@ export class FetchBasicDataService {
 
     let timestampNow: number = Math.floor((new Date()).getTime() / 1000);
     return of(timestampNow);
+  }
+
+  public getClosestMatchday$(): Observable<number> {
+    // returns the closest matchday in terms of time difference
+
+    return combineLatest(
+      this.appData.getNextMatch$(SEASON),
+      this.appData.getLastMatch$(SEASON),
+      this.getCurrentTimestamp$(),
+      (nextMatch: Match, lastMatch: Match, timestampNow: number) => {
+        let diffNextMatch: number = Math.abs(nextMatch.timestamp - timestampNow);
+        let diffLastMatch: number = Math.abs(lastMatch.timestamp - timestampNow);
+        return (diffNextMatch <= diffLastMatch ? nextMatch.matchday : lastMatch.matchday);
+      }
+    );
   }
 
   private getFirstMatchTimestamp$(season: number): Observable<number> {

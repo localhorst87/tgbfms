@@ -1,0 +1,62 @@
+<mat-card *ngIf="nextMatchInfo.matchday > 0">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>fast_forward</mat-icon>
+    </div>
+    <mat-card-title>{{ nextMatchInfo.teamNameHome }} - {{ nextMatchInfo.teamNameAway }}</mat-card-title>
+    <mat-card-subtitle>Nächstes Spiel</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <p>
+      <b>Kickoff:</b> {{ nextMatchInfo.matchDate | date: "EEEEEE dd.MM. - HH:mm" }} Uhr
+    </p>
+    <p>
+      <b>{{ nextMatchInfo.teamNameShortHome }}:</b> {{ nextMatchInfo.placeHome }}. Platz ({{ nextMatchInfo.pointsHome }} Pkt)
+      +++
+      <b>{{ nextMatchInfo.teamNameShortAway }}:</b> {{ nextMatchInfo.placeAway }}. Platz ({{ nextMatchInfo.pointsAway }} Pkt)
+    </p>
+  </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="topMatchInfo.matchday > 0">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>star</mat-icon>
+    </div>
+    <mat-card-title>{{ topMatchInfo.teamNameHome }} - {{ topMatchInfo.teamNameAway }}</mat-card-title>
+    <mat-card-subtitle>Topspiel (Spieltag {{ topMatchInfo.matchday }})</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <p>
+      <b>Kickoff:</b> {{ topMatchInfo.matchDate | date: "EEEEEE dd.MM. - HH:mm" }} Uhr
+    </p>
+    <p>
+      <b>{{ topMatchInfo.teamNameShortHome }}:</b> {{ topMatchInfo.placeHome }}. Platz ({{ topMatchInfo.pointsHome }} Pkt)
+      +++
+      <b>{{ topMatchInfo.teamNameShortAway }}:</b> {{ topMatchInfo.placeAway }}. Platz ({{ topMatchInfo.pointsAway }} Pkt)
+    </p>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>model_training</mat-icon>
+    </div>
+    <mat-card-title>App Updates</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <table>
+      <tr>
+        <td>20.08.</td>
+        <td>Dashboard als neue Startseite</td>
+        <td>(Feature)</td>
+      </tr>
+      <tr>
+        <td>19.08.</td>
+        <td>Manueller Daten-Sync eingeführt</td>
+        <td>(Modification)</td>
+      </tr>
+    </table>
+  </mat-card-content>
+</mat-card>

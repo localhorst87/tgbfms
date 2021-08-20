@@ -244,6 +244,30 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return match$;
   }
 
+  getTopMatch$(season: number, matchday: number): Observable<Match> {
+    // returns the top match of the given matchday. If no top match has been set,
+    // the function returns a dummy match
+
+    let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
+      ref.where("matchday", "==", matchday).where("season", "==", season).where("isTopMatch", "==", true))
+      .valueChanges({ idField: 'documentId' });
+
+    let match$: Observable<Match> = matchQuery$.pipe(
+      take(1),
+      map(matchArray => {
+        if (matchArray.length == 0) {
+          return this.makeUnknownMatch(-1);
+        }
+        else {
+          return matchArray[0];
+        }
+      }),
+      distinct()
+    );
+
+    return match$;
+  }
+
   getTeamNameByTeamId$(teamId: number, shortName: boolean = false): Observable<string> {
     // returns the name of the team with the given teamId. If the shortName flag is set
     // to true, the abbreviation of the team name will be returned

@@ -1,5 +1,23 @@
 import { Observable } from 'rxjs';
 
+export interface MatchInfo {
+  matchDate: Date;
+  matchday: number;
+  teamNameHome: string;
+  teamNameAway: string;
+  teamNameShortHome: string;
+  teamNameShortAway: string;
+  placeHome: number;
+  placeAway: number;
+  pointsHome: number;
+  pointsAway: number;
+}
+
+export interface TeamStats {
+  place: number;
+  points: number;
+}
+
 export interface BetWriteData {
   matchId: number;
   matchDate: Date;

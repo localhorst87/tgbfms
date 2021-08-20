@@ -4,6 +4,8 @@ import { tap, map, mergeMap, concatMap, pluck, distinct, filter, first, toArray 
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { Bet, Match, Team, SeasonBet } from '../Businessrules/basic_datastructures';
+import { MatchInfo, TeamStats } from './output_datastructures';
+import { TeamRankingImportData } from '../Dataaccess/import_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT, SEASON } from '../Businessrules/rule_defined_values';
 
 @Injectable({
@@ -26,6 +28,22 @@ export class FetchBasicDataService {
     return this.matchData.getActiveTeams$(season).pipe(
       mergeMap((teamId: number) => this.appData.getTeamByTeamId$(teamId)),
       distinct()
+    );
+  }
+
+  public fetchNextMatchInfos$(season: number): Observable<MatchInfo> {
+    // returns information about the next match as Observable
+
+    return this.appData.getNextMatch$(SEASON).pipe(
+      mergeMap((nextMatch: Match) => this.makeMatchInfo$(nextMatch))
+    );
+  }
+
+  public fetchTopMatchInfos$(season: number, matchday: number): Observable<MatchInfo> {
+    // returns information about the top match of the given matchday as Observable
+
+    return this.appData.getTopMatch$(SEASON, matchday).pipe(
+      mergeMap((topMatch: Match) => this.makeMatchInfo$(topMatch))
     );
   }
 
@@ -85,6 +103,48 @@ export class FetchBasicDataService {
         let diffLastMatch: number = Math.abs(lastMatch.timestamp - timestampNow);
         return (diffNextMatch <= diffLastMatch ? nextMatch.matchday : lastMatch.matchday);
       }
+    );
+  }
+
+  private makeMatchInfo$(match: Match): Observable<MatchInfo> {
+    // converts to MatchInfo Observable
+
+    return combineLatest(
+      this.appData.getTeamByTeamId$(match.teamIdHome),
+      this.appData.getTeamByTeamId$(match.teamIdAway),
+      this.getTeamStats$(match.teamIdHome),
+      this.getTeamStats$(match.teamIdAway),
+
+      (teamHome: Team, teamAway: Team, statsHome: TeamStats, statsAway: TeamStats) => {
+        return {
+          matchDate: new Date(match.timestamp * 1000),
+          matchday: match.matchday,
+          teamNameHome: teamHome.nameLong,
+          teamNameAway: teamAway.nameLong,
+          teamNameShortHome: teamHome.nameShort,
+          teamNameShortAway: teamAway.nameShort,
+          placeHome: statsHome.place,
+          placeAway: statsAway.place,
+          pointsHome: statsHome.points,
+          pointsAway: statsAway.points
+        };
+      }
+    );
+  }
+
+  private getTeamStats$(teamId: number): Observable<TeamStats> {
+    // returns the stats of the team with the given team ID as Observable
+
+    return this.matchData.importCurrentTeamRanking$(SEASON).pipe(
+      toArray(),
+      map((teamRankingArray: TeamRankingImportData[]) => {
+        let arrIdx: number = teamRankingArray.findIndex(rankingRow => rankingRow.teamId == teamId);
+        return {
+          place: arrIdx + 1,
+          points: teamRankingArray[arrIdx].points
+        };
+      }
+      ),
     );
   }
 

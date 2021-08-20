@@ -47,6 +47,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +58,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     TableComponent,
     LoginComponent,
     RegisterComponent,
-    SyncDialogComponent
+    SyncDialogComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,

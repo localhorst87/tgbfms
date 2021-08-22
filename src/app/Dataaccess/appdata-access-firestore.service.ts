@@ -416,13 +416,13 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
-  setBet(bet: Bet): void {
+  setBet(bet: Bet): Promise<void> {
     let betToUpdate: any = bet;
     let documentId: string = bet.documentId;
     delete betToUpdate.documentId;
 
     let betDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_BETS + "/" + documentId);
-    betDocument.set(betToUpdate);
+    return betDocument.set(betToUpdate);
   }
 
   setSeasonBet(bet: SeasonBet): void {

@@ -2,6 +2,7 @@ import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angu
 import { FetchBetWriteDataService } from '../UseCases/fetch-bet-write-data.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { Bet, SeasonBet, Team } from '../Businessrules/basic_datastructures';
 import { BetWriteData, SeasonBetWriteData } from '../UseCases/output_datastructures';
@@ -37,7 +38,8 @@ export class BetWriteComponent implements OnInit, OnChanges {
     private fetchBetService: FetchBetWriteDataService,
     private fetchBasicService: FetchBasicDataService,
     private appData: AppdataAccessService,
-    private formBuilder: FormBuilder) {
+    private formBuilder: FormBuilder,
+    private snackbar: MatSnackBar) {
 
     this.userId = "";
     this.lastUpdateTime = -1;
@@ -153,7 +155,11 @@ export class BetWriteComponent implements OnInit, OnChanges {
       };
 
       if (this.isBetFormFilled(form)) {
-        this.appData.setBet(updatedBet);
+        this.appData.setBet(updatedBet)
+          .then(() => {
+            let confirmMessage: string = String(value.betHome) + ":" + String(value.betAway) + " eingetragen";
+            this.snackbar.open(confirmMessage, "", { duration: 500 });
+          });
       }
     });
   }

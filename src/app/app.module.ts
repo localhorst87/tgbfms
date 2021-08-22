@@ -1,10 +1,10 @@
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule, Injectable, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpInterceptor, HttpRequest, HttpHandler, HTTP_INTERCEPTORS } from '@angular/common/http';
 import '@angular/common/locales/global/de';
 
 import { AngularFireModule } from '@angular/fire';
@@ -49,6 +49,19 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
+@Injectable()
+export class NoCacheHeadersInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest<any>, next: HttpHandler) {
+    const authReq = req.clone({
+      setHeaders: {
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache"
+      }
+    });
+    return next.handle(authReq);
+  }
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -91,6 +104,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },
+    { provide: HTTP_INTERCEPTORS, useClass: NoCacheHeadersInterceptor, multi: true },
     { provide: AppdataAccessService, useClass: AppdataAccessFirestoreService },
     { provide: MatchdataAccessService, useClass: MatchdataAccessOpenligaService },
     { provide: PointCalculatorService, useClass: PointCalculatorTrendbasedService },

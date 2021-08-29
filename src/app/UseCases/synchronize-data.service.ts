@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { Observable, combineLatest, range, concat, from } from 'rxjs';
-import { tap, map, take, toArray, concatMap, distinct } from 'rxjs/operators';
+import { Observable, combineLatest, range, concat, from, throwError } from 'rxjs';
+import { tap, map, take, toArray, concatMap, distinct, retry } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
@@ -197,7 +197,13 @@ export class SynchronizeDataService {
 
     let newScoreSnapshot$: Observable<MatchdayScoreSnapshot> = this.appDataAccess.getMatchesByMatchday$(season, matchday).pipe(
       toArray(),
-      // tap(val => console.log(val)),
+      map((matchArray: Match[]) => {
+        if (matchArray.length < MATCHES_PER_MATCHDAY) {
+          throw throwError("firestore error");
+        }
+        return matchArray;
+      }),
+      retry(5),
       concatMap((matchArray: Match[]) => this.getScoreArrayFromMatchArray$(matchArray)),
       map((scoreArray: Score[]) => this.convertToScoreSnapshot(season, matchday, scoreArray))
     );

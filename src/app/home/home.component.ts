@@ -13,7 +13,7 @@ import { SEASON, MATCHDAYS_PER_SEASON } from '../Businessrules/rule_defined_valu
 
 const BET_FIX_CYCLE: number = 60 * 1000; // cycle time in [ms] that is used to check if Bets needs to be fixed
 const SYNC_CYCLE: number = 5 * 60 * 1000; // cycle time in [ms] that is used to check if new Data to synchronize is available
-
+const DURATION_SYNC_SNACKBAR: number = 5 * 1000; // duration in [ms] the snackbar for data sync shows up until dismissal
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -78,6 +78,7 @@ export class HomeComponent implements OnInit {
     //
 
     let dialogRef: MatDialogRef<SyncDialogComponent> = this.dialog.open(SyncDialogComponent, { minWidth: "60vw", data: { matchdaysToSync: this.matchdaysToSync } });
+    this.matchdaysToSync = [];
   }
 
   subscribeToSyncCheck(matchdayLastMatch: number): void {
@@ -249,7 +250,8 @@ export class HomeComponent implements OnInit {
         let action: string = "abrufen";
         let config: MatSnackBarConfig<any> = {
           horizontalPosition: "center",
-          verticalPosition: "bottom"
+          verticalPosition: "bottom",
+          duration: DURATION_SYNC_SNACKBAR
         };
 
         let syncNotificationBar: MatSnackBarRef<any> = this.snackbar.open(message, action, config);

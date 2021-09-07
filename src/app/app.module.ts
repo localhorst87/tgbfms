@@ -7,9 +7,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HttpInterceptor, HttpRequest, HttpHandler, HTTP_INTERCEPTORS } from '@angular/common/http';
 import '@angular/common/locales/global/de';
 
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { environment } from '../environments/environment';
 
 import { AppdataAccessService } from './Dataaccess/appdata-access.service';

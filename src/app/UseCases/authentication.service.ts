@@ -1,7 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Router } from "@angular/router";
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { User } from '../Businessrules/basic_datastructures';
 

@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { AppdataAccessService } from './appdata-access.service';
 import { Observable, from } from 'rxjs';
 import { map, switchMap, distinct, take, pluck } from 'rxjs/operators';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import firebase from 'firebase/app';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
+import firebase from 'firebase/compat/app';
 import { Bet, Match, Result, Team, User, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
 

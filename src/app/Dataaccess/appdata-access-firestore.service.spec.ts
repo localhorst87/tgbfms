@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AppdataAccessFirestoreService } from './appdata-access-firestore.service';
 // import { AppdataAccessService } from './appdata-access.service';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { of } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { COLLECTION_NAME_BETS, COLLECTION_NAME_MATCHES, COLLECTION_NAME_RESULTS, COLLECTION_NAME_TEAMS, COLLECTION_NAME_USERS } from './appdata-access-firestore.service';

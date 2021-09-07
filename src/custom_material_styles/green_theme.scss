@@ -1,14 +1,14 @@
-@import '~@angular/material/theming';
-@include mat-core();
+@use '~@angular/material' as mat;
+@include mat.core();
 
-$primary_palette: mat-palette($mat-teal, 200, 50, 400);
-$accent_palette: mat-palette($mat-teal, 200, 50, 400);
+$primary_palette: mat.define-palette(mat.$teal-palette, 200, 50, 400);
+$accent_palette: mat.define-palette(mat.$teal-palette, 200, 50, 400);
 
-$green-theme: mat-light-theme((
+$green-theme: mat.define-light-theme((
   color: (
     primary: $primary_palette,
     accent: $accent_palette,
   )
 ));
 
-@include angular-material-theme($green-theme);
+@include mat.all-component-themes($green-theme);

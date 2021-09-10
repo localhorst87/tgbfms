@@ -47,6 +47,12 @@ export class AuthenticationService {
       );
   }
 
+  public sendResetMail(email: string): any {
+    // sends a mail to reset the password
+
+    return this.fireAuth.sendPasswordResetEmail(email);
+  }
+
   public login(email: string, password: string): any {
     // login user and perform sync of activation status
 

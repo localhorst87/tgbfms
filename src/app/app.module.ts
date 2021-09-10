@@ -48,6 +48,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
 
 @Injectable()
 export class NoCacheHeadersInterceptor implements HttpInterceptor {
@@ -72,7 +73,8 @@ export class NoCacheHeadersInterceptor implements HttpInterceptor {
     LoginComponent,
     RegisterComponent,
     SyncDialogComponent,
-    DashboardComponent
+    DashboardComponent,
+    PasswordResetComponent
   ],
   imports: [
     BrowserModule,

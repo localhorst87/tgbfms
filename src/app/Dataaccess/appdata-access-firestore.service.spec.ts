@@ -725,7 +725,7 @@ describe('AppdataAccessFirestoreService', () => {
   // getNextMatch$
   // ---------------------------------------------------------------------------
 
-  it("getNextMatch$, dataset available", (done: DoneFn) => {
+  it("getNextMatch$, dataset available, no amount arugment given", (done: DoneFn) => {
     const argument: number = 2020;
 
     const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
@@ -762,6 +762,62 @@ describe('AppdataAccessFirestoreService', () => {
     service["getNextMatch$"](argument).subscribe(
       val => {
         expect(val).toEqual(expectedValue[i++]);
+        done();
+      }
+    );
+  });
+
+  it("getNextMatch$, dataset available, amount arugment given", (done: DoneFn) => {
+    const argument1: number = 2020;
+    const argument2: number = 3;
+
+    const targetMatches: Match[] = [
+      {
+        documentId: "test_id_1",
+        season: 2020,
+        matchday: 28,
+        matchId: 1,
+        timestamp: 1617640000,
+        isFinished: false,
+        isTopMatch: true,
+        teamIdHome: 10,
+        teamIdAway: 20
+      },
+      {
+        documentId: "test_id_2",
+        season: 2020,
+        matchday: 28,
+        matchId: 2,
+        timestamp: 1617640000,
+        isFinished: false,
+        isTopMatch: true,
+        teamIdHome: 11,
+        teamIdAway: 21
+      },
+      {
+        documentId: "test_id_3",
+        season: 2020,
+        matchday: 28,
+        matchId: 3,
+        timestamp: 1617640000,
+        isFinished: false,
+        isTopMatch: true,
+        teamIdHome: 12,
+        teamIdAway: 22
+      }
+    ];
+    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of(targetMatches)) };
+    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
+
+    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
+    service = TestBed.inject(AppdataAccessFirestoreService);
+
+    const expectedValues: Match[] = targetMatches;
+
+    let i: number = 0;
+    service["getNextMatch$"](argument1, argument2).subscribe(
+      val => {
+        expect(val).toEqual(expectedValues[i++]);
         done();
       }
     );

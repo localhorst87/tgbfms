@@ -13,7 +13,7 @@ export abstract class AppdataAccessService {
   public abstract getMatchesByMatchday$(season: number, matchday: number): Observable<Match>;
   public abstract getNextMatchesByTime$(nextDays: number): Observable<Match>;
   public abstract getMatchdayByMatchId$(matchId: number): Observable<number>;
-  public abstract getNextMatch$(season: number): Observable<Match>;
+  public abstract getNextMatch$(season: number, amount?: number): Observable<Match>;
   public abstract getLastMatch$(season: number): Observable<Match>;
   public abstract getTopMatch$(season: number, matchday: number): Observable<Match>;
   public abstract getTeamNameByTeamId$(teamId: number, shortName?: boolean): Observable<string>;

@@ -1,66 +1,53 @@
-<mat-toolbar class="toolbar">
-  <button mat-icon-button (click)="sidenav.toggle()">
-    <mat-icon>menu</mat-icon>
+<mat-toolbar class="toolbar-top">
+  <button mat-icon-button>
+    <mat-icon>notes</mat-icon>
   </button>
-  <button mat-icon-button (click)="changeView('dashboard')">
-    <mat-icon>home</mat-icon>
-  </button>
-  <span>TGBFMS</span>
-  <span class="toolbar-spacer"></span>
-    <!-- <button mat-icon-button>
-      <mat-icon>settings</mat-icon>
-    </button> -->
-    <button mat-icon-button (click)="logout()">
-      <mat-icon>logout</mat-icon>
-    </button>
 </mat-toolbar>
 
-<mat-sidenav-container hasBackdrop=false>
+<app-bet-write
+  *ngIf = "selectedPage == 'write'"
+  [userId] = "loggedUser.id"
+  [selectedMatchday] = "matchdayNextMatch"
+  [lastUpdateTime] = "betsUpdateTime"
+  (selectMatchdayEvent) = "changeMatchdayOnUserSelection($event)">
+</app-bet-write>
 
-  <mat-sidenav #sidenav mode="over">
-    <button mat-mini-fab (click)="changeView('write');sidenav.close()">
-      <mat-icon>edit</mat-icon>
-    </button>
-    <span> TIPPEN</span>
-    <br><br>
-    <button mat-mini-fab (click)="changeView('view');sidenav.close()">
-      <mat-icon>search</mat-icon>
-    </button>
-    <span> ALLE TIPPS</span>
-    <br><br>
-    <button mat-mini-fab (click)="changeView('table');sidenav.close()">
-      <mat-icon>leaderboard</mat-icon>
-    </button>
-    <span> TABELLE</span>
-  </mat-sidenav>
+<app-bet-overview
+  *ngIf = "selectedPage == 'view'"
+  [userId] = "loggedUser.id"
+  [selectedMatchday] = "matchdayClosestMatch">
+</app-bet-overview>
 
-  <mat-sidenav-content>
+<app-table
+  *ngIf = "selectedPage == 'table'"
+  [userId] = "loggedUser.id"
+  [currentMatchday] = "matchdayLastMatch">
+</app-table>
 
-    <app-bet-write
-      *ngIf = "selectedPage == 'write'"
-      [userId] = "loggedUser.id"
-      [selectedMatchday] = "matchdayNextMatch"
-      [lastUpdateTime] = "betsUpdateTime"
-      (selectMatchdayEvent) = "changeMatchdayOnUserSelection($event)">
-    </app-bet-write>
+<app-dashboard
+  *ngIf = "selectedPage == 'dashboard'"
+  [matchdayNextMatch] = "matchdayNextMatch"
+  [userId] = "loggedUser.id">
+</app-dashboard>
 
-    <app-bet-overview
-      *ngIf = "selectedPage == 'view'"
-      [userId] = "loggedUser.id"
-      [selectedMatchday] = "matchdayClosestMatch">
-    </app-bet-overview>
+<mat-toolbar class="toolbar-bottom">
+  <!-- dashboard -->
+  <button mat-icon-button color="{{selectedPage == 'dashboard'? 'accent' : 'primary'}}" (click)="changeView('dashboard')">
+    <mat-icon>grid_view</mat-icon>
+  </button>
 
-    <app-table
-      *ngIf = "selectedPage == 'table'"
-      [userId] = "loggedUser.id"
-      [currentMatchday] = "matchdayLastMatch">
-    </app-table>
+  <!-- write bets -->
+  <button mat-icon-button color="{{selectedPage == 'write'? 'accent' : 'primary'}}" (click)="changeView('write')">
+    <mat-icon>edit</mat-icon>
+  </button>
 
-    <app-dashboard
-      *ngIf = "selectedPage == 'dashboard'"
-      [matchdayNextMatch] = "matchdayNextMatch">
-    </app-dashboard>
+  <!-- bet overview -->
+  <button mat-icon-button color="{{selectedPage == 'view'? 'accent' : 'primary'}}" (click)="changeView('view')">
+    <mat-icon>search</mat-icon>
+  </button>
 
-  </mat-sidenav-content>
-
-</mat-sidenav-container>
+  <!-- table -->
+  <button mat-icon-button color="{{selectedPage == 'table'? 'accent' : 'primary'}}" (click)="changeView('table')">
+    <mat-icon>format_list_numbered</mat-icon>
+  </button>
+</mat-toolbar>

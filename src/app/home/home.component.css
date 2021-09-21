@@ -1,5 +1,17 @@
-.toolbar {
+.toolbar-top {
   position: sticky;
   top: 0;
-  z-index: 999
+  z-index: 999;
+  display: flex;
+  justify-content: space-between;
+  background: #b2dfdb;
+}
+
+.toolbar-bottom {
+  position: fixed;
+  bottom: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: space-evenly;
+  background: white;
 }

@@ -31,19 +31,19 @@ export class FetchBasicDataService {
     );
   }
 
-  public fetchNextMatchInfos$(season: number): Observable<MatchInfo> {
+  public fetchNextMatchInfos$(season: number, userId: string, amount: number = 1): Observable<MatchInfo> {
     // returns information about the next match as Observable
 
-    return this.appData.getNextMatch$(SEASON).pipe(
-      mergeMap((nextMatch: Match) => this.makeMatchInfo$(nextMatch))
+    return this.appData.getNextMatch$(SEASON, amount).pipe(
+      concatMap((nextMatch: Match) => this.makeMatchInfo$(nextMatch, userId))
     );
   }
 
-  public fetchTopMatchInfos$(season: number, matchday: number): Observable<MatchInfo> {
+  public fetchTopMatchInfos$(season: number, userId: string, matchday: number): Observable<MatchInfo> {
     // returns information about the top match of the given matchday as Observable
 
     return this.appData.getTopMatch$(SEASON, matchday).pipe(
-      mergeMap((topMatch: Match) => this.makeMatchInfo$(topMatch))
+      mergeMap((topMatch: Match) => this.makeMatchInfo$(topMatch, userId))
     );
   }
 
@@ -106,7 +106,7 @@ export class FetchBasicDataService {
     );
   }
 
-  private makeMatchInfo$(match: Match): Observable<MatchInfo> {
+  private makeMatchInfo$(match: Match, userId: string): Observable<MatchInfo> {
     // converts to MatchInfo Observable
 
     return combineLatest(
@@ -114,8 +114,9 @@ export class FetchBasicDataService {
       this.appData.getTeamByTeamId$(match.teamIdAway),
       this.getTeamStats$(match.teamIdHome),
       this.getTeamStats$(match.teamIdAway),
+      this.appData.getBet$(match.matchId, userId),
 
-      (teamHome: Team, teamAway: Team, statsHome: TeamStats, statsAway: TeamStats) => {
+      (teamHome: Team, teamAway: Team, statsHome: TeamStats, statsAway: TeamStats, userBet: Bet) => {
         return {
           matchDate: new Date(match.timestamp * 1000),
           matchday: match.matchday,
@@ -126,7 +127,9 @@ export class FetchBasicDataService {
           placeHome: statsHome.place,
           placeAway: statsAway.place,
           pointsHome: statsHome.points,
-          pointsAway: statsAway.points
+          pointsAway: statsAway.points,
+          betGoalsHome: userBet.goalsHome,
+          betGoalsAway: userBet.goalsAway
         };
       }
     );

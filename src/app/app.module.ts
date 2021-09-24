@@ -53,6 +53,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Other UI components
 import { SwiperModule } from 'swiper/angular';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @Injectable()
 export class NoCacheHeadersInterceptor implements HttpInterceptor {
@@ -108,7 +109,8 @@ export class NoCacheHeadersInterceptor implements HttpInterceptor {
     MatDialogModule,
     MatGridListModule,
     MatTooltipModule,
-    SwiperModule
+    SwiperModule,
+    NgxChartsModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, from, iif, combineLatest, range, concat } from 'rxjs';
-import { map, concatMap, toArray, reduce, pluck, defaultIfEmpty } from 'rxjs/operators';
+import { map, tap, concatMap, toArray, reduce, scan, pluck, defaultIfEmpty } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
 import { Score, SeasonBet, SeasonResult, User } from '../Businessrules/basic_datastructures';
@@ -23,7 +23,9 @@ export class FetchTableService {
   }
 
   public fetchTableByMatchdays$(season: number, matchdays: number[], includeSeasonBets: boolean = false): Observable<TableData> {
-    // fetches TableData according to the given season and the given matchdays
+    // fetches individual TableData according to the given season and the given matchdays
+    // e.g. matchdays = [17, 18, 19, 20, ..., 34] return the TableData of the second leg
+    // (if season has 34 matchdays)
     // if includeSeasonBets is set to true, the points from the SeasonBets will be
     // included in the calculation (according to the current team ranking)
 
@@ -50,6 +52,61 @@ export class FetchTableService {
 
     return iif(() => includeSeasonBets, aggregatedMatchdayAndSeasonScore$, aggregatedMatchdayScore$).pipe(
       concatMap((scores: Score[]) => this.makeTableData$(scores))
+    );
+  }
+
+  public fetchTotalTableForMatchdays$(season: number, matchdayFirst: number, matchdayLast: number = -1): Observable<TableData[]> {
+    // returns the total Table as TableData arrays for the matchdays from matchdayFirst to matchdayLast
+    // e.g., matchdayFirst = 5, matchdayLast = 8 returns the total table for matchday 5, for matchday 6
+    // and so on...
+
+    if (matchdayLast == -1) {
+      matchdayLast = matchdayFirst;
+    }
+
+    return this.fetchTotalScoreArraysForMatchdays$(season, matchdayFirst, matchdayLast).pipe(
+      concatMap((scores: Score[]) => this.makeTableData$(scores).pipe(toArray()))
+    );
+  }
+
+  public fetchUserPlaceForMatchdays$(season: number, matchdayFirst: number, matchdayLast: number, userId: string): Observable<number> {
+    // returns the user place in the table for in a consecutive order for the given matchdays from matchdayFirst to matchdayLast
+
+    return this.fetchTotalScoreArraysForMatchdays$(season, matchdayFirst, matchdayLast).pipe(
+      map((unsortedScoreArray: Score[]) => {
+        let sortedScoreArray: Score[] = unsortedScoreArray.sort(this.statisticsCalculator.compareScores);
+        let positions: number[] = this.statisticsCalculator.makePositions(unsortedScoreArray, this.statisticsCalculator.compareScores)
+        let idxUser: number = sortedScoreArray.findIndex(el => el.userId == userId);
+        return positions[idxUser];
+      })
+    );
+  }
+
+  private fetchTotalScoreArraysForMatchdays$(season: number, matchdayFirst: number, matchdayLast: number): Observable<Score[]> {
+    // returns the total Table as Score arrays for the matchdays from matchdayFirst to matchdayLast
+    // e.g., matchdayFirst = 5, matchdayLast = 8 returns the total table for matchday 5, for matchday 6
+    // and so on...
+
+    if (matchdayFirst < 1) {
+      return this.initScoreArray$();
+    }
+
+    let matchdaysCount: number = matchdayLast - matchdayFirst + 1;
+
+    let firstMatchdayScoreArray$: Observable<Score[]> = range(1, matchdayFirst).pipe(
+      concatMap((matchday: number) => this.appData.getMatchdayScoreSnapshot$(season, matchday)),
+      map((scoreSnap: MatchdayScoreSnapshot) => this.scoreSnapToScoreArray(scoreSnap)),
+      reduce((acc: Score[], matchdayScoreArray: Score[]) => this.statisticsCalculator.addScoreArrays(acc, matchdayScoreArray), []),
+      tap(val => console.log(val))
+    );
+
+    let followingMatchdaysScoreArray$: Observable<Score[]> = range(matchdayFirst + 1, matchdaysCount - 1).pipe(
+      concatMap((matchday: number) => this.appData.getMatchdayScoreSnapshot$(season, matchday)),
+      map((scoreSnapShot: MatchdayScoreSnapshot) => this.scoreSnapToScoreArray(scoreSnapShot)),
+    );
+
+    return concat(firstMatchdayScoreArray$, followingMatchdaysScoreArray$).pipe(
+      scan((acc: Score[], matchdayScoreArray: Score[]) => this.statisticsCalculator.addScoreArrays(acc, matchdayScoreArray), [])
     );
   }
 

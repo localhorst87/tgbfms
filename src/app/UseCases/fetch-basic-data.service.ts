@@ -22,6 +22,15 @@ export class FetchBasicDataService {
     );
   }
 
+  public fetchNumberOfUsers$(): Observable<number> {
+    // returns the number of users as Observable
+
+    return this.appData.getActiveUserIds$().pipe(
+      toArray(),
+      map((userIds: string[]) => userIds.length)
+    );
+  }
+
   public fetchActiveTeams$(season: number): Observable<Team> {
     // returns the requested frame data (data without user bets) as Observable
 

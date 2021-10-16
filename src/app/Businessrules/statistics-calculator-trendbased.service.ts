@@ -130,6 +130,30 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     return scores;
   }
 
+  calculateForm(pointsUser: number[], pointsOpponents: number[][], weights: number[]) {
+    // calculates the current form of a user, according to given point array and point
+    // array of the opponents
+
+    let weightedAvg: number = 0;
+
+    for (let i in pointsUser) {
+      let pointsSumOpponents: number = pointsOpponents[i].reduce((a, b) => a + b, 0);
+      let pointsMeanOpponents: number = pointsSumOpponents / pointsOpponents[i].length;
+      weightedAvg += weights[i] * pointsUser[i] / pointsMeanOpponents;
+    }
+
+    let weightsSum: number = weights.reduce((a, b) => a + b, 0);
+
+    if (weightsSum == 0) { // in case of no points directly return -10
+      return -10;
+    }
+
+    weightedAvg /= weightsSum;
+    let normedValue: number = 10 * Math.tanh(2.5 * (weightedAvg - 1)) // norm from -10 to +10
+
+    return Math.round(normedValue * 10) / 10; // round to 1 decimal
+  }
+
   private identifyUsers(inputArray: any[], ...furtherArrays: any[]): string[] {
     // identifies all unique user IDs that are present in objects of inputArray
     // and furtherArrays, and sorts them by userId.

@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit {
   loggedUser: User;
   matchdayNextMatch: number;
   matchdayLastMatch: number;
+  matchdayCompleted: number;
   matchdayClosestMatch: number;
   matchdayUserSelection: number;
   nextFixTimestamp: number; // next time point to check if all Bets are fixed
@@ -54,6 +55,7 @@ export class HomeComponent implements OnInit {
     this.matchdayNextMatch = -1;
     this.matchdayLastMatch = -1;
     this.matchdayClosestMatch = -1;
+    this.matchdayCompleted = -1;
     this.matchdayUserSelection = -1;
     this.nextFixTimestamp = -1;
     this.betsUpdateTime = -1;
@@ -124,21 +126,30 @@ export class HomeComponent implements OnInit {
           this.matchdayLastMatch = 1;
           this.matchdayNextMatch = 1;
           this.matchdayClosestMatch = 1;
+          this.matchdayCompleted = 0;
         }
         else if (matchdayLast > 0 && matchdayNext == -1) { // all matches played
-          this.matchdayLastMatch = matchdayLast; //matchdayLast;
+          this.matchdayLastMatch = matchdayLast;
           this.matchdayNextMatch = matchdayLast;
           this.matchdayClosestMatch = matchdayLast;
+          this.matchdayCompleted = matchdayLast;
         }
         else if (matchdayLast == -1 && matchdayNext > 0) { // no matches played yet
-          this.matchdayLastMatch = matchdayNext; //matchdayNext;
+          this.matchdayLastMatch = matchdayNext;
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayNext;
+          this.matchdayCompleted = -1;
         }
         else {
-          this.matchdayLastMatch = matchdayLast; //matchdayLast;
+          this.matchdayLastMatch = matchdayLast;
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayClosest;
+          if (matchdayNext > matchdayLast) {
+            this.matchdayCompleted = matchdayLast;
+          }
+          else {
+            this.matchdayCompleted = matchdayNext - 1;
+          }
         }
       },
       err => { },

@@ -1,16 +1,47 @@
 @import "~swiper/css";
 @import "~swiper/css/pagination";
 
+.dashboard-element-container {
+  height: calc(100vh - 2*56px);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px 5px;
+  align-content: flex-start;
+}
+
 .swiper {
   width:100%;
-  height: 45vw;
+  height: 33%;
 }
 
 .swiper-slide {
-  background: white;
   display: flex;
   justify-content: center;
   align-items: flex-start;
+}
+
+.card-container {
+  width: calc(50% - 2*16px - 5px - 2px); // 16px padding, 5px gap, 2px beauty-offset
+  height: calc(33% - 2*16px - 5px); // 16px padding, 5px gap
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.table-chart-item {
+  width: 100%;
+  height: 80%;
+}
+
+.vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 }
 
 td {
@@ -19,4 +50,24 @@ td {
 
 mat-icon {
   vertical-align: middle;
+}
+
+tspan {
+  font-family: "Roboto Mono";
+}
+
+.ngx-charts .bar-chart { // text color bar chart
+  fill: var(--text-primary-color);
+}
+
+.ngx-charts .bar { // bar colors
+  fill: var(--accent-color);
+}
+
+.ngx-charts .line-chart { // text color line chart
+  fill: var(--text-primary-color);
+}
+
+.ngx-charts .line { // line color
+  stroke: var(--accent-color);
 }

@@ -1,56 +1,115 @@
-<!-- Next matches swipe cards -->
-<swiper [pagination]="true">
-    <ng-template swiperSlide *ngFor="let match of nextMatchesInfo">
+<div class="dashboard-element-container">
+  <!-- Next matches swipe cards -->
+  <swiper [pagination]="true">
+      <ng-template swiperSlide *ngFor="let match of nextMatchesInfo">
 
-        <table>
-          <tr>
-            <td class="mat-caption">{{match.placeHome}}. ({{match.pointsHome}} Pkt)</td>
-            <td></td>
-            <td class="mat-caption">{{match.placeAway}}. ({{match.pointsAway}} Pkt)</td>
-          </tr>
+          <table>
+            <tr>
+              <td class="mat-caption">{{match.placeHome}}. ({{match.pointsHome}} Pkt)</td>
+              <td></td>
+              <td class="mat-caption">{{match.placeAway}}. ({{match.pointsAway}} Pkt)</td>
+            </tr>
 
-          <tr>
-            <td class="mat-display-3">{{match.teamNameShortHome}}</td>
-            <td class="mat-display-3">-</td>
-            <td class="mat-display-3">{{match.teamNameShortAway}}</td>
-          </tr>
+            <tr>
+              <td class="mat-display-3">{{match.teamNameShortHome}}</td>
+              <td class="mat-display-3">-</td>
+              <td class="mat-display-3">{{match.teamNameShortAway}}</td>
+            </tr>
 
-          <tr>
-            <td colspan=3 class="mat-caption">
-              {{match.matchDate | date: "EEEEEE dd.MM. - HH:mm" }} Uhr
+            <tr>
+              <td colspan=3 class="mat-caption">
+                {{match.matchDate | date: "EEEEEE dd.MM. - HH:mm" }} Uhr
 
-              <!-- bet available -->
-              <mat-icon
-                *ngIf="match.betGoalsHome > -1 && match.betGoalsAway > -1"
-                color="primary"
-                matTooltip="{{match.betGoalsHome}} : {{match.betGoalsAway}} getippt"
-                matTooltipPosition="left"
-                matTooltipTouchGestures="on">
-                check_circle
-              </mat-icon>
+                <!-- bet available -->
+                <mat-icon
+                  *ngIf="match.betGoalsHome > -1 && match.betGoalsAway > -1"
+                  color="primary"
+                  matTooltip="{{match.betGoalsHome}} : {{match.betGoalsAway}} getippt"
+                  matTooltipPosition="left"
+                  matTooltipTouchGestures="on">
+                  check_circle
+                </mat-icon>
 
-              <!-- bet not available -->
-              <mat-icon
-                *ngIf="match.betGoalsHome == -1 && match.betGoalsAway == -1 && match.matchDate.getTime() - currentTime.getTime() > 60 * 60 * 1000"
-                color="accent"
-                matTooltip="noch nicht getippt!"
-                matTooltipPosition="left"
-                matTooltipTouchGestures="on">
-                highlight_off
-              </mat-icon>
+                <!-- bet not available -->
+                <mat-icon
+                  *ngIf="match.betGoalsHome == -1 && match.betGoalsAway == -1 && match.matchDate.getTime() - currentTime.getTime() > 60 * 60 * 1000"
+                  color="accent"
+                  matTooltip="noch nicht getippt!"
+                  matTooltipPosition="left"
+                  matTooltipTouchGestures="on">
+                  highlight_off
+                </mat-icon>
 
-              <!-- bet not available and match starts within 1 hour -->
-              <mat-icon
-                *ngIf="match.betGoalsHome == -1 && match.betGoalsAway == -1 && match.matchDate.getTime() - currentTime.getTime() < 60 * 60 * 1000"
-                color="warn"
-                matTooltip="noch nicht getippt! Nur noch {{(match.matchDate.getTime() - currentTime.getTime())/(60*1000) | number: '1.0-0'}} min bis Anpfiff">
-                running_with_errors
-              </mat-icon>
+                <!-- bet not available and match starts within 1 hour -->
+                <mat-icon
+                  *ngIf="match.betGoalsHome == -1 && match.betGoalsAway == -1 && match.matchDate.getTime() - currentTime.getTime() < 60 * 60 * 1000"
+                  color="warn"
+                  matTooltip="noch nicht getippt! Nur noch {{(match.matchDate.getTime() - currentTime.getTime())/(60*1000) | number: '1.0-0'}} min bis Anpfiff">
+                  running_with_errors
+                </mat-icon>
 
-            </td>
-          </tr>
+              </td>
+            </tr>
 
-        </table>
+          </table>
 
-    </ng-template>
-</swiper>
+      </ng-template>
+  </swiper>
+
+  <mat-card class="card-container">
+    <mat-card-subtitle>Aktuelle Form</mat-card-subtitle>
+    <mat-card-content class="vertical-center">
+      <span class="big-numbers">
+        {{currentForm}}
+      </span>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card-container ">
+    <mat-card-subtitle>Dein Formverlauf</mat-card-subtitle>
+    <mat-card-content class="table-chart-item">
+      <ngx-charts-line-chart
+        [xAxis]="True"
+        [yAxis]="True"
+        [results]="formHistoryData"
+        [showGridLines]="True"
+        [yScaleMin]="formHistoryOptions.yMin"
+        [yScaleMax]="formHistoryOptions.yMax"
+        [yAxisTicks]="formHistoryOptions.ticks"
+        [tooltipDisabled]="True">
+      </ngx-charts-line-chart>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card-container ">
+    <mat-card-subtitle>Tabellenplatzverlauf</mat-card-subtitle>
+    <mat-card-content class="table-chart-item">
+      <ngx-charts-line-chart
+        [xAxis]="True"
+        [yAxis]="True"
+        [results]="tableHistoryData"
+        [showGridLines]="True"
+        [yScaleMin]="tableHistoryOptions.yMin"
+        [yScaleMax]="tableHistoryOptions.yMax"
+        [yAxisTickFormatting]="tableHistoryOptions.formattingFcn"
+        [yAxisTicks]="tableHistoryOptions.ticks"
+        [roundDomains]="True"
+        [tooltipDisabled]="True">
+      </ngx-charts-line-chart>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card-container">
+    <mat-card-subtitle>Rückstand auf {{tableLeader}}</mat-card-subtitle>
+    <mat-card-content class="table-chart-item">
+      <ngx-charts-bar-horizontal
+      [results]="tableData"
+      [yAxis]="True"
+      [legend]="False"
+      [showDataLabel]="True"
+      [tooltipDisabled]="True">
+      </ngx-charts-bar-horizontal>
+    </mat-card-content>
+  </mat-card>
+
+</div>

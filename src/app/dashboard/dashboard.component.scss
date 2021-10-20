@@ -58,6 +58,7 @@ tspan {
 
 .ngx-charts .bar-chart { // text color bar chart
   fill: var(--text-primary-color);
+  font-family: "Roboto Mono";
 }
 
 .ngx-charts .bar { // bar colors
@@ -66,6 +67,7 @@ tspan {
 
 .ngx-charts .line-chart { // text color line chart
   fill: var(--text-primary-color);
+  font-family: "Roboto Mono";
 }
 
 .ngx-charts .line { // line color

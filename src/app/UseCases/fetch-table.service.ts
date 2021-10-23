@@ -97,7 +97,6 @@ export class FetchTableService {
       concatMap((matchday: number) => this.appData.getMatchdayScoreSnapshot$(season, matchday)),
       map((scoreSnap: MatchdayScoreSnapshot) => this.scoreSnapToScoreArray(scoreSnap)),
       reduce((acc: Score[], matchdayScoreArray: Score[]) => this.statisticsCalculator.addScoreArrays(acc, matchdayScoreArray), []),
-      tap(val => console.log(val))
     );
 
     let followingMatchdaysScoreArray$: Observable<Score[]> = range(matchdayFirst + 1, matchdaysCount - 1).pipe(

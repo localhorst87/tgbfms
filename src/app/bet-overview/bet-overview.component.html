@@ -66,7 +66,7 @@
       Auto Close
     </mat-slide-toggle>
   </div>
-  <div *ngIf="displayMethodForm.value=='matchday'">
+  <div *ngIf="selectedDisplayMethod=='matchday'">
     <mat-slide-toggle
       color="accent"
       checked="false"
@@ -122,7 +122,7 @@
 
         <table>
           <tr *ngFor="let bet of betData.get(match.matchId); let i = index">
-            <td style="text-align: right" class="subheading-mono-letters">
+            <td class="subheading-mono-letters" style="text-align: right;">
               {{ bet.userName }}
             </td>
             <td class="subheading-mono-letters">
@@ -151,7 +151,7 @@
                 lock
               </mat-icon>
             </td>
-            <td>
+            <td style="text-align: left;">
               <ng-container *ngIf="bet.betGoalsHome > -1 && bet.betGoalsAway > -1">
                 <span class="subheading-mono-letters" [class.result-line-through]="isBetWrong(bet, match) && highlightResults.value" matBadge="{{bet.possibleOutsiderPoints}}" matBadgeSize="small" matBadgeOverlap="false" matBadgeHidden="{{bet.possibleOutsiderPoints == 0}}">
                   {{bet.betGoalsHome}} : {{bet.betGoalsAway}}
@@ -202,7 +202,7 @@
 
         <table>
           <tr *ngFor="let bet of seasonBetData.get(frameData.place)">
-            <td style="text-align: right" class="subheading-mono-letters">
+            <td class="subheading-mono-letters" style="text-align: right;">
               {{ bet.userName }}
             </td>
             <td class="subheading-mono-letters">
@@ -231,7 +231,7 @@
                 lock
               </mat-icon>
             </td>
-            <td>
+            <td style="text-align: left;">
               <ng-container *ngIf="bet.teamName!='unknown team'">
                 <span class="subheading-mono-letters">
                   {{ bet.teamName }}

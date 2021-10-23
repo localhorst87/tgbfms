@@ -1,3 +1,9 @@
+.loading-bar {
+  position: fixed;
+  top: 56px;
+  z-index: 999;
+}
+
 .content-container {
   height: calc(100vh - 2*56px);
   display: flex;

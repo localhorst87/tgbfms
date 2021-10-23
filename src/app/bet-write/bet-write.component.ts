@@ -35,6 +35,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
   @Output() selectMatchdayEvent = new EventEmitter<number>(); // directs selected matchday to home component
   betForm: FormGroup; // formular for setting bets
   seasonBetForm: FormGroup; // formular for setting season bets
+  isLoading: boolean;
 
   constructor(
     private fetchBetService: FetchBetWriteDataService,
@@ -66,6 +67,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
     this.fetchBasicService.fetchActiveTeams$(SEASON).subscribe(
       (team: Team) => this.activeTeams.push(team)
     );
+    this.isLoading = false;
   }
 
   get bets() {
@@ -90,12 +92,21 @@ export class BetWriteComponent implements OnInit, OnChanges {
 
   showMatchesByMatchday(matchday: number): void {
     this.resetData();
+    this.isLoading = true;
+
     this.fetchBetService.fetchDataByMatchday$(SEASON, matchday, this.userId).subscribe(
       (betData: BetWriteData) => {
         this.matches.push(betData);
         this.addMatchForm(betData);
+      },
+      err => {
+        this.isLoading = false;
+      },
+      () => {
+        this.isLoading = false;
       }
     );
+
     this.isPanelExpanded = false;
     this.selectedMatchday = this.matchdayForm.value;
     this.selectMatchdayEvent.emit(this.matchdayForm.value);
@@ -104,10 +115,18 @@ export class BetWriteComponent implements OnInit, OnChanges {
 
   showSeasonBets(): void {
     this.resetData();
+    this.isLoading = true;
+
     this.fetchBetService.fetchSeasonData$(SEASON, this.userId).subscribe(
       (betData: SeasonBetWriteData) => {
         this.seasonBets.push(betData);
         this.addSeasonBetForm(betData);
+      },
+      err => {
+        this.isLoading = false;
+      },
+      () => {
+        this.isLoading = false;
       }
     );
 

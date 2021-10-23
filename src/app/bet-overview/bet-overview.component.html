@@ -1,168 +1,246 @@
+<!-- shows up when loading content. has absolute position under the top toolbar -->
+<mat-progress-bar mode="query" color="accent" *ngIf="isLoading" class="loading-bar"></mat-progress-bar>
+
+<div class="content-container">
+
 <!-- settings to display matches are integrated into an expansion panel -->
-<mat-expansion-panel
-  class="settings-panel"
-  [expanded]="isPanelExpanded"
-  (opened)="isPanelExpanded = true"
-  (closed)="isPanelExpanded = false">
-  <mat-expansion-panel-header>
-    <mat-panel-title>
-      Spiele wählen
-    </mat-panel-title>
-    <mat-panel-description *ngIf="selectedDisplayMethod=='matchday'">
-      Spieltag {{ selectedMatchday > 0 ? selectedMatchday : "" }}
-    </mat-panel-description>
-    <mat-panel-description *ngIf="selectedDisplayMethod=='season'">
-      Saisontipps
-    </mat-panel-description>
-  </mat-expansion-panel-header>
+<div class="settings-panel">
+  <mat-expansion-panel
+    [expanded]="isPanelExpanded"
+    (opened)="isPanelExpanded = true"
+    (closed)="isPanelExpanded = false">
+    <mat-expansion-panel-header>
+      <ng-container *ngIf="selectedDisplayMethod=='matchday'">
+        <mat-panel-title>
+          Spieltag {{ selectedMatchday > 0 ? selectedMatchday : "" }}
+        </mat-panel-title>
+        <mat-panel-description class="subheading-mono-letters" *ngIf="selectedMatchday > 0">
+          {{ frameData[0].matchDate | date: "EEEEEE dd.MM."}} - {{ frameData[frameData.length-1].matchDate | date: "EEEEEE dd.MM."}}
+        </mat-panel-description>
+      </ng-container>
+      <ng-container *ngIf="selectedDisplayMethod=='season'">
+        <mat-panel-title>
+          Saisontipps
+        </mat-panel-title>
+        <mat-panel-description class="subheading-mono-letters">
+          Saison {{ currentSeason }}
+        </mat-panel-description>
+      </ng-container>
+    </mat-expansion-panel-header>
 
-  <!-- radio buttons for selecting the display method -->
-  <mat-radio-group class="match-selection-radio-group" [formControl]="displayMethodForm">
-    <mat-radio-button class="match-selection-radio-button" value="matchday">Spieltag</mat-radio-button>
-    <mat-radio-button class="match-selection-radio-button" value="season" (click)="showSeasonBets()">Saisontipps</mat-radio-button>
-  </mat-radio-group>
+    <!-- radio buttons for selecting the display method -->
+    <mat-radio-group class="match-selection-radio-group" [formControl]="displayMethodForm">
+      <mat-radio-button class="match-selection-radio-button" value="matchday">Spieltag</mat-radio-button>
+      <mat-radio-button class="match-selection-radio-button" value="season" (click)="addSeasonFrameData()">Saisontipps</mat-radio-button>
+    </mat-radio-group>
 
-  <!-- selection with slider when choosing matchdays as method -->
-  <div *ngIf="displayMethodForm.value=='matchday'">
-    <mat-slider
-        class="matchday-slider"
-        [formControl]="matchdayForm"
-        min = "1"
-        max = "34"
-        step = "1"
-        thumbLabel="true"
-        tickInterval="1">
-    </mat-slider>
-    Spieltag {{ matchdayForm.value }}
-    <br>
-    <button mat-raised-button (click)="showBetsByMatchday(matchdayForm.value)">
-      anzeigen
-    </button>
+    <!-- selection with slider when choosing matchdays as method -->
+    <div *ngIf="displayMethodForm.value=='matchday'">
+      <mat-slider
+          class="matchday-slider"
+          [formControl]="matchdayForm"
+          min = "1"
+          max = {{nMatchdays}}
+          step = "1"
+          thumbLabel="true"
+          tickInterval="1">
+      </mat-slider>
+      <br>
+      <button mat-raised-button class="load-button" color="primary" (click)="addFrameData(matchdayForm.value)">
+        <mat-icon>downloading</mat-icon>  Spieltag {{ matchdayForm.value }}
+      </button>
+    </div>
+  </mat-expansion-panel>
+</div>
+
+<!-- options for match panels -->
+<div class="config-match-panels">
+  <div>
+    <mat-slide-toggle
+      color="accent"
+      [checked]="enableAutoClose.value"
+      [formControl]="enableAutoClose"
+      matTooltip="Klappt geöffnetes Panel zu, wenn ein neues Panel aufgeklappt wird"
+      matTooltipPosition="above"
+      matTooltipTouchGestures="on">
+      Auto Close
+    </mat-slide-toggle>
   </div>
-</mat-expansion-panel>
-
-<!-- loading bar (shows up when loading contents) -->
-<mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+  <div *ngIf="displayMethodForm.value=='matchday'">
+    <mat-slide-toggle
+      color="accent"
+      checked="false"
+      [formControl]="highlightResults"
+      matTooltip="Streicht falsche Tipps durch"
+      matTooltipPosition="above"
+      matTooltipTouchGestures="on">
+      Highlighting
+    </mat-slide-toggle>
+  </div>
+</div>
 
 <!-- display of the matchday overview -->
-<mat-tab-group mat-align-tabs="start" *ngIf="selectedDisplayMethod=='matchday'">
+<div class="matches-box" *ngIf="selectedDisplayMethod=='matchday'">
+  <mat-accordion [multi]="!enableAutoClose.value">
+    <ng-container *ngFor="let match of frameData">
+      <mat-expansion-panel
+        class="bet-panel"
+        (opened)="addUserBets(match.matchId)"
+        disabled="{{!match.isBetFixed}}">
+        <mat-expansion-panel-header class="right-aligned-header">
+          <mat-panel-title>
+            {{match.teamNameHome}} - {{match.teamNameAway}}
+            <ng-container *ngIf="match.isTopMatch">
+              <mat-icon class="star-icon">star</mat-icon>
+            </ng-container>
+          </mat-panel-title>
+          <mat-panel-description class="subheading-mono-letters">
+            {{ match.matchDate | date: "EEEEEE HH:mm" }} Uhr
+          </mat-panel-description>
+        </mat-expansion-panel-header>
 
-  <mat-tab *ngFor="let match of frameData">
-    <ng-template mat-tab-label>
-      {{match.teamNameShortHome}} - {{match.teamNameShortAway}}
-      <ng-container *ngIf="match.isTopMatch">
-        <mat-icon>star</mat-icon>
-      </ng-container>
-    </ng-template>
+        <p *ngIf="match.resultGoalsHome > -1 && match.resultGoalsAway > -1" class="mat-body-2">
+          Ergebnis {{ match.resultGoalsHome }} : {{ match.resultGoalsAway }}
+          <mat-icon
+            *ngIf="!match.isMatchFinished"
+            class="result-icon"
+            matTooltip="Zwischenstand"
+            matTooltipPosition="above"
+            matTooltipTouchGestures="on">
+            hourglass_top
+          </mat-icon>
+          <mat-icon
+            *ngIf="match.isMatchFinished"
+            class="result-icon"
+            matTooltip="Endstand"
+            matTooltipPosition="above"
+            matTooltipTouchGestures="on">
+            check_circle_outline
+          </mat-icon>
+          <mat-divider class="result-divider"></mat-divider>
+        </p>
 
-    <!-- Match-Info-Card -->
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>
-          {{ match.teamNameHome }} - {{ match.teamNameAway }}
-        </mat-card-title>
-        <mat-card-subtitle>
-          {{ match.matchDate | date: "EEEEEE, dd.MM. - HH:mm" }} Uhr
-          <ng-container *ngIf="match.isTopMatch">
-          #Topspiel
-          </ng-container>
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content *ngIf="match.resultGoalsHome > -1 && match.resultGoalsAway > -1">
-        Ergebnis {{ match.resultGoalsHome }} : {{ match.resultGoalsAway }}
-      </mat-card-content>
-    </mat-card>
-
-    <!-- User Bet cards -->
-    <mat-card *ngFor="let bet of betData.get(match.matchId)" class="bet-card">
-      <mat-card-header>
-        <mat-card-title>
-          {{ bet.userName }}
-        </mat-card-title>
-        <mat-card-subtitle>
-          <ng-container *ngIf="!match.isBetFixed && bet.userId != userId">
-            Tipp noch nicht sichtbar
-          </ng-container>
-          <ng-container *ngIf="(match.isBetFixed && bet.betGoalsHome == -1 && bet.betGoalsAway == -1) || (!match.isBetFixed && bet.userId == userId && bet.betGoalsHome == -1 && bet.betGoalsAway == -1)">
-            kein Tipp abgegeben
-          </ng-container>
-          <!-- <ng-container *ngIf="!bet.isBetFixed && bet.betGoalsHome > -1 && bet.betGoalsAway > -1">
-            offener Tipp
-          </ng-container>
-          <ng-container *ngIf="bet.isBetFixed && bet.betGoalsHome > -1 && bet.betGoalsAway > -1">
-            fixer Tipp
-          </ng-container> -->
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-icon *ngIf="!match.isBetFixed && bet.userId != userId">
-          block
-        </mat-icon>
-        <mat-icon *ngIf="(match.isBetFixed && bet.betGoalsHome == -1 && bet.betGoalsAway == -1) || (!match.isBetFixed && bet.userId == userId && bet.betGoalsHome == -1 && bet.betGoalsAway == -1)">
-          highlight_off
-        </mat-icon>
-        <mat-icon *ngIf="!bet.isBetFixed && bet.betGoalsHome > -1 && bet.betGoalsAway > -1">
-          lock_open
-        </mat-icon>
-        <mat-icon *ngIf="bet.isBetFixed && bet.betGoalsHome > -1 && bet.betGoalsAway > -1">
-          lock
-        </mat-icon>
-        <ng-container *ngIf="bet.betGoalsHome > -1 && bet.betGoalsAway > -1">
-          <span matBadge="{{bet.possibleOutsiderPoints}}" matBadgeSize="small" matBadgeOverlap="false" matBadgeHidden="{{bet.possibleOutsiderPoints == 0}}">
-            {{bet.betGoalsHome}} : {{bet.betGoalsAway}}
-          </span>
-        </ng-container>
-      </mat-card-content>
-    </mat-card>
-
-  </mat-tab>
-</mat-tab-group>
+        <table>
+          <tr *ngFor="let bet of betData.get(match.matchId); let i = index">
+            <td style="text-align: right" class="subheading-mono-letters">
+              {{ bet.userName }}
+            </td>
+            <td class="subheading-mono-letters">
+              <mat-icon
+                *ngIf="bet.betGoalsHome == -1 && bet.betGoalsAway == -1"
+                color="warn"
+                matTooltip="Kein Tipp abgegeben"
+                matTooltipPosition="right"
+                matTooltipTouchGestures="on">
+                highlight_off
+              </mat-icon>
+              <mat-icon
+                *ngIf="!bet.isBetFixed && (bet.betGoalsHome > -1 && bet.betGoalsAway > -1)"
+                color="accent"
+                matTooltip="offener Tipp"
+                matTooltipPosition="right"
+                matTooltipTouchGestures="on">
+                lock_open
+              </mat-icon>
+              <mat-icon
+                *ngIf="bet.isBetFixed && (bet.betGoalsHome > -1 && bet.betGoalsAway > -1)"
+                color="primary"
+                matTooltip="fixer Tipp"
+                matTooltipPosition="right"
+                matTooltipTouchGestures="on">
+                lock
+              </mat-icon>
+            </td>
+            <td>
+              <ng-container *ngIf="bet.betGoalsHome > -1 && bet.betGoalsAway > -1">
+                <span class="subheading-mono-letters" [class.result-line-through]="isBetWrong(bet, match) && highlightResults.value" matBadge="{{bet.possibleOutsiderPoints}}" matBadgeSize="small" matBadgeOverlap="false" matBadgeHidden="{{bet.possibleOutsiderPoints == 0}}">
+                  {{bet.betGoalsHome}} : {{bet.betGoalsAway}}
+                </span>
+              </ng-container>
+            </td>
+          </tr>
+        </table>
+      </mat-expansion-panel>
+    </ng-container>
+  </mat-accordion>
+</div>
 
 <!-- display of the season bets -->
-<ng-container *ngIf="selectedDisplayMethod=='season'">
+<div class="season-box" *ngIf="selectedDisplayMethod=='season'">
+  <mat-accordion [multi]="!enableAutoClose.value">
+    <ng-container *ngFor="let frameData of seasonFrameData">
+      <mat-expansion-panel
+        class="bet-panel"
+        (opened)="addUserSeasonBets(frameData.place)"
+        disabled="{{!frameData.isBetFixed}}">
+        <mat-expansion-panel-header class="right-aligned-header">
+          <mat-panel-title>
+            Platz {{ frameData.place < 0 ? (frameData.place + nTeams + 1) : frameData.place }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
 
-  <!-- result card -->
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        Ergebnis
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p *ngFor="let frameData of seasonFrameData">
-        {{ frameData.place < 0 ? frameData.place + nTeams + 1 : frameData.place }}.
-        {{ frameData.resultTeamName == "unknown team" ? "noch nicht bekannt" : frameData.resultTeamName }}
-      </p>
-    </mat-card-content>
-  </mat-card>
+        <p class="mat-body-2">
+          Ergebnis: {{ frameData.resultTeamName == "unknown team" ? "noch nicht bekannt" : frameData.resultTeamName }}
+          <mat-icon
+            *ngIf="matchdayCompleted < nMatchdays"
+            class="result-icon"
+            matTooltip="Zwischenstand nach Spieltag {{ matchdayCompleted }}"
+            matTooltipPosition="above"
+            matTooltipTouchGestures="on">
+            hourglass_top
+          </mat-icon>
+          <mat-icon
+            *ngIf="matchdayCompleted == nMatchdays"
+            class="result-icon"
+            matTooltip="Endstand"
+            matTooltipPosition="above"
+            matTooltipTouchGestures="on">
+            check_circle_outline
+          </mat-icon>
+          <mat-divider class="result-divider"></mat-divider>
+        </p>
 
-  <!-- bet cards -->
-  <mat-card *ngFor="let userName of seasonBetDataUserNames; let i = index;" class="bet-card">
-    <mat-card-header>
-      <mat-card-title>
-        {{ userName }}
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p *ngFor="let betData of seasonBetData[i]; let k = index;">
-        {{ betData.place < 0 ? betData.place + nTeams + 1 : betData.place}}.
-        <ng-container *ngIf="!seasonFrameData[k].isBetFixed && betData.userId != userId">
-          <mat-icon>block</mat-icon>
-          noch nicht sichtbar
-        </ng-container>
-        <ng-container *ngIf="(seasonFrameData[k].isBetFixed && betData.teamName == 'unknown team') || (!seasonFrameData[k].isBetFixed && betData.userId == userId && betData.teamName == 'unknown team')">
-          <mat-icon>highlight_off</mat-icon>
-          kein Tipp abgegeben
-        </ng-container>
-        <ng-container *ngIf="!betData.isBetFixed && betData.teamName != 'unknown team'">
-          {{ betData.teamName }}
-          <mat-icon>lock_open</mat-icon>
-        </ng-container>
-        <ng-container *ngIf="betData.isBetFixed && betData.teamName != 'unknown team'">
-          {{ betData.teamName }}
-          <mat-icon>lock</mat-icon>
-        </ng-container>
-      </p>
-    </mat-card-content>
-  </mat-card>
-</ng-container>
+        <table>
+          <tr *ngFor="let bet of seasonBetData.get(frameData.place)">
+            <td style="text-align: right" class="subheading-mono-letters">
+              {{ bet.userName }}
+            </td>
+            <td class="subheading-mono-letters">
+              <mat-icon
+                *ngIf="bet.teamName=='unknown team'"
+                color="warn"
+                matTooltip="Kein Tipp abgegeben"
+                matTooltipPosition="right"
+                matTooltipTouchGestures="on">
+                highlight_off
+              </mat-icon>
+              <mat-icon
+                *ngIf="!bet.isBetFixed && bet.teamName!='unknown team'"
+                color="accent"
+                matTooltip="offener Tipp"
+                matTooltipPosition="right"
+                matTooltipTouchGestures="on">
+                lock_open
+              </mat-icon>
+              <mat-icon
+                *ngIf="bet.isBetFixed && bet.teamName!='unknown team'"
+                color="primary"
+                matTooltip="fixer Tipp"
+                matTooltipPosition="right"
+                matTooltipTouchGestures="on">
+                lock
+              </mat-icon>
+            </td>
+            <td>
+              <ng-container *ngIf="bet.teamName!='unknown team'">
+                <span class="subheading-mono-letters">
+                  {{ bet.teamName }}
+                </span>
+              </ng-container>
+            </td>
+          </tr>
+        </table>
+      </mat-expansion-panel>
+    </ng-container>
+  </mat-accordion>
+</div>

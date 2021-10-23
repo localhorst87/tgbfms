@@ -130,7 +130,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     }
   }
 
-  private isTendencyCorrect(bet: Bet, result: Result): boolean {
+  isTendencyCorrect(bet: Bet, result: Result): boolean {
     // returns true if the tendency of bet and result are the same
 
     if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !

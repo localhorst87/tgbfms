@@ -16,17 +16,20 @@ import { SEASON, MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from '../Businessrules/
 export class BetOverviewComponent implements OnInit, OnChanges {
 
   @Input() userId: string;
+  @Input() matchdayCompleted: number;
   nTeams: number;
+  nMatchdays: number;
+  currentSeason: string;
   frameData: BetOverviewFrameData[];
   seasonFrameData: SeasonBetOverviewFrameData[];
   betData: any; // will be a key-value pair of <matchId: number, betData: BetOverviewUserData[]>
-  seasonBetDataMap: any; // will be a key-value pair of <userName: string, betData: SeasonBetOverviewUserData[]>
-  seasonBetDataUserNames: string[]; // sorted list with user names of the Season Bets for iterating in template
-  seasonBetData: SeasonBetOverviewUserData[][];
+  seasonBetData: any; // will be a key-value pair of <userName: string, betData: SeasonBetOverviewUserData[]>
   isPanelExpanded: boolean;
   displayMethodForm: FormControl; // option field (matchday, duration, season)
   selectedDisplayMethod: string;
   matchdayForm: FormControl; // slider which matchday to load
+  enableAutoClose: FormControl; // assigned to slider-toggle
+  highlightResults: FormControl; // assigned to slider-toggle
   @Input() selectedMatchday: number; // (will be pre allocated with closest matchday)
   isLoading: boolean;
 
@@ -36,17 +39,20 @@ export class BetOverviewComponent implements OnInit, OnChanges {
     private formBuilder: FormBuilder) {
 
     this.userId = "";
+    this.matchdayCompleted = -1;
     this.nTeams = NUMBER_OF_TEAMS;
+    this.nMatchdays = MATCHDAYS_PER_SEASON;
+    this.currentSeason = String(SEASON) + "/" + String(SEASON + 1);
     this.frameData = [];
     this.seasonFrameData = []
     this.betData = new Map();
-    this.seasonBetDataMap = new Map();
-    this.seasonBetDataUserNames = [];
-    this.seasonBetData = [];
+    this.seasonBetData = new Map();
     this.isPanelExpanded = false;
     this.displayMethodForm = this.formBuilder.control("matchday");
     this.selectedDisplayMethod = "matchday";
     this.matchdayForm = this.formBuilder.control(1);
+    this.enableAutoClose = this.formBuilder.control(true);
+    this.highlightResults = this.formBuilder.control(false);
     this.selectedMatchday = -1;
     this.isLoading = false;
   }
@@ -56,13 +62,11 @@ export class BetOverviewComponent implements OnInit, OnChanges {
 
     this.frameData = [];
     this.seasonFrameData = [];
-    this.seasonBetDataMap = new Map();
-    this.seasonBetDataUserNames = [];
-    this.seasonBetData = [];
+    this.seasonBetData = new Map();
     // no reset of Maps. Key-value pairs are just added. Saves database queries
   }
 
-  showBetsByMatchday(matchday: number): void {
+  addFrameData(matchday: number): void {
     // fills the arrays with the requested frame and user Bet data
 
     this.resetData();
@@ -70,9 +74,6 @@ export class BetOverviewComponent implements OnInit, OnChanges {
       (overviewFrameData: BetOverviewFrameData) => {
         this.isLoading = true;
         this.frameData.push(overviewFrameData);
-        if (!this.betData.has(overviewFrameData.matchId)) {
-          this.addUserBets(overviewFrameData.matchId, overviewFrameData.isBetFixed);
-        }
       },
       err => {
         this.isLoading = false;
@@ -84,23 +85,22 @@ export class BetOverviewComponent implements OnInit, OnChanges {
 
     this.isPanelExpanded = false;
     this.selectedMatchday = this.matchdayForm.value;
-    this.selectedDisplayMethod = this.displayMethodForm.value;
+    this.selectedDisplayMethod = "matchday";
   }
 
-  showSeasonBets(): void {
-    // fills the arrays with the season frame and user data
+  addSeasonFrameData(): void {
+    // fills the arrays with the season frame data
+    this.isLoading = true;
 
     this.resetData();
     this.fetchBetService.fetchSeasonFrameData$(SEASON, this.userId).subscribe(
       (overviewFrameData: SeasonBetOverviewFrameData) => {
-        this.isLoading = true;
         this.seasonFrameData.push(overviewFrameData);
       },
       err => {
         this.isLoading = false;
       },
       () => {
-        this.addUserSeasonBets();
         this.isLoading = false;
       }
     );
@@ -109,16 +109,18 @@ export class BetOverviewComponent implements OnInit, OnChanges {
     this.selectedDisplayMethod = "season";
   }
 
-  addUserBets(matchId: number, isBetFixed: boolean): void {
+  addUserBets(matchId: number): void {
     // adds all the user data
 
-    let overviewData$: Observable<BetOverviewUserData> = isBetFixed ?
-      this.fetchBetService.fetchUserBetDataByMatchday$(matchId) :
-      this.fetchBetService.fetchUserBetDataByMatchday$(matchId, this.userId);
+    // do nothing in case data is already loaded
+    if (this.betData.has(matchId)) {
+      return;
+    }
 
-    overviewData$.pipe(toArray()).subscribe(
+    this.isLoading = true;
+
+    this.fetchBetService.fetchUserBetDataByMatchday$(matchId).pipe(toArray()).subscribe(
       (overviewUserData: BetOverviewUserData[]) => {
-        this.isLoading = true;
         this.betData.set(matchId, overviewUserData);
       },
       err => {
@@ -130,76 +132,45 @@ export class BetOverviewComponent implements OnInit, OnChanges {
     );
   }
 
-  addUserSeasonBets(): void {
-    // adds all the user season data as two level key-value pairs: the first level
-    // is the userName, the second level is the place.
-    // so, this.seasonBetDataMap.get("john_doe").get(1) returns john_doe's bet for the
-    // first place
+  addUserSeasonBets(place: number): void {
+    // adds all the user season data as key-value pairs
 
-    // use Observable here to make use of check if subscription has finished,
-    // when transfer from Map to array starts!
-    from(this.seasonFrameData).pipe(
-      concatMap((frameData: SeasonBetOverviewFrameData) => {
-        return (frameData.isBetFixed ?
-          this.fetchBetService.fetchUserSeasonBetData$(SEASON, frameData.place) :
-          this.fetchBetService.fetchUserSeasonBetData$(SEASON, frameData.place, this.userId) // else-case returns dummy bet
-        );
-      })
-    ).subscribe(
-      (overviewUserData: SeasonBetOverviewUserData) => {
-        this.isLoading = true;
+    // do nothing in case data is already loaded
+    if (this.seasonBetData.has(place)) {
+      return;
+    }
 
-        if (!this.seasonBetDataMap.has(overviewUserData.userName)) {
-          this.seasonBetDataMap.set(overviewUserData.userName, []); // init if user appears 1st time
-        }
-        let userBetArray: SeasonBetOverviewUserData[] = this.seasonBetDataMap.get(overviewUserData.userName);
-        userBetArray.push(overviewUserData);
-        this.seasonBetDataMap.set(overviewUserData.userName, userBetArray);
+    this.isLoading = true;
+
+    this.fetchBetService.fetchUserSeasonBetData$(SEASON, place).pipe(toArray()).subscribe(
+      (overviewUserData: SeasonBetOverviewUserData[]) => {
+        this.seasonBetData.set(place, overviewUserData); // init if user appears 1st time
       },
       err => {
         this.isLoading = false;
       },
       () => {
-        this.seasonBetMapToArrays(); // after Map has finished collecting values, transfer values to arrays
         this.isLoading = false;
       }
     )
   }
 
-  seasonBetMapToArrays(): void {
-    // transfers the Map values to arrays for error-resistant iterating in template
-    // sorts the arrays according to the place order from first to last place
+  isBetWrong(bet: BetOverviewUserData, result: BetOverviewFrameData) {
+    // checks if the Bet is worth 0 points, in case result is available
 
-    for (let userBetsEntry of this.seasonBetDataMap.entries()) {
-      this.seasonBetDataUserNames.push(userBetsEntry[0]); // [0] denotes the key
-      this.seasonBetData.push(userBetsEntry[1]); // [1] denotes the value
+    if (result.resultGoalsHome == -1 && result.resultGoalsAway == -1) {
+      return false;
     }
-    this.sortSeasonBetArray();
+
+    return !this.fetchBasicService.isBetCorrect(bet.betGoalsHome, bet.betGoalsAway, result.resultGoalsHome, result.resultGoalsAway);
   }
-
-  sortSeasonBetArray(): void {
-    // sorts the SeasonBetOverviewUserData from first to last place
-
-    for (let i = 0; i < this.seasonBetData.length; i++) {
-      this.seasonBetData[i].sort(this.comparePlaces);
-    }
-  }
-
-  comparePlaces(a: SeasonBetOverviewUserData, b: SeasonBetOverviewUserData) {
-    // compare function to sort places from first to last place
-
-    let placeA: number = a.place < 0 ? a.place + NUMBER_OF_TEAMS + 1 : a.place;
-    let placeB: number = b.place < 0 ? b.place + NUMBER_OF_TEAMS + 1 : b.place;
-    return placeA - placeB;
-  }
-
 
   ngOnInit(): void { }
 
   ngOnChanges(): void {
-    if (this.selectedMatchday > 0) {
+    if (this.selectedMatchday > 0 && this.matchdayCompleted != -1) {
       this.matchdayForm.setValue(this.selectedMatchday);
-      this.showBetsByMatchday(this.selectedMatchday);
+      this.addFrameData(this.selectedMatchday);
     }
   }
 

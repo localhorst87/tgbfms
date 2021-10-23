@@ -46,6 +46,7 @@ export interface BetOverviewFrameData {
   teamNameShortAway: string;
   resultGoalsHome: number;
   resultGoalsAway: number;
+  isMatchFinished: boolean;
   isBetFixed: boolean;
 }
 

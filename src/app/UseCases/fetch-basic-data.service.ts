@@ -3,7 +3,8 @@ import { Observable, of, from, range, concat, iif, combineLatest } from 'rxjs';
 import { tap, map, mergeMap, concatMap, pluck, distinct, filter, first, toArray } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
-import { Bet, Match, Team, SeasonBet } from '../Businessrules/basic_datastructures';
+import { PointCalculatorService } from '../Businessrules/point-calculator.service';
+import { Bet, Result, Match, Team, SeasonBet } from '../Businessrules/basic_datastructures';
 import { MatchInfo, TeamStats } from './output_datastructures';
 import { TeamRankingImportData } from '../Dataaccess/import_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT, SEASON } from '../Businessrules/rule_defined_values';
@@ -15,7 +16,10 @@ export class FetchBasicDataService {
 
   relevantPlaces$: Observable<number>;
 
-  constructor(private appData: AppdataAccessService, private matchData: MatchdataAccessService) {
+  constructor(
+    private appData: AppdataAccessService,
+    private matchData: MatchdataAccessService,
+    private pointCalc: PointCalculatorService) {
     this.relevantPlaces$ = concat(
       range(1, RELEVANT_FIRST_PLACES_COUNT),
       range(-RELEVANT_LAST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT)
@@ -113,6 +117,28 @@ export class FetchBasicDataService {
         return (diffNextMatch <= diffLastMatch ? nextMatch.matchday : lastMatch.matchday);
       }
     );
+  }
+
+  public isBetCorrect(betGoalsHome: number, betGoalsAway: number, resultGoalsHome: number, resultGoalsAway: number): boolean {
+    // returns true if the Bet and Match tendecy correlate
+
+    let bet: Bet = {
+      documentId: "",
+      matchId: -1,
+      userId: "",
+      isFixed: false,
+      goalsHome: betGoalsHome,
+      goalsAway: betGoalsAway
+    };
+
+    let result: Result = {
+      documentId: "",
+      matchId: -1,
+      goalsHome: resultGoalsHome,
+      goalsAway: resultGoalsAway
+    }
+
+    return this.pointCalc.isTendencyCorrect(bet, result);
   }
 
   private makeMatchInfo$(match: Match, userId: string): Observable<MatchInfo> {

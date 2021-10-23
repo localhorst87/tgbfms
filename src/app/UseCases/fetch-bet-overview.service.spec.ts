@@ -350,6 +350,7 @@ describe('FetchBetOverviewService', () => {
         teamNameShortAway: teams[11].nameShort,
         resultGoalsHome: results[0].goalsHome,
         resultGoalsAway: results[0].goalsAway,
+        isMatchFinished: matches[0].isFinished,
         isBetFixed: false
       },
       {
@@ -362,6 +363,7 @@ describe('FetchBetOverviewService', () => {
         teamNameShortAway: teams[13].nameShort,
         resultGoalsHome: results[1].goalsHome,
         resultGoalsAway: results[1].goalsAway,
+        isMatchFinished: matches[1].isFinished,
         isBetFixed: true
       }
     ];
@@ -516,6 +518,7 @@ describe('FetchBetOverviewService', () => {
       teamNameShortAway: "",
       resultGoalsHome: -1,
       resultGoalsAway: -1,
+      isMatchFinished: false,
       isBetFixed: false
     };
 

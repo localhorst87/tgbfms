@@ -20,7 +20,8 @@ $fontConfig: (
   caption: mat.define-typography-level(2vh, 3vh, 400, 'Roboto Mono', 0.1667em),
   input: mat.define-typography-level(inherit, 1.2, 400, 'Roboto Mono', -0.0089em),
   big-mono-letters: mat.define-typography-level(10.0vh, 13vh, 500, 'Roboto Mono', -0.10em),
-  subheading-1-mono: mat.define-typography-level(14px, 20px, 400, 'Roboto Mono', -0.075em)
+  subheading-1-mono: mat.define-typography-level(14px, 20px, 400, 'Roboto Mono', -0.075em),
+  subheading-2-mono: mat.define-typography-level(16px, 28px, 400, 'Roboto Mono', 0.0094em)
 );
 
 // Foreground Elements
@@ -290,4 +291,16 @@ $altTheme: (
 
 .subheading-mono-letters {
   @include mat.typography-level($fontConfig, 'subheading-1-mono');
+}
+
+.subheading-big-mono-letters {
+  @include mat.typography-level($fontConfig, 'subheading-2-mono');
+}
+
+.right-aligned-header > .mat-content {
+    justify-content: space-between;
+}
+
+.mat-content > mat-panel-title, .mat-content > mat-panel-description {
+  flex: 0 0 auto;
 }

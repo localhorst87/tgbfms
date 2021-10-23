@@ -80,6 +80,7 @@ export class FetchBetOverviewService {
           teamNameShortAway: teamAway.nameShort,
           resultGoalsHome: result.goalsHome,
           resultGoalsAway: result.goalsAway,
+          isMatchFinished: match.isFinished,
           isBetFixed: betUser.isFixed
         };
       });

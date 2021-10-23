@@ -51,7 +51,7 @@ export class HomeComponent implements OnInit {
       isActive: false
     };
 
-    this.selectedPage = "view";
+    this.selectedPage = "dashboard";
     this.matchdayNextMatch = -1;
     this.matchdayLastMatch = -1;
     this.matchdayClosestMatch = -1;

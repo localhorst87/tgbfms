@@ -1,3 +1,6 @@
+<!-- shows up when loading content. has absolute position under the top toolbar -->
+<mat-progress-bar mode="query" color="accent" *ngIf="elementsLoaded<5" class="loading-bar" style="position: fixed; top: 56px; z-index: 999;"></mat-progress-bar>
+
 <div class="dashboard-element-container">
   <!-- Next matches swipe cards -->
   <swiper [pagination]="true">

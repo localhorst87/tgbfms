@@ -37,7 +37,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   @Input() matchdayNextMatch: number;
   @Input() matchdayLastMatch: number;
   @Input() matchdayCompleted: number;
-
+  elementsLoaded: number;
   currentForm: number;
   nextMatchesInfo: MatchInfo[];
   currentTime: Date;
@@ -68,6 +68,7 @@ export class DashboardComponent implements OnInit, OnChanges {
     this.matchdayNextMatch = -1;
     this.matchdayCompleted = -1;
     this.matchdayLastMatch = -1;
+    this.elementsLoaded = 0;
     this.currentForm = 0;
     this.nextMatchesInfo = [];
     this.currentTime = new Date();
@@ -178,12 +179,17 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
+    this.elementsLoaded = 0;
+
     if (this.matchdayNextMatch != -1 && this.matchdayCompleted != -1 && this.userId != "") {
 
       this.fetchBasicService.fetchNextMatchInfos$(SEASON, this.userId, NUM_NEXT_MATCHES).subscribe(
         (matchInfo: MatchInfo) => {
           this.nextMatchesInfo.push(matchInfo);
-        }
+        },
+        (err) => { },
+        () => { this.elementsLoaded++; }
+
       );
 
       this.formHistoryData[0].series = []; // clear formHistoryData
@@ -220,7 +226,10 @@ export class DashboardComponent implements OnInit, OnChanges {
           this.formHistoryData[0].series.push(dataPoint);
         },
         (err) => { },
-        () => { this.formHistoryData = [...this.formHistoryData]; }
+        () => {
+          this.formHistoryData = [...this.formHistoryData];
+          this.elementsLoaded++;
+        }
       );
 
       // update Table History Data
@@ -232,12 +241,19 @@ export class DashboardComponent implements OnInit, OnChanges {
           this.tableHistoryData[0].series.push(dataPoint);
         },
         (err) => { },
-        () => { this.tableHistoryData = [...this.tableHistoryData]; }
+        () => {
+          this.tableHistoryData = [...this.tableHistoryData];
+          this.elementsLoaded++;
+        }
       );
 
       // update current user Form
       this.fetchStatsService.fetchFormByUserId$(SEASON, endMatchday, this.userId).subscribe(
-        val => { this.currentForm = val }
+        val => { this.currentForm = val },
+        (err) => { },
+        () => {
+          this.elementsLoaded++;
+        }
       );
 
       // update Table History Data
@@ -254,7 +270,10 @@ export class DashboardComponent implements OnInit, OnChanges {
           this.tableData.push({ "name": tableDataArray[n - 1].userName, "value": leaderPoints - tableDataArray[n - 1].points });
         },
         (err) => { },
-        () => { this.tableData = [...this.tableData]; }
+        () => {
+          this.tableData = [...this.tableData];
+          this.elementsLoaded++;
+        }
       );
     }
   }

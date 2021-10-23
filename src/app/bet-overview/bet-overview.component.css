@@ -67,12 +67,7 @@ mat-slider {
   text-decoration: line-through;
 }
 
-.star-icon {
+.icon-adjustment {
   position: relative;
   top: -2px; /* used to adjust the icon */
-}
-
-.result-icon {
-  position: relative;
-  top: 5px; /* used to adjust the icon */
 }

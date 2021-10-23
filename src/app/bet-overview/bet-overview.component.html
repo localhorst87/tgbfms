@@ -91,7 +91,7 @@
           <mat-panel-title>
             {{match.teamNameHome}} - {{match.teamNameAway}}
             <ng-container *ngIf="match.isTopMatch">
-              <mat-icon class="star-icon">star</mat-icon>
+              <mat-icon class="icon-adjustment">star</mat-icon>
             </ng-container>
           </mat-panel-title>
           <mat-panel-description class="subheading-mono-letters">
@@ -103,7 +103,7 @@
           Ergebnis {{ match.resultGoalsHome }} : {{ match.resultGoalsAway }}
           <mat-icon
             *ngIf="!match.isMatchFinished"
-            class="result-icon"
+            class="icon-adjustment"
             matTooltip="Zwischenstand"
             matTooltipPosition="above"
             matTooltipTouchGestures="on">
@@ -111,7 +111,7 @@
           </mat-icon>
           <mat-icon
             *ngIf="match.isMatchFinished"
-            class="result-icon"
+            class="icon-adjustment"
             matTooltip="Endstand"
             matTooltipPosition="above"
             matTooltipTouchGestures="on">
@@ -183,7 +183,7 @@
           Ergebnis: {{ frameData.resultTeamName == "unknown team" ? "noch nicht bekannt" : frameData.resultTeamName }}
           <mat-icon
             *ngIf="matchdayCompleted < nMatchdays"
-            class="result-icon"
+            class="icon-adjustment"
             matTooltip="Zwischenstand nach Spieltag {{ matchdayCompleted }}"
             matTooltipPosition="above"
             matTooltipTouchGestures="on">
@@ -191,7 +191,7 @@
           </mat-icon>
           <mat-icon
             *ngIf="matchdayCompleted == nMatchdays"
-            class="result-icon"
+            class="icon-adjustment"
             matTooltip="Endstand"
             matTooltipPosition="above"
             matTooltipTouchGestures="on">

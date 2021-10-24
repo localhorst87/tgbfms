@@ -51,8 +51,9 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
     return scores;
   }
 
-  compareScores(firstEl: Score, secondEl: Score): number {
+  compareScores(firstEl: any, secondEl: any): number {
     // used as sorting function to sort table according to business rules
+    // elements must fulfill properties "points", "matches" and "results"
 
     if (firstEl.points != secondEl.points) {
       return secondEl.points - firstEl.points;

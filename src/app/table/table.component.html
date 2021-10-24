@@ -1,153 +1,250 @@
+<!-- shows up when loading content. has absolute position under the top toolbar -->
+<mat-progress-bar mode="query" color="accent" *ngIf="tablesLoaded < 2" class="loading-bar"></mat-progress-bar>
+
 <!-- settings to display matches are integrated into an expansion panel -->
-<mat-expansion-panel
-  class="settings-panel"
-  [expanded]="isPanelExpanded"
-  (opened)="isPanelExpanded = true"
-  (closed)="isPanelExpanded = false">
-  <mat-expansion-panel-header>
-    <mat-panel-title>
-      Spieltage wählen
-    </mat-panel-title>
-    <mat-panel-description *ngIf="selectedStartMatchday > 0 && selectedEndMatchday > 0">
-      Spieltag {{ selectedStartMatchday }} bis {{ selectedEndMatchday }}
-    </mat-panel-description>
-  </mat-expansion-panel-header>
+<div class="content-container">
 
-  Slider-Presets
-  <br>
-  <button mat-raised-button (click)="setSliders(1, currentMatchday)">
-    Gesamt
-  </button>
-  <button mat-raised-button (click)="setSliders(1, nMatchdays/2)">
-    Hinrunde
-  </button>
-  <button mat-raised-button (click)="setSliders(nMatchdays/2 + 1, nMatchdays)" [disabled]="currentMatchday<nMatchdays/2">
-    Rückrunde
-  </button>
-  <button mat-raised-button (click)="setSliders(currentMatchday - 4, currentMatchday)">
-    letzte 5
-  </button>
+  <div class="settings-panel">
+    <mat-expansion-panel
+      [expanded]="isPanelExpanded"
+      (opened)="isPanelExpanded = true"
+      (closed)="isPanelExpanded = false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Spieltag
+        </mat-panel-title>
+        <mat-panel-description *ngIf="selectedStartMatchday > 0 && selectedEndMatchday > 0" class="subheading-mono-letters">
+          {{ selectedStartMatchday }} bis {{ selectedEndMatchday }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
 
-  <mat-slider
-      class="matchday-slider"
-      [formControl]="matchdayStartForm"
-      min = "1"
-      max = "34"
-      step = "1"
-      thumbLabel="true"
-      tickInterval="1">
-  </mat-slider>
-  von Spieltag {{ matchdayStartForm.value }}
-  <br>
-  <mat-slider
-      class="matchday-slider"
-      [formControl]="matchdayEndForm"
-      min = "1"
-      max = "34"
-      step = "1"
-      thumbLabel="true"
-      tickInterval="1">
-  </mat-slider>
-  bis Spieltag {{ matchdayEndForm.value }}
-  <br>
-  <button mat-raised-button (click)="showTable(matchdayStartForm.value, matchdayEndForm.value)">
-    anzeigen
-  </button>
+      Slider-Presets
+      <div class="presets-box">
+        <button mat-mini-fab color="primary" class="preset-button" (click)="setSliders(1, currentMatchday)">
+          <mat-icon
+            matTooltip="Aktuelle Gesamtwertung"
+            matTooltipPosition="above"
+            matTooltipTouchGestures="on">
+            schedule
+          </mat-icon>
+        </button>
+        <button mat-mini-fab color="primary" class="preset-button" (click)="setSliders(1, nMatchdays/2)">
+          <mat-icon
+            matTooltip="Hinrunde"
+            matTooltipPosition="above"
+            matTooltipTouchGestures="on">
+            switch_right
+          </mat-icon>
+        </button>
+        <button mat-mini-fab color="primary" class="preset-button" (click)="setSliders(nMatchdays/2 + 1, nMatchdays)" [disabled]="currentMatchday<nMatchdays/2">
+          <mat-icon
+            matTooltip="Rückrunde"
+            matTooltipPosition="above"
+            matTooltipTouchGestures="on">
+            switch_left
+          </mat-icon>
+        </button>
+        <button mat-mini-fab color="primary" class="preset-button" (click)="setSliders(currentMatchday - 4, currentMatchday)">
+          <mat-icon
+            matTooltip="letzte 5 Spieltage"
+            matTooltipPosition="above"
+            matTooltipTouchGestures="on">
+            replay_5
+          </mat-icon>
+        </button>
+        <button mat-mini-fab color="primary" class="preset-button" (click)="setSliders(currentMatchday - 9, currentMatchday)">
+          <mat-icon
+            matTooltip="letzte 10 Spieltage"
+            matTooltipPosition="above"
+            matTooltipTouchGestures="on">
+            replay_10
+          </mat-icon>
+        </button>
+      </div>
 
-</mat-expansion-panel>
+      <div class="slider-box">
+        <div class="slider-item-box">
+          <span>von</span>
+          <mat-slider
+              class="matchday-slider"
+              [formControl]="matchdayStartForm"
+              min = "1"
+              max = "34"
+              step = "1"
+              thumbLabel="true"
+              tickInterval="1">
+          </mat-slider>
+        </div>
+        <div class="slider-item-box">
+          <span>bis</span>
+          <mat-slider
+              class="matchday-slider"
+              [formControl]="matchdayEndForm"
+              min = "1"
+              max = "34"
+              step = "1"
+              thumbLabel="true"
+              tickInterval="1">
+          </mat-slider>
+        </div>
+      </div>
+      <button mat-raised-button color="primary" class="load-button" (click)="showTable(matchdayStartForm.value, matchdayEndForm.value)">
+        <mat-icon>downloading</mat-icon> Spieltag {{ matchdayStartForm.value }} - {{ matchdayEndForm.value }}
+      </button>
+    </mat-expansion-panel>
+  </div>
 
-Gewählte Spiele:
-<br>
+  <!-- options table calculation -->
+  <div class="config-table">
+    <mat-slide-toggle
+      color="accent"
+      [checked]="includeSeasonBets.value"
+      [formControl]="includeSeasonBets"
+      (change)="showTable(matchdayStartForm.value, matchdayEndForm.value); adjustProperties();"
+      matTooltip="Bezieht die Saisontipps nach aktuellem Stand mit ein"
+      matTooltipPosition="above"
+      matTooltipTouchGestures="on">
+      Saisontipps
+    </mat-slide-toggle>
+  </div>
 
-<table mat-table [dataSource]="tableDataAllMatchdays" class="mat-elevation-z8" #allMatchdays>
+  <div class="table-desc-box">
+    <p class="mat-body-2">Wertung Spieltag {{selectedStartMatchday}} - {{selectedEndMatchday}}</p>
+  </div>
+
+  <table mat-table matSort [dataSource]="tableDataAllMatchdays" class="mat-elevation-z8" (matSortChange)="sortNew($event)" #allMatchdays>
+      <ng-container matColumnDef="place" class="small-mono">
+        <th mat-header-cell *matHeaderCellDef> PL </th>
+        <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.position}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="userName">
+        <th mat-header-cell *matHeaderCellDef> NAME </th>
+        <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.userName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="points">
+        <th mat-header-cell *matHeaderCellDef> PKT </th>
+        <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.points}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="matches">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef
+          matTooltip="Anzahl richtiger Tendenzen"
+          matTooltipPosition="above"
+          matTooltipTouchGestures="on">
+          SP
+        </th>
+        <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.matches}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="results">
+        <th mat-header-cell mat-sort-header mat-sort-header *matHeaderCellDef
+          matTooltip="davon Anzahl richtiger Ergebnisse"
+          matTooltipPosition="above"
+          matTooltipTouchGestures="on">
+          ERG
+        </th>
+        <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.results}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="extraTop">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef
+          matTooltip="Zusatzpunkte durch Topspielboni"
+          matTooltipPosition="above"
+          matTooltipTouchGestures="on">
+          ZT
+        </th>
+        <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.extraTop}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="extraOutsider">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef
+          matTooltip="Zusatzpunkte durch Außenseiterboni"
+          matTooltipPosition="above"
+          matTooltipTouchGestures="on">
+          ZT
+        </th>
+        <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.extraOutsider}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="extraSeason">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef
+          matTooltip="Zusatzpunkte durch Saisontipps"
+          matTooltipPosition="above"
+          matTooltipTouchGestures="on">
+          ZS
+        </th>
+        <td mat-cell *matCellDef="let userData" class="small-mono">  {{userData.extraSeason}} </td>
+      </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="propertiesToDisplay" class="table-header"></tr>
+    <tr mat-row *matRowDef="let rowData; columns: propertiesToDisplay;"></tr>
+  </table>
+
+  <div class="table-desc-box">
+    <p class="mat-body-2">Tageswertung Spieltag {{ selectedEndMatchday }}</p>
+  </div>
+
+  <table mat-table [dataSource]="tableDataMatchday" class="mat-elevation-z8" #matchday>
 
     <ng-container matColumnDef="place">
       <th mat-header-cell *matHeaderCellDef> PL </th>
-      <td mat-cell *matCellDef="let userData"> {{userData.position}} </td>
+      <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.position}} </td>
     </ng-container>
 
     <ng-container matColumnDef="userName">
       <th mat-header-cell *matHeaderCellDef> NAME </th>
-      <td mat-cell *matCellDef="let userData"> {{userData.userName}} </td>
+      <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.userName}} </td>
     </ng-container>
 
     <ng-container matColumnDef="points">
       <th mat-header-cell *matHeaderCellDef> PKT </th>
-      <td mat-cell *matCellDef="let userData"> {{userData.points}} </td>
+      <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.points}} </td>
     </ng-container>
 
     <ng-container matColumnDef="matches">
-      <th mat-header-cell *matHeaderCellDef> SP </th>
-      <td mat-cell *matCellDef="let userData"> {{userData.matches}} </td>
+      <th mat-header-cell *matHeaderCellDef
+        matTooltip="Anzahl richtiger Tendenzen"
+        matTooltipPosition="above"
+        matTooltipTouchGestures="on">
+        SP
+      </th>
+      <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.matches}} </td>
     </ng-container>
 
     <ng-container matColumnDef="results">
-      <th mat-header-cell *matHeaderCellDef> ERG </th>
-      <td mat-cell *matCellDef="let userData"> {{userData.results}} </td>
+      <th mat-header-cell *matHeaderCellDef
+        matTooltip="davon Anzahl richtiger Ergebnisse"
+        matTooltipPosition="above"
+        matTooltipTouchGestures="on">
+        ERG
+      </th>
+      <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.results}} </td>
     </ng-container>
 
     <ng-container matColumnDef="extraTop">
-      <th mat-header-cell *matHeaderCellDef> ZUS (TOP) </th>
-      <td mat-cell *matCellDef="let userData"> {{userData.extraTop}} </td>
+      <th mat-header-cell *matHeaderCellDef
+        matTooltip="Zusatzpunkte durch Topspielboni"
+        matTooltipPosition="above"
+        matTooltipTouchGestures="on">
+        ZT
+      </th>
+      <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.extraTop}} </td>
     </ng-container>
 
     <ng-container matColumnDef="extraOutsider">
-      <th mat-header-cell *matHeaderCellDef> ZUS (AUSS) </th>
-      <td mat-cell *matCellDef="let userData"> {{userData.extraOutsider}} </td>
+      <th mat-header-cell *matHeaderCellDef
+        matTooltip="Zusatzpunkte durch Außenseiterboni"
+        matTooltipPosition="above"
+        matTooltipTouchGestures="on">
+        ZT
+      </th>
+      <td mat-cell *matCellDef="let userData" class="small-mono"> {{userData.extraOutsider}} </td>
     </ng-container>
 
-    <ng-container matColumnDef="extraSeason">
-      <th mat-header-cell *matHeaderCellDef> ZUS (SAIS) </th>
-      <td mat-cell *matCellDef="let userData"> {{userData.extraSeason}} </td>
-    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="propertiesDefault" class="table-header"></tr>
+    <tr mat-row *matRowDef="let rowData; columns: propertiesDefault;"></tr>
+  </table>
 
-  <tr mat-header-row *matHeaderRowDef="propertiesToDisplay"></tr>
-  <tr mat-row *matRowDef="let rowData; columns: propertiesToDisplay;"></tr>
-
-</table>
-
-<br>
-Tageswertung Spieltag {{ selectedEndMatchday }}
-<br>
-
-<table mat-table [dataSource]="tableDataMatchday" class="mat-elevation-z8" #matchday>
-
-  <ng-container matColumnDef="place">
-    <th mat-header-cell *matHeaderCellDef> PL </th>
-    <td mat-cell *matCellDef="let userData"> {{userData.position}} </td>
-  </ng-container>
-
-  <ng-container matColumnDef="userName">
-    <th mat-header-cell *matHeaderCellDef> NAME </th>
-    <td mat-cell *matCellDef="let userData"> {{userData.userName}} </td>
-  </ng-container>
-
-  <ng-container matColumnDef="points">
-    <th mat-header-cell *matHeaderCellDef> PKT </th>
-    <td mat-cell *matCellDef="let userData"> {{userData.points}} </td>
-  </ng-container>
-
-  <ng-container matColumnDef="matches">
-    <th mat-header-cell *matHeaderCellDef> SP </th>
-    <td mat-cell *matCellDef="let userData"> {{userData.matches}} </td>
-  </ng-container>
-
-  <ng-container matColumnDef="results">
-    <th mat-header-cell *matHeaderCellDef> ERG </th>
-    <td mat-cell *matCellDef="let userData"> {{userData.results}} </td>
-  </ng-container>
-
-  <ng-container matColumnDef="extraTop">
-    <th mat-header-cell *matHeaderCellDef> ZUS (TOP) </th>
-    <td mat-cell *matCellDef="let userData"> {{userData.extraTop}} </td>
-  </ng-container>
-
-  <ng-container matColumnDef="extraOutsider">
-    <th mat-header-cell *matHeaderCellDef> ZUS (AUSS) </th>
-    <td mat-cell *matCellDef="let userData"> {{userData.extraOutsider}} </td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="propertiesToDisplay"></tr>
-  <tr mat-row *matRowDef="let rowData; columns: propertiesToDisplay;"></tr>
-
-</table>
+</div>

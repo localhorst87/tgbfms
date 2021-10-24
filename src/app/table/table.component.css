@@ -1,11 +1,115 @@
+.loading-bar {
+  position: fixed;
+  top: 56px;
+  z-index: 999;
+}
+
+.content-container {
+  height: calc(100vh - 2*56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-y: auto;
+}
+
 .settings-panel {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.presets-box {
+  display:flex;
+}
+
+.preset-button {
+  margin-right: 5px;
+  margin-left: 0px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.slider-box {
+  display: flex;
+  flex-direction: column;
   width: 100%;
 }
 
-mat-slider {
-  width: 60%;
+.slider-item-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.load-button {
+  width: 100%;
+}
+
+.matchday-slider {
+  width: calc(100% - 3em);
+}
+
+.config-table {
+  display:flex;
+  justify-content: flex-start;
+  width: 92.5%;
+  margin-bottom: 10px;
 }
 
 table {
-  width: 100%;
+  width: 92.5%;
+  margin-bottom: 25px;
+}
+
+.table-desc-box {
+  display: flex;
+  justify-content: flex-start;
+  width: 92.5%;
+}
+
+.table-header {
+  background-color: var(--primary-color);
+}
+
+.mat-column-place {
+  width: 5%;
+  text-align: left;
+}
+
+.mat-column-userName {
+  padding-left: 5px;
+  padding-right: 15px;
+  text-align: left;
+}
+
+.mat-column-points {
+  width: 15%;
+  padding-right: 5px;
+  text-align: left;
+}
+
+.mat-column-matches {
+  width: 15%;
+  text-align: left;
+}
+
+.mat-column-results {
+  width: 15%;
+  text-align: left;
+}
+
+.mat-column-extraTop {
+  width: 10%;
+  text-align: left;
+}
+
+.mat-column-extraOutsider {
+  width: 10%;
+  text-align: left;
+}
+
+.mat-column-extraSeason {
+  width: 10%;
+  text-align: left;
 }

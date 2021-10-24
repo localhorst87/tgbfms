@@ -165,7 +165,10 @@ export class BetOverviewComponent implements OnInit, OnChanges {
     return !this.fetchBasicService.isBetCorrect(bet.betGoalsHome, bet.betGoalsAway, result.resultGoalsHome, result.resultGoalsAway);
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
 
   ngOnChanges(): void {
     if (this.selectedMatchday > 0 && this.matchdayCompleted != -1) {

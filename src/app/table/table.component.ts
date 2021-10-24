@@ -215,6 +215,8 @@ export class TableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
   }
 
   ngOnChanges(): void {

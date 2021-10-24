@@ -1,4 +1,5 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit, EventEmitter, Renderer2 } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { Observable, Subscription, combineLatest, timer, from, of } from 'rxjs';
 import { switchMap, mergeMap, pluck, delay, filter, map, tap } from 'rxjs/operators';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
@@ -31,6 +32,7 @@ export class HomeComponent implements OnInit {
   nextFixTimestamp: number; // next time point to check if all Bets are fixed
   betsUpdateTime: number;
   matchdaysToSync: number[];
+  applyDarkTheme: FormControl;
   fixBetEvent: EventEmitter<number>;
   syncNeededEvent: EventEmitter<void>;
 
@@ -39,6 +41,8 @@ export class HomeComponent implements OnInit {
     private fetchBasicService: FetchBasicDataService,
     public syncService: SynchronizeDataService,
     private authenticator: AuthenticationService,
+    private renderer: Renderer2,
+    private formBuilder: FormBuilder,
     private snackbar: MatSnackBar,
     private dialog: MatDialog) {
 
@@ -60,8 +64,18 @@ export class HomeComponent implements OnInit {
     this.nextFixTimestamp = -1;
     this.betsUpdateTime = -1;
     this.matchdaysToSync = [];
+    this.applyDarkTheme = this.formBuilder.control(false);
     this.fixBetEvent = new EventEmitter();
     this.syncNeededEvent = new EventEmitter();
+  }
+
+  switchTheme(): void {
+    if (this.applyDarkTheme.value) {
+      this.renderer.addClass(document.body, 'theme-dark');
+    }
+    else {
+      this.renderer.removeClass(document.body, 'theme-dark');
+    }
   }
 
   changeView(targetPage: string): void {

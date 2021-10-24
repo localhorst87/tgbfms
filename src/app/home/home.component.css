@@ -1,10 +1,10 @@
 .toolbar-top {
   position: sticky;
   top: 0;
-  z-index: 999;
+  z-index: 99;
   display: flex;
   justify-content: space-between;
-  background: #b2dfdb;
+  background: var(--primary-color);
 }
 
 .toolbar-bottom {

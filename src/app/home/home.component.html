@@ -2,6 +2,15 @@
   <button mat-icon-button>
     <mat-icon>notes</mat-icon>
   </button>
+  <div>
+    <mat-icon>nights_stay</mat-icon>
+    <mat-slide-toggle
+      color="accent"
+      [checked]="applyDarkTheme.value"
+      [formControl]="applyDarkTheme"
+      (change)="switchTheme()">
+    </mat-slide-toggle>
+  </div>
 </mat-toolbar>
 
 <app-bet-write

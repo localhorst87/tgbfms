@@ -1,127 +1,109 @@
-<!-- settings to display matches are integrated into an expansion panel -->
-<mat-expansion-panel
-  class="settings-panel"
-  [expanded]="isPanelExpanded"
-  (opened)="isPanelExpanded = true"
-  (closed)="isPanelExpanded = false">
-  <mat-expansion-panel-header>
-    <mat-panel-title>
-      Spiele wählen
-    </mat-panel-title>
-    <mat-panel-description *ngIf="selectedDisplayMethod=='matchday'">
-      Spieltag {{ selectedMatchday > 0 ? selectedMatchday : "" }}
-    </mat-panel-description>
-    <mat-panel-description *ngIf="selectedDisplayMethod=='duration'">
-      nächste {{ selectedDuration }} Tage
-    </mat-panel-description>
-    <mat-panel-description *ngIf="selectedDisplayMethod=='season'">
-      Saisontipps
-    </mat-panel-description>
-  </mat-expansion-panel-header>
+<!-- shows up when loading content. has absolute position under the top toolbar -->
+<mat-progress-bar mode="query" color="accent" *ngIf="isLoading" class="loading-bar"></mat-progress-bar>
 
-  <!-- radio buttons for selecting the display method -->
-  <mat-radio-group class="match-selection-radio-group" [formControl]="displayMethodForm">
-    <mat-radio-button class="match-selection-radio-button" value="matchday">Spieltag</mat-radio-button>
-    <mat-radio-button class="match-selection-radio-button" value="duration">Zeitraum</mat-radio-button>
-    <mat-radio-button class="match-selection-radio-button" value="season" (click)="showSeasonBets()">Saisontipps</mat-radio-button>
-  </mat-radio-group>
+<div class="content-container">
 
-  <!-- selection with slider when choosing matchdays as method -->
-  <div *ngIf="displayMethodForm.value=='matchday'">
-    <mat-slider
-        class="matchday-slider"
-        [formControl]="matchdayForm"
-        min = "1"
-        max = "34"
-        step = "1"
-        class="example-margin"
-        thumbLabel="true"
-        tickInterval="1">
-    </mat-slider>
-    Spieltag {{ matchdayForm.value }}
-    <br>
-    <button mat-raised-button (click)="showMatchesByMatchday(matchdayForm.value)">
-      anzeigen
-    </button>
+  <!-- settings to display matches are integrated into an expansion panel -->
+  <div class="settings-panel">
+    <mat-expansion-panel
+      [expanded]="isPanelExpanded"
+      (opened)="isPanelExpanded = true"
+      (closed)="isPanelExpanded = false">
+      <mat-expansion-panel-header>
+        <ng-container *ngIf="selectedDisplayMethod=='matchday'">
+          <mat-panel-title>
+            Spieltag {{ selectedMatchday > 0 ? selectedMatchday : "" }}
+          </mat-panel-title>
+          <mat-panel-description class="subheading-mono-letters" *ngIf="selectedMatchday > 0">
+            {{ matches[0].matchDate | date: "EEEEEE dd.MM."}} - {{ matches[matches.length-1].matchDate | date: "EEEEEE dd.MM."}}
+          </mat-panel-description>
+        </ng-container>
+        <ng-container *ngIf="selectedDisplayMethod=='season'">
+          <mat-panel-title>
+            Saisontipps
+          </mat-panel-title>
+          <mat-panel-description class="subheading-mono-letters">
+            Saison {{ currentSeason }}
+          </mat-panel-description>
+        </ng-container>
+      </mat-expansion-panel-header>
+
+      <!-- radio buttons for selecting the display method -->
+      <mat-radio-group class="match-selection-radio-group" [formControl]="displayMethodForm">
+        <mat-radio-button class="match-selection-radio-button" value="matchday">Spieltag</mat-radio-button>
+        <mat-radio-button class="match-selection-radio-button" value="season" (click)="showSeasonBets()">Saisontipps</mat-radio-button>
+      </mat-radio-group>
+
+      <!-- selection with slider when choosing matchdays as method -->
+      <div *ngIf="displayMethodForm.value=='matchday'">
+        <mat-slider
+            [formControl]="matchdayForm"
+            min = "1"
+            max = {{nMatchdays}}
+            step = "1"
+            thumbLabel="true"
+            tickInterval="1">
+        </mat-slider>
+        <br>
+        <button mat-raised-button class="load-button" color="primary" (click)="showMatchesByMatchday(matchdayForm.value)">
+          <mat-icon>downloading</mat-icon> Spieltag {{ matchdayForm.value }}
+        </button>
+      </div>
+    </mat-expansion-panel>
   </div>
 
-  <!-- selection with slider when choosing duration as method -->
-  <div *ngIf="displayMethodForm.value=='duration'">
-    <mat-slider
-        class="matchday-slider"
-        [formControl]="durationForm"
-        min = "1"
-        max = "20"
-        step = "1"
-        class="example-margin"
-        thumbLabel="true"
-        tickInterval="1">
-    </mat-slider>
-    nächste {{ durationForm.value }} Tage
-    <br>
-    <button mat-raised-button (click)="showMatchesByDuration(durationForm.value)">
-      anzeigen
-    </button>
-  </div>
-</mat-expansion-panel>
+  <!-- matchdays to display -->
+  <ng-container *ngIf="displayMethodForm.value=='matchday'">
+    <form [formGroup]="betForm">
+      <table class="form-container">
+        <tr formArrayName="bets" *ngFor="let match of matches; let i = index">
+          <td [formGroupName]="i" class="td-result">
+            <mat-form-field class="bet-form-field-home" appearance="outline">
+              <mat-label>{{ match.teamNameHome }}</mat-label>
+              <input matInput type="number" formControlName="betHome" class="input-bet-home">
+              <mat-hint>{{ match.matchDate | date: "EEEEEE HH:mm" }} Uhr</mat-hint>
+            </mat-form-field>
+            -
+            <mat-form-field class="bet-form-field-away" appearance="outline" style="text-align:left">
+              <mat-label>{{ match.teamNameAway }}</mat-label>
+              <input matInput type="number" formControlName="betAway" class="input-bet-away">
+              <mat-icon matSuffix *ngIf="match.isTopMatch">star</mat-icon>
+            </mat-form-field>
+          </td>
+          <td class="td-lock-icon">
+            <button *ngIf="!match.isBetFixed && currentTime < match.matchDate" matSuffix mat-icon-button aria-label="lock" (click)="lockBet(i)">
+              <mat-icon class="lock-icon" color="accent">lock_open</mat-icon>
+            </button>
+            <button *ngIf="match.isBetFixed || currentTime > match.matchDate" matSuffix mat-icon-button disabled="true">
+              <mat-icon class="lock-icon" color="primary">lock</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </ng-container>
 
-<br>
-
-<!-- matchdays to display -->
-<ng-container *ngIf="displayMethodForm.value=='matchday'">
-  <p class="mat-h1" style="padding: 10px;">
-    {{ matches[0].matchDate | date: "EEEEEE dd.MM."}} - {{ matches[matches.length-1].matchDate | date: "EEEEEE dd.MM."}}
-  </p>
-  <form [formGroup]="betForm">
-    <table>
-      <tr formArrayName="bets" *ngFor="let match of matches; let i = index">
-        <td [formGroupName]="i">
-          <mat-form-field class="example-form" appearance="outline">
-            <mat-label>{{ match.teamNameHome }}</mat-label>
-            <input matInput type="number" formControlName="betHome">
-            <mat-hint>{{ match.matchDate | date: "EEEEEE HH:mm" }} Uhr &uArr;</mat-hint>
-          </mat-form-field>
-          -
-          <mat-form-field class="example-form" appearance="outline">
-            <mat-label>{{ match.teamNameAway }}</mat-label>
-            <input matInput type="number" formControlName="betAway">
-            <mat-hint *ngIf="match.isTopMatch">Topspiel &uArr;</mat-hint>
-            <mat-icon matSuffix *ngIf="match.isTopMatch">star</mat-icon>
+  <!-- season bet places to display -->
+  <form [formGroup]="seasonBetForm">
+    <table class="form-container">
+      <tr formArrayName="places" *ngFor="let bet of seasonBets; let i = index">
+        <td class="td-season-result">
+          <mat-form-field appearance="outline" class="select-team">
+            <mat-label>Platz {{ bet.place < 0 ? bet.place + nTeams + 1 : bet.place }}</mat-label>
+            <mat-select [formControlName]="i">
+              <mat-option *ngFor="let team of activeTeams;" value="{{ team.id }}">{{ team.nameLong }}</mat-option>
+            </mat-select>
           </mat-form-field>
         </td>
-        <td>
-          <button *ngIf="!match.isBetFixed && currentDate < match.matchDate" matSuffix mat-icon-button aria-label="lock" (click)="lockBet(i)">
-            <mat-icon>lock_open</mat-icon>
+        <td class="td-lock-icon">
+          <button *ngIf="!bet.isBetFixed && currentTime < bet.dueDate" matSuffix mat-icon-button aria-label="lock" (click)="lockSeasonBet(i)">
+            <mat-icon color="accent">lock_open</mat-icon>
           </button>
-          <button *ngIf="match.isBetFixed || currentDate > match.matchDate" matSuffix mat-icon-button disabled="true">
-            <mat-icon>lock</mat-icon>
+          <button *ngIf="bet.isBetFixed || currentTime > bet.dueDate" matSuffix mat-icon-button disabled="true">
+            <mat-icon color="primary">lock</mat-icon>
           </button>
         </td>
       </tr>
     </table>
   </form>
-</ng-container>
-
-<!-- season bet places to display -->
-<form [formGroup]="seasonBetForm">
-  <table>
-    <tr formArrayName="places" *ngFor="let bet of seasonBets; let i = index">
-      <td>
-        <mat-form-field appearance="outline">
-          <mat-label>Platz {{ bet.place < 0 ? bet.place + nTeams + 1 : bet.place }}</mat-label>
-          <mat-select [formControlName]="i">
-            <mat-option *ngFor="let team of activeTeams;" value="{{ team.id }}">{{ team.nameLong }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </td>
-      <td>
-        <button *ngIf="!bet.isBetFixed && currentDate < bet.dueDate" matSuffix mat-icon-button aria-label="lock" (click)="lockSeasonBet(i)">
-          <mat-icon>lock_open</mat-icon>
-        </button>
-        <button *ngIf="bet.isBetFixed || currentDate > bet.dueDate" matSuffix mat-icon-button disabled="true">
-          <mat-icon>lock</mat-icon>
-        </button>
-      </td>
-    </tr>
-  </table>
-</form>
+</div>

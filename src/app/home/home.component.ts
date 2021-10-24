@@ -1,4 +1,5 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit, EventEmitter, Renderer2 } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { Observable, Subscription, combineLatest, timer, from, of } from 'rxjs';
 import { switchMap, mergeMap, pluck, delay, filter, map, tap } from 'rxjs/operators';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
@@ -25,11 +26,13 @@ export class HomeComponent implements OnInit {
   loggedUser: User;
   matchdayNextMatch: number;
   matchdayLastMatch: number;
+  matchdayCompleted: number;
   matchdayClosestMatch: number;
   matchdayUserSelection: number;
   nextFixTimestamp: number; // next time point to check if all Bets are fixed
   betsUpdateTime: number;
   matchdaysToSync: number[];
+  applyDarkTheme: FormControl;
   fixBetEvent: EventEmitter<number>;
   syncNeededEvent: EventEmitter<void>;
 
@@ -38,6 +41,8 @@ export class HomeComponent implements OnInit {
     private fetchBasicService: FetchBasicDataService,
     public syncService: SynchronizeDataService,
     private authenticator: AuthenticationService,
+    private renderer: Renderer2,
+    private formBuilder: FormBuilder,
     private snackbar: MatSnackBar,
     private dialog: MatDialog) {
 
@@ -54,12 +59,23 @@ export class HomeComponent implements OnInit {
     this.matchdayNextMatch = -1;
     this.matchdayLastMatch = -1;
     this.matchdayClosestMatch = -1;
+    this.matchdayCompleted = -1;
     this.matchdayUserSelection = -1;
     this.nextFixTimestamp = -1;
     this.betsUpdateTime = -1;
     this.matchdaysToSync = [];
+    this.applyDarkTheme = this.formBuilder.control(false);
     this.fixBetEvent = new EventEmitter();
     this.syncNeededEvent = new EventEmitter();
+  }
+
+  switchTheme(): void {
+    if (this.applyDarkTheme.value) {
+      this.renderer.addClass(document.body, 'theme-dark');
+    }
+    else {
+      this.renderer.removeClass(document.body, 'theme-dark');
+    }
   }
 
   changeView(targetPage: string): void {
@@ -124,21 +140,30 @@ export class HomeComponent implements OnInit {
           this.matchdayLastMatch = 1;
           this.matchdayNextMatch = 1;
           this.matchdayClosestMatch = 1;
+          this.matchdayCompleted = 0;
         }
         else if (matchdayLast > 0 && matchdayNext == -1) { // all matches played
-          this.matchdayLastMatch = matchdayLast; //matchdayLast;
+          this.matchdayLastMatch = matchdayLast;
           this.matchdayNextMatch = matchdayLast;
           this.matchdayClosestMatch = matchdayLast;
+          this.matchdayCompleted = matchdayLast;
         }
         else if (matchdayLast == -1 && matchdayNext > 0) { // no matches played yet
-          this.matchdayLastMatch = matchdayNext; //matchdayNext;
+          this.matchdayLastMatch = matchdayNext;
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayNext;
+          this.matchdayCompleted = -1;
         }
         else {
-          this.matchdayLastMatch = matchdayLast; //matchdayLast;
+          this.matchdayLastMatch = matchdayLast;
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayClosest;
+          if (matchdayNext > matchdayLast) {
+            this.matchdayCompleted = matchdayLast;
+          }
+          else {
+            this.matchdayCompleted = matchdayNext - 1;
+          }
         }
       },
       err => { },

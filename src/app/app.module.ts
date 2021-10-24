@@ -26,6 +26,7 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { SyncDialogComponent } from './sync-dialog/sync-dialog.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
@@ -47,8 +48,17 @@ import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { PasswordResetComponent } from './password-reset/password-reset.component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSortModule } from '@angular/material/sort';
+import { MatMenuModule } from '@angular/material/menu';
+
+
+// Other UI components
+import { SwiperModule } from 'swiper/angular';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @Injectable()
 export class NoCacheHeadersInterceptor implements HttpInterceptor {
@@ -102,7 +112,15 @@ export class NoCacheHeadersInterceptor implements HttpInterceptor {
     MatTableModule,
     MatFormFieldModule,
     MatSnackBarModule,
-    MatDialogModule
+    MatDialogModule,
+    MatGridListModule,
+    MatTooltipModule,
+    MatDividerModule,
+    MatSlideToggleModule,
+    MatSortModule,
+    MatMenuModule,
+    SwiperModule,
+    NgxChartsModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },

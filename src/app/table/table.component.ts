@@ -1,7 +1,9 @@
 import { Component, OnInit, OnChanges, Input, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { MatTable } from '@angular/material/table';
+import { MatSort, Sort } from '@angular/material/sort';
 import { FetchTableService } from '../UseCases/fetch-table.service';
+import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
 import { TableData } from '../UseCases/output_datastructures';
 import { SEASON, MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
 
@@ -17,58 +19,141 @@ export class TableComponent implements OnInit {
   nMatchdays: number;
   selectedStartMatchday: number;
   selectedEndMatchday: number;
+  includeSeasonBets: FormControl;
   isPanelExpanded: boolean;
   matchdayStartForm: FormControl; // slider that indicates the start matchday of the calculation
   matchdayEndForm: FormControl; // slider that indicates the end matchday of the calculation
   @ViewChild("allMatchdays") tableAllMatchdays!: MatTable<TableData>;
   @ViewChild("matchday") tableMatchday!: MatTable<TableData>;
+  // @ViewChild('allMatchdays', { read: MatSort, static: true }) sortAll!: MatSort;
   tableDataAllMatchdays: TableData[];
   tableDataMatchday: TableData[];
+  propertiesDefault: string[];
+  propertiesIncludeSeason: string[];
   propertiesToDisplay: string[];
+  tablesLoaded: number;
 
   constructor(
     private fetchService: FetchTableService,
-    private formBuilder: FormBuilder) {
+    private formBuilder: FormBuilder,
+    private statCalc: StatisticsCalculatorService) {
     this.userId = "";
     this.currentMatchday = -1;
     this.nMatchdays = MATCHDAYS_PER_SEASON;
     this.selectedStartMatchday = -1;
     this.selectedEndMatchday = -1;
+    this.includeSeasonBets = this.formBuilder.control(false);
     this.isPanelExpanded = false;
     this.matchdayStartForm = this.formBuilder.control(1);
     this.matchdayEndForm = this.formBuilder.control(1);
     this.tableDataAllMatchdays = [];
     this.tableDataMatchday = [];
-    this.propertiesToDisplay = ["place", "userName", "points", "matches", "results", "extraTop", "extraOutsider"];
+    this.propertiesDefault = ["place", "userName", "points", "matches", "results", "extraTop", "extraOutsider"];
+    this.propertiesIncludeSeason = ["place", "userName", "points", "matches", "results", "extraTop", "extraOutsider", "extraSeason"];
+    this.propertiesToDisplay = this.propertiesDefault;
+    this.tablesLoaded = 0;
     this.subscribeCorrectingSliders();
   }
 
-  resetData(): void {
-    //
+  sortNew(sortState: Sort): void {
 
-    this.tableDataAllMatchdays = [];
-    this.tableDataMatchday = [];
+    if (sortState.active == "matches") {
+      if (sortState.direction == "desc") {
+        this.tableDataAllMatchdays.sort((a, b) => b.matches - a.matches);
+      }
+      else if (sortState.direction == "asc") {
+        this.tableDataAllMatchdays.sort((a, b) => a.matches - b.matches);
+      }
+      else {
+        this.tableDataAllMatchdays.sort(this.statCalc.compareScores);
+      }
+    }
+    else if (sortState.active == "results") {
+      if (sortState.direction == "desc") {
+        this.tableDataAllMatchdays.sort((a, b) => b.results - a.results);
+      }
+      else if (sortState.direction == "asc") {
+        this.tableDataAllMatchdays.sort((a, b) => a.results - b.results);
+      }
+      else {
+        this.tableDataAllMatchdays.sort(this.statCalc.compareScores);
+      }
+    }
+    else if (sortState.active == "extraTop") {
+      if (sortState.direction == "desc") {
+        this.tableDataAllMatchdays.sort((a, b) => b.extraTop - a.extraTop);
+      }
+      else if (sortState.direction == "asc") {
+        this.tableDataAllMatchdays.sort((a, b) => a.extraTop - b.extraTop);
+      }
+      else {
+        this.tableDataAllMatchdays.sort(this.statCalc.compareScores);
+      }
+    }
+    else if (sortState.active == "extraOutsider") {
+      if (sortState.direction == "desc") {
+        this.tableDataAllMatchdays.sort((a, b) => b.extraOutsider - a.extraOutsider);
+      }
+      else if (sortState.direction == "asc") {
+        this.tableDataAllMatchdays.sort((a, b) => a.extraOutsider - b.extraOutsider);
+      }
+      else {
+        this.tableDataAllMatchdays.sort(this.statCalc.compareScores);
+      }
+    }
+    else if (sortState.active == "extraSeason") {
+      if (sortState.direction == "desc") {
+        this.tableDataAllMatchdays.sort((a, b) => b.extraSeason - a.extraSeason);
+      }
+      else if (sortState.direction == "asc") {
+        this.tableDataAllMatchdays.sort((a, b) => a.extraSeason - b.extraSeason);
+      }
+      else {
+        this.tableDataAllMatchdays.sort(this.statCalc.compareScores);
+      }
+    }
+    else {
+      this.tableDataAllMatchdays.sort(this.statCalc.compareScores);
+    }
+
+    this.tableAllMatchdays.renderRows();
+    return;
+  }
+
+  adjustProperties(): void {
+    if (this.includeSeasonBets.value) {
+      this.propertiesToDisplay = this.propertiesIncludeSeason;
+    } else {
+      this.propertiesToDisplay = this.propertiesDefault;
+    }
   }
 
   showTable(startMatchday: number, endMatchday: number): void {
-    //
+    // fill the table with new data according to the given matchdays and
+    // renders the data!
 
-    this.resetData();
+    this.tablesLoaded = 0;
+    let newTableData: TableData[] = [];
+    let newTableDataMatchday: TableData[] = [];
 
     let matchdays: number[] = this.createMatchdayArray(startMatchday, endMatchday);
-    this.fetchService.fetchTableByMatchdays$(SEASON, matchdays).subscribe(
-      (tableDataset: TableData) => { this.tableDataAllMatchdays.push(tableDataset); },
+    this.fetchService.fetchTableByMatchdays$(SEASON, matchdays, this.includeSeasonBets.value).subscribe(
+      (tableDataset: TableData) => { newTableData.push(tableDataset); },
       err => { },
       () => {
+        this.tableDataAllMatchdays = newTableData;
         this.tableAllMatchdays.renderRows();
+        this.tablesLoaded++;
       }
     );
 
     this.fetchService.fetchTableByMatchdays$(SEASON, [endMatchday]).subscribe(
-      (tableDataset: TableData) => { this.tableDataMatchday.push(tableDataset); },
+      (tableDataset: TableData) => { newTableDataMatchday.push(tableDataset); },
       err => { },
       () => {
+        this.tableDataMatchday = newTableDataMatchday;
         this.tableMatchday.renderRows();
+        this.tablesLoaded++;
       }
     );
 

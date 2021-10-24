@@ -188,28 +188,29 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return matchday$;
   }
 
-  getNextMatch$(season: number): Observable<Match> {
+  getNextMatch$(season: number, amount: number = 1): Observable<Match> {
     // returns the next match that will take place. If no matches are left,
     // the function returns a dummy match
+    // if amount is given, it returns the next matches according to the amount
+    // given
 
     let timestampNow: number = Math.floor((new Date()).getTime() / 1000);
 
     let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
       ref.where("timestamp", ">", timestampNow).where("season", "==", season)
         .orderBy("timestamp")
-        .limit(1))
+        .limit(amount))
       .valueChanges({ idField: 'documentId' });
 
     let match$: Observable<Match> = matchQuery$.pipe(
       take(1),
       map(matchArray => {
         if (matchArray.length == 0) {
-          return this.makeUnknownMatch(-1);
+          matchArray.push(this.makeUnknownMatch(-1));
         }
-        else {
-          return matchArray[0];
-        }
+        return matchArray;
       }),
+      switchMap((matchArray: Match[]) => from(matchArray)),
       distinct()
     );
 

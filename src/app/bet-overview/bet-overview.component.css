@@ -1,31 +1,73 @@
+.loading-bar {
+  position: fixed;
+  top: 56px;
+  z-index: 999;
+}
+
+.content-container {
+  height: calc(100vh - 2*56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.settings-panel {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
 .match-selection-radio-group {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   margin: 15px 0;
 }
 
 .match-selection-radio-button {
   margin-left: 10px;
-  margin-right: 15px;
-}
-
-.settings-panel {
-  width: 100%;
+  margin-right: 10px;
 }
 
 mat-slider {
-  width: 75%;
+  width: 100%;
 }
 
-.bet-card {
-  max-width: 200px;
-  margin: 3px;
+.load-button {
+  width: 100%;
 }
 
-mat-card-content {
-  padding-left: 15px;
+.config-match-panels {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 90%;
 }
 
-mat-icon {
-  vertical-align: middle;
+.matches-box {
+  width: 95%;
+  padding: 4px;
+}
+
+.season-box {
+  width: 95%;
+  padding: 4px;
+}
+
+.bet-panel {
+  margin-top: 2px;
+}
+
+.result-divider {
+  margin: 10px;
+}
+
+.result-line-through {
+  text-decoration: line-through;
+}
+
+.icon-adjustment {
+  position: relative;
+  top: -2px; /* used to adjust the icon */
 }

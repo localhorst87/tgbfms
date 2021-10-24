@@ -3,7 +3,8 @@ import { Observable, of, from, range, concat, iif, combineLatest } from 'rxjs';
 import { tap, map, mergeMap, concatMap, pluck, distinct, filter, first, toArray } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
-import { Bet, Match, Team, SeasonBet } from '../Businessrules/basic_datastructures';
+import { PointCalculatorService } from '../Businessrules/point-calculator.service';
+import { Bet, Result, Match, Team, SeasonBet } from '../Businessrules/basic_datastructures';
 import { MatchInfo, TeamStats } from './output_datastructures';
 import { TeamRankingImportData } from '../Dataaccess/import_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT, SEASON } from '../Businessrules/rule_defined_values';
@@ -15,10 +16,22 @@ export class FetchBasicDataService {
 
   relevantPlaces$: Observable<number>;
 
-  constructor(private appData: AppdataAccessService, private matchData: MatchdataAccessService) {
+  constructor(
+    private appData: AppdataAccessService,
+    private matchData: MatchdataAccessService,
+    private pointCalc: PointCalculatorService) {
     this.relevantPlaces$ = concat(
       range(1, RELEVANT_FIRST_PLACES_COUNT),
       range(-RELEVANT_LAST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT)
+    );
+  }
+
+  public fetchNumberOfUsers$(): Observable<number> {
+    // returns the number of users as Observable
+
+    return this.appData.getActiveUserIds$().pipe(
+      toArray(),
+      map((userIds: string[]) => userIds.length)
     );
   }
 
@@ -31,19 +44,19 @@ export class FetchBasicDataService {
     );
   }
 
-  public fetchNextMatchInfos$(season: number): Observable<MatchInfo> {
+  public fetchNextMatchInfos$(season: number, userId: string, amount: number = 1): Observable<MatchInfo> {
     // returns information about the next match as Observable
 
-    return this.appData.getNextMatch$(SEASON).pipe(
-      mergeMap((nextMatch: Match) => this.makeMatchInfo$(nextMatch))
+    return this.appData.getNextMatch$(SEASON, amount).pipe(
+      concatMap((nextMatch: Match) => this.makeMatchInfo$(nextMatch, userId))
     );
   }
 
-  public fetchTopMatchInfos$(season: number, matchday: number): Observable<MatchInfo> {
+  public fetchTopMatchInfos$(season: number, userId: string, matchday: number): Observable<MatchInfo> {
     // returns information about the top match of the given matchday as Observable
 
     return this.appData.getTopMatch$(SEASON, matchday).pipe(
-      mergeMap((topMatch: Match) => this.makeMatchInfo$(topMatch))
+      mergeMap((topMatch: Match) => this.makeMatchInfo$(topMatch, userId))
     );
   }
 
@@ -106,7 +119,29 @@ export class FetchBasicDataService {
     );
   }
 
-  private makeMatchInfo$(match: Match): Observable<MatchInfo> {
+  public isBetCorrect(betGoalsHome: number, betGoalsAway: number, resultGoalsHome: number, resultGoalsAway: number): boolean {
+    // returns true if the Bet and Match tendecy correlate
+
+    let bet: Bet = {
+      documentId: "",
+      matchId: -1,
+      userId: "",
+      isFixed: false,
+      goalsHome: betGoalsHome,
+      goalsAway: betGoalsAway
+    };
+
+    let result: Result = {
+      documentId: "",
+      matchId: -1,
+      goalsHome: resultGoalsHome,
+      goalsAway: resultGoalsAway
+    }
+
+    return this.pointCalc.isTendencyCorrect(bet, result);
+  }
+
+  private makeMatchInfo$(match: Match, userId: string): Observable<MatchInfo> {
     // converts to MatchInfo Observable
 
     return combineLatest(
@@ -114,8 +149,9 @@ export class FetchBasicDataService {
       this.appData.getTeamByTeamId$(match.teamIdAway),
       this.getTeamStats$(match.teamIdHome),
       this.getTeamStats$(match.teamIdAway),
+      this.appData.getBet$(match.matchId, userId),
 
-      (teamHome: Team, teamAway: Team, statsHome: TeamStats, statsAway: TeamStats) => {
+      (teamHome: Team, teamAway: Team, statsHome: TeamStats, statsAway: TeamStats, userBet: Bet) => {
         return {
           matchDate: new Date(match.timestamp * 1000),
           matchday: match.matchday,
@@ -126,7 +162,9 @@ export class FetchBasicDataService {
           placeHome: statsHome.place,
           placeAway: statsAway.place,
           pointsHome: statsHome.points,
-          pointsAway: statsAway.points
+          pointsAway: statsAway.points,
+          betGoalsHome: userBet.goalsHome,
+          betGoalsAway: userBet.goalsAway
         };
       }
     );

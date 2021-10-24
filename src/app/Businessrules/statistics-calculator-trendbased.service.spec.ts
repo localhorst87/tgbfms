@@ -28,6 +28,43 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
 
   // ---------------------------------------------------------------------------
+  // calculateForm
+  // ---------------------------------------------------------------------------
+
+  it("calculateForm, straight forward", () => {
+
+    const argument1: number[] = [5, 8, 9];
+    const argument2: number[][] = [[12, 7, 2, 2], [6, 6, 5, 4], [9, 9, 7, 4]];
+    const argument3: number[] = [0.8, 1.0, 1.2]
+
+    const expectedValue: number = 5.3;
+
+    expect(service["calculateForm"](argument1, argument2, argument3)).toEqual(expectedValue);
+  });
+
+  it("calculateForm, pointsOpponents all 0", () => {
+
+    const argument1: number[] = [5, 8, 9];
+    const argument2: number[][] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+    const argument3: number[] = [0.8, 1.0, 1.2]
+
+    const expectedValue: number = 10.0;
+
+    expect(service["calculateForm"](argument1, argument2, argument3)).toEqual(expectedValue);
+  });
+
+  it("calculateForm, pointsUser all 0", () => {
+
+    const argument1: number[] = [0, 0, 0];
+    const argument2: number[][] = [[12, 7, 2, 2], [6, 6, 5, 4], [9, 9, 7, 4]];
+    const argument3: number[] = [0.8, 1.0, 1.2]
+
+    const expectedValue: number = -10.0;
+
+    expect(service["calculateForm"](argument1, argument2, argument3)).toEqual(expectedValue);
+  });
+
+  // ---------------------------------------------------------------------------
   // makePositions
   // ---------------------------------------------------------------------------
 

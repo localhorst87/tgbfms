@@ -2,11 +2,14 @@ import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angu
 import { FetchBetWriteDataService } from '../UseCases/fetch-bet-write-data.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
+import { interval } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { Bet, SeasonBet, Team } from '../Businessrules/basic_datastructures';
 import { BetWriteData, SeasonBetWriteData } from '../UseCases/output_datastructures';
 import { SEASON, MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
+
+const INTERVAL_TIME_REFRESH: number = 1 * 1000; // 1 sec
 
 @Component({
   selector: 'app-bet-write',
@@ -17,9 +20,10 @@ export class BetWriteComponent implements OnInit, OnChanges {
 
   @Input() userId: string;
   @Input() lastUpdateTime: number;
+  currentSeason: string; // current season name, e.g. "2021/2022"
   nTeams: number; // total number of teams in the campaign
   nMatchdays: number; // total number of matchdays per season
-  currentDate: Date;
+  currentTime: Date;
   activeTeams: Team[]; // all active teams in this campaign
   matches: BetWriteData[]; // loaded matches to bet
   seasonBets: SeasonBetWriteData[]; // loaded season bets
@@ -29,10 +33,9 @@ export class BetWriteComponent implements OnInit, OnChanges {
   matchdayForm: FormControl; // slider which matchday to load
   @Input() selectedMatchday: number; // (will be pre allocated with next matchday)
   @Output() selectMatchdayEvent = new EventEmitter<number>(); // directs selected matchday to home component
-  durationForm: FormControl; // slider of future days matches to load
-  selectedDuration: number; // pre allocated with 7 days
   betForm: FormGroup; // formular for setting bets
   seasonBetForm: FormGroup; // formular for setting season bets
+  isLoading: boolean;
 
   constructor(
     private fetchBetService: FetchBetWriteDataService,
@@ -42,10 +45,11 @@ export class BetWriteComponent implements OnInit, OnChanges {
     private snackbar: MatSnackBar) {
 
     this.userId = "";
+    this.currentSeason = String(SEASON) + "/" + String(SEASON + 1);
     this.lastUpdateTime = -1;
     this.nTeams = NUMBER_OF_TEAMS;
     this.nMatchdays = MATCHDAYS_PER_SEASON;
-    this.currentDate = new Date();
+    this.currentTime = new Date();
     this.selectedMatchday = -1;
     this.matches = [];
     this.seasonBets = [];
@@ -59,12 +63,11 @@ export class BetWriteComponent implements OnInit, OnChanges {
     this.isPanelExpanded = false;
     this.selectedDisplayMethod = "matchday";
     this.matchdayForm = this.formBuilder.control(1);
-    this.selectedDuration = 7;
-    this.durationForm = this.formBuilder.control(this.selectedDuration);
     this.activeTeams = [];
     this.fetchBasicService.fetchActiveTeams$(SEASON).subscribe(
       (team: Team) => this.activeTeams.push(team)
     );
+    this.isLoading = false;
   }
 
   get bets() {
@@ -76,7 +79,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
   }
 
   resetData(): void {
-    this.currentDate = new Date();
+    this.currentTime = new Date();
     this.matches = [];
     this.seasonBets = [];
     this.betForm = this.formBuilder.group({
@@ -89,37 +92,41 @@ export class BetWriteComponent implements OnInit, OnChanges {
 
   showMatchesByMatchday(matchday: number): void {
     this.resetData();
+    this.isLoading = true;
+
     this.fetchBetService.fetchDataByMatchday$(SEASON, matchday, this.userId).subscribe(
       (betData: BetWriteData) => {
         this.matches.push(betData);
         this.addMatchForm(betData);
+      },
+      err => {
+        this.isLoading = false;
+      },
+      () => {
+        this.isLoading = false;
       }
     );
+
     this.isPanelExpanded = false;
     this.selectedMatchday = this.matchdayForm.value;
     this.selectMatchdayEvent.emit(this.matchdayForm.value);
-    this.selectedDisplayMethod = this.displayMethodForm.value;
-  }
-
-  showMatchesByDuration(days: number): void {
-    this.resetData();
-    this.fetchBetService.fetchDataByTime$(days, this.userId).subscribe(
-      (betData: BetWriteData) => {
-        this.matches.push(betData);
-        this.addMatchForm(betData);
-      }
-    );
-    this.isPanelExpanded = false;
-    this.selectedDuration = this.durationForm.value;
-    this.selectedDisplayMethod = this.displayMethodForm.value;
+    this.selectedDisplayMethod = "matchday";
   }
 
   showSeasonBets(): void {
     this.resetData();
+    this.isLoading = true;
+
     this.fetchBetService.fetchSeasonData$(SEASON, this.userId).subscribe(
       (betData: SeasonBetWriteData) => {
         this.seasonBets.push(betData);
         this.addSeasonBetForm(betData);
+      },
+      err => {
+        this.isLoading = false;
+      },
+      () => {
+        this.isLoading = false;
       }
     );
 
@@ -131,8 +138,8 @@ export class BetWriteComponent implements OnInit, OnChanges {
     // adds the BetWriteData to the Form
 
     let matchForm: FormGroup = this.formBuilder.group({
-      betHome: [{ value: betWriteData.betGoalsHome < 0 ? null : betWriteData.betGoalsHome, disabled: betWriteData.isBetFixed || this.currentDate > betWriteData.matchDate }, Validators.min(0)],
-      betAway: [{ value: betWriteData.betGoalsAway < 0 ? null : betWriteData.betGoalsAway, disabled: betWriteData.isBetFixed || this.currentDate > betWriteData.matchDate }, Validators.min(0)]
+      betHome: [{ value: betWriteData.betGoalsHome < 0 ? null : betWriteData.betGoalsHome, disabled: betWriteData.isBetFixed || this.currentTime > betWriteData.matchDate }, Validators.min(0)],
+      betAway: [{ value: betWriteData.betGoalsAway < 0 ? null : betWriteData.betGoalsAway, disabled: betWriteData.isBetFixed || this.currentTime > betWriteData.matchDate }, Validators.min(0)]
     });
 
     this.subscribeCorrectingBetValues(matchForm);
@@ -189,7 +196,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
   addSeasonBetForm(seasonBetWriteData: SeasonBetWriteData): void {
     // is adding SeasonBetWriteData to the Form
 
-    let placeForm: FormControl = this.formBuilder.control({ value: String(seasonBetWriteData.teamId), disabled: seasonBetWriteData.isBetFixed || this.currentDate > seasonBetWriteData.dueDate });
+    let placeForm: FormControl = this.formBuilder.control({ value: String(seasonBetWriteData.teamId), disabled: seasonBetWriteData.isBetFixed || this.currentTime > seasonBetWriteData.dueDate });
 
     this.subscribeToSeasonBetChanges(placeForm, seasonBetWriteData);
     this.places.push(placeForm);
@@ -292,6 +299,13 @@ export class BetWriteComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+
+    // refresh current time
+    interval(INTERVAL_TIME_REFRESH).subscribe(
+      val => {
+        this.currentTime = new Date();
+      }
+    );
   }
 
   ngOnChanges(): void {

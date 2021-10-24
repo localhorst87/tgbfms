@@ -11,6 +11,8 @@ export interface MatchInfo {
   placeAway: number;
   pointsHome: number;
   pointsAway: number;
+  betGoalsHome: number;
+  betGoalsAway: number;
 }
 
 export interface TeamStats {
@@ -44,6 +46,7 @@ export interface BetOverviewFrameData {
   teamNameShortAway: string;
   resultGoalsHome: number;
   resultGoalsAway: number;
+  isMatchFinished: boolean;
   isBetFixed: boolean;
 }
 

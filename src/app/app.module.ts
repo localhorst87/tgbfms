@@ -25,6 +25,7 @@ import { BetOverviewComponent } from './bet-overview/bet-overview.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { SyncDialogComponent } from './sync-dialog/sync-dialog.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 

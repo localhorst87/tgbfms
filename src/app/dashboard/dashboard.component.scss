@@ -2,8 +2,7 @@
 @import "~swiper/css/pagination";
 
 .dashboard-element-container {
-  height: calc(100vh - 2*56px - 75px); // fallback
-  height: calc(var(--vh, 1vh) * 100 - 2*56px);
+  height: calc(100vh - 2*56px - 50px); // fallback
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;

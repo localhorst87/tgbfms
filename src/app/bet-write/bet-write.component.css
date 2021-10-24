@@ -5,8 +5,7 @@
 }
 
 .content-container {
-  height: calc(100vh - 2*56px - 75px); /* fallback */
-  height: calc(var(--vh, 1vh) * 100 - 2*56px);
+  height: calc(100% - 2*56px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

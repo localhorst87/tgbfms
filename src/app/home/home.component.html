@@ -1,7 +1,27 @@
 <mat-toolbar class="toolbar-top">
-  <button mat-icon-button>
+
+  <button mat-icon-button [matMenuTriggerFor]="mainMenu">
     <mat-icon>notes</mat-icon>
   </button>
+  <mat-menu #mainMenu="matMenu">
+    <button mat-menu-item disabled>
+      <mat-icon>insights</mat-icon>
+      <span>Statistiken</span>
+    </button>
+    <button mat-menu-item disabled>
+      <mat-icon>manage_accounts</mat-icon>
+      <span>Profil</span>
+    </button>
+    <button mat-menu-item disabled>
+      <mat-icon>settings</mat-icon>
+      <span>Einstellungen</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+
   <div>
     <mat-icon>nights_stay</mat-icon>
     <mat-slide-toggle

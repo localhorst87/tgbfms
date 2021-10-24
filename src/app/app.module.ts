@@ -53,6 +53,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSortModule } from '@angular/material/sort';
+import { MatMenuModule } from '@angular/material/menu';
+
 
 // Other UI components
 import { SwiperModule } from 'swiper/angular';
@@ -115,6 +117,7 @@ export class NoCacheHeadersInterceptor implements HttpInterceptor {
     MatDividerModule,
     MatSlideToggleModule,
     MatSortModule,
+    MatMenuModule,
     SwiperModule,
     NgxChartsModule
   ],

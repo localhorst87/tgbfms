@@ -14,3 +14,9 @@
   display: flex;
   justify-content: space-evenly;
 }
+
+.light-dark-toggle {
+  display: flex;
+  justify-content: space-around;
+  width: 100px;
+}

@@ -73,3 +73,7 @@ tspan {
 .ngx-charts .line { // line color
   stroke: var(--accent-color);
 }
+
+.swiper-pagination-bullet-active {
+  background: var(--accent-color);
+}

@@ -22,14 +22,15 @@
     </button>
   </mat-menu>
 
-  <div>
-    <mat-icon>nights_stay</mat-icon>
+  <div class="light-dark-toggle">
+    <mat-icon>light_mode</mat-icon>
     <mat-slide-toggle
       color="accent"
       [checked]="applyDarkTheme.value"
       [formControl]="applyDarkTheme"
       (change)="switchTheme()">
     </mat-slide-toggle>
+    <mat-icon>dark_mode</mat-icon>
   </div>
 </mat-toolbar>
 

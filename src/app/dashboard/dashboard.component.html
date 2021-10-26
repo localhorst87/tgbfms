@@ -63,7 +63,7 @@
     <mat-card-subtitle>Aktuelle Form</mat-card-subtitle>
     <mat-card-content class="vertical-center">
       <span class="big-numbers">
-        {{currentForm}}
+        {{currentForm | number: '1.1-1':'en-us'}}
       </span>
     </mat-card-content>
   </mat-card>

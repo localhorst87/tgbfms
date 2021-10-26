@@ -1,35 +1,48 @@
 <mat-toolbar class="toolbar-top">
+  <div>
+    <button mat-icon-button [matMenuTriggerFor]="mainMenu">
+      <mat-icon>notes</mat-icon>
+    </button>
+    <mat-menu #mainMenu="matMenu">
+      <button mat-menu-item disabled>
+        <mat-icon>insights</mat-icon>
+        <span>Statistiken</span>
+      </button>
+      <button mat-menu-item disabled>
+        <mat-icon>manage_accounts</mat-icon>
+        <span>Profil</span>
+      </button>
+      <button mat-menu-item disabled>
+        <mat-icon>settings</mat-icon>
+        <span>Einstellungen</span>
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
 
-  <button mat-icon-button [matMenuTriggerFor]="mainMenu">
-    <mat-icon>notes</mat-icon>
-  </button>
-  <mat-menu #mainMenu="matMenu">
-    <button mat-menu-item disabled>
-      <mat-icon>insights</mat-icon>
-      <span>Statistiken</span>
+    <button mat-icon-button (click)="openSyncDialog()" *ngIf="matchdaysToSync.length > 0">
+      <mat-icon
+        color="warn"
+        matTooltip="neue Spieldaten abrufen"
+        matTooltipPosition="right"
+        matTooltipTouchGestures="on">
+        sync
+      </mat-icon>
     </button>
-    <button mat-menu-item disabled>
-      <mat-icon>manage_accounts</mat-icon>
-      <span>Profil</span>
-    </button>
-    <button mat-menu-item disabled>
-      <mat-icon>settings</mat-icon>
-      <span>Einstellungen</span>
-    </button>
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Logout</span>
-    </button>
-  </mat-menu>
+  </div>
 
   <div class="light-dark-toggle">
     <mat-icon>light_mode</mat-icon>
+
     <mat-slide-toggle
       color="accent"
       [checked]="applyDarkTheme.value"
       [formControl]="applyDarkTheme"
       (change)="switchTheme()">
     </mat-slide-toggle>
+
     <mat-icon>dark_mode</mat-icon>
   </div>
 </mat-toolbar>

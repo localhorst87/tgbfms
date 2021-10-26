@@ -1,7 +1,7 @@
 import { Component, OnInit, EventEmitter, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { Observable, Subscription, combineLatest, timer, from, of } from 'rxjs';
-import { switchMap, mergeMap, pluck, delay, filter, map, tap } from 'rxjs/operators';
+import { switchMap, mergeMap, pluck, delay, filter, map, tap, distinct } from 'rxjs/operators';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
@@ -12,9 +12,9 @@ import { SyncDialogComponent } from '../sync-dialog/sync-dialog.component';
 import { Bet, SeasonBet, User } from '../Businessrules/basic_datastructures';
 import { SEASON, MATCHDAYS_PER_SEASON } from '../Businessrules/rule_defined_values';
 
-const BET_FIX_CYCLE: number = 60 * 1000; // cycle time in [ms] that is used to check if Bets needs to be fixed
-const SYNC_CYCLE: number = 5 * 60 * 1000; // cycle time in [ms] that is used to check if new Data to synchronize is available
-const DURATION_SYNC_SNACKBAR: number = 5 * 1000; // duration in [ms] the snackbar for data sync shows up until dismissal
+const BET_FIX_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if Bets needs to be fixed
+const SYNC_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if new Data to synchronize is available
+const DURATION_SYNC_SNACKBAR: number = 2 * 1000; // duration in [ms] the snackbar for data sync shows up until dismissal
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -114,14 +114,19 @@ export class HomeComponent implements OnInit {
               return -1;
             }
           }),
-          filter((matchday: number) => matchday > 0)
+          distinct()
         ))
       )
       .subscribe(
         (matchdayToSync: number) => {
-          if (!this.matchdaysToSync.includes(matchdayToSync)) {
-            this.matchdaysToSync.push(matchdayToSync);
-            this.syncNeededEvent.emit();
+          if (matchdayToSync > 0) {
+            if (!this.matchdaysToSync.includes(matchdayToSync)) {
+              this.matchdaysToSync.push(matchdayToSync);
+              this.syncNeededEvent.emit();
+            }
+          }
+          else {
+            this.matchdaysToSync = [];
           }
         }
       );
@@ -272,7 +277,7 @@ export class HomeComponent implements OnInit {
     this.syncNeededEvent.subscribe(
       () => {
         let message: string = "Neue Daten verfügbar";
-        let action: string = "abrufen";
+        let action: string = "";
         let config: MatSnackBarConfig<any> = {
           horizontalPosition: "center",
           verticalPosition: "bottom",

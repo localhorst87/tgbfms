@@ -164,7 +164,8 @@ export class FetchBasicDataService {
           pointsHome: statsHome.points,
           pointsAway: statsAway.points,
           betGoalsHome: userBet.goalsHome,
-          betGoalsAway: userBet.goalsAway
+          betGoalsAway: userBet.goalsAway,
+          isTopMatch: match.isTopMatch
         };
       }
     );

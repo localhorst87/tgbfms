@@ -9,7 +9,7 @@
           <table>
             <tr>
               <td class="mat-caption">{{match.placeHome}}. ({{match.pointsHome}} Pkt)</td>
-              <td></td>
+              <td><mat-icon *ngIf="match.isTopMatch">star</mat-icon></td>
               <td class="mat-caption">{{match.placeAway}}. ({{match.pointsAway}} Pkt)</td>
             </tr>
 

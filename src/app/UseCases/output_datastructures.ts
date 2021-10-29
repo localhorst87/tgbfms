@@ -13,6 +13,7 @@ export interface MatchInfo {
   pointsAway: number;
   betGoalsHome: number;
   betGoalsAway: number;
+  isTopMatch: boolean;
 }
 
 export interface TeamStats {

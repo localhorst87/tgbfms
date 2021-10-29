@@ -9,12 +9,20 @@
         <span>Statistiken</span>
       </button>
       <button mat-menu-item disabled>
+        <mat-icon>history_edu</mat-icon>
+        <span>History</span>
+      </button>
+      <button mat-menu-item disabled>
         <mat-icon>manage_accounts</mat-icon>
         <span>Profil</span>
       </button>
       <button mat-menu-item disabled>
         <mat-icon>settings</mat-icon>
         <span>Einstellungen</span>
+      </button>
+      <button mat-menu-item disabled>
+        <mat-icon>description</mat-icon>
+        <span>Regeln</span>
       </button>
       <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
@@ -75,6 +83,9 @@
   [matchdayLastMatch] = "matchdayLastMatch"
   [matchdayCompleted] = "matchdayCompleted">
 </app-dashboard>
+
+<app-rules *ngIf = "selectedPage == 'rules'">
+</app-rules>
 
 <mat-toolbar class="toolbar-bottom">
   <!-- dashboard -->

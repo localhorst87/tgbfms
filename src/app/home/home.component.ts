@@ -125,9 +125,6 @@ export class HomeComponent implements OnInit {
               this.syncNeededEvent.emit();
             }
           }
-          else {
-            this.matchdaysToSync = [];
-          }
         }
       );
   }

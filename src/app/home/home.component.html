@@ -84,9 +84,6 @@
   [matchdayCompleted] = "matchdayCompleted">
 </app-dashboard>
 
-<app-rules *ngIf = "selectedPage == 'rules'">
-</app-rules>
-
 <mat-toolbar class="toolbar-bottom">
   <!-- dashboard -->
   <button mat-icon-button color="{{selectedPage == 'dashboard'? 'accent' : 'primary'}}" (click)="changeView('dashboard')">

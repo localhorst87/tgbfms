@@ -3,6 +3,9 @@ import { StatisticsCalculatorService } from './statistics-calculator.service';
 import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
 import { PointCalculatorService } from './point-calculator.service';
 
+const WEIGHT_RELATIVE_TO_OPP: number = 0.67; // weight for points relative to opponents
+const WEIGHT_RELATIVE_TO_REF: number = 0.33; // weight for points relative to point reference
+const POINT_REFERENCE: number = 6; // a chosen mean point reference
 
 @Injectable()
 export class StatisticsCalculatorTrendbasedService implements StatisticsCalculatorService {
@@ -137,15 +140,18 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
 
     let weightedAvg: number = 0;
 
+    // weighted average is being calculated from a fraction relative to opponents points
+    // and a fraction relative to an absolute point reference
+    // the weights given as the functional argument is weighting the matchdays in time progression
     for (let i in pointsUser) {
       let pointsSumOpponents: number = pointsOpponents[i].reduce((a, b) => a + b, 0);
       let pointsMeanOpponents: number = pointsSumOpponents / pointsOpponents[i].length;
-      weightedAvg += weights[i] * pointsUser[i] / pointsMeanOpponents;
+      weightedAvg += weights[i] * pointsUser[i] * (WEIGHT_RELATIVE_TO_OPP / pointsMeanOpponents + WEIGHT_RELATIVE_TO_REF / POINT_REFERENCE);
     }
 
     let weightsSum: number = weights.reduce((a, b) => a + b, 0);
 
-    if (weightsSum == 0) { // in case of no points directly return -10
+    if (weightedAvg == 0) { // in case of no points directly return -10
       return -10;
     }
 

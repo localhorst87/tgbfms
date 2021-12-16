@@ -6,7 +6,7 @@ import { StatisticsCalculatorService } from '../Businessrules/statistics-calcula
 import { MatchdayScoreSnapshot } from '../Dataaccess/import_datastructures';
 
 const N_MATCHDAYS_TO_INCLUDE: number = 3;
-const WEIGHTING_FACTOR: number = 1.413;
+const WEIGHTING_FACTOR: number = 1.225; // current matchday is weighted 1.5 as much as pre-pre matchday
 
 @Injectable({
   providedIn: 'root'

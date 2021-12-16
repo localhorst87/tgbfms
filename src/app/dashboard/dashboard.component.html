@@ -37,7 +37,7 @@
                 <mat-icon
                   *ngIf="match.betGoalsHome == -1 && match.betGoalsAway == -1 && match.matchDate.getTime() - currentTime.getTime() > 60 * 60 * 1000"
                   color="accent"
-                  matTooltip="noch nicht getippt!"
+                  matTooltip="noch nicht getippt"
                   matTooltipPosition="left"
                   matTooltipTouchGestures="on">
                   highlight_off
@@ -47,7 +47,7 @@
                 <mat-icon
                   *ngIf="match.betGoalsHome == -1 && match.betGoalsAway == -1 && match.matchDate.getTime() - currentTime.getTime() < 60 * 60 * 1000"
                   color="warn"
-                  matTooltip="noch nicht getippt! Nur noch {{(match.matchDate.getTime() - currentTime.getTime())/(60*1000) | number: '1.0-0'}} min bis Anpfiff">
+                  matTooltip="noch nicht getippt! Noch {{(match.matchDate.getTime() - currentTime.getTime())/(60*1000) | number: '1.0-0'}} min bis Anpfiff">
                   running_with_errors
                 </mat-icon>
 

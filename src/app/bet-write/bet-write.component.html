@@ -67,7 +67,7 @@
             <mat-form-field class="bet-form-field-away" appearance="outline" style="text-align:left">
               <mat-label>{{ match.teamNameAway }}</mat-label>
               <input matInput type="number" formControlName="betAway" class="input-bet-away">
-              <button mat-icon-button matSuffix (click)="voteTopMatch(matchdayForm.value, match.matchId)" *ngIf="!selectedMatchdayHasBegun && precedingMatchdayIsFinished && votedTopMatch==-1"><mat-icon>star_outline</mat-icon></button>
+              <button mat-icon-button matSuffix (click)="voteTopMatch(matchdayForm.value, match.matchId)" *ngIf="!selectedMatchdayHasBegun && precedingMatchdayIsFinished && !match.isBetFixed && votedTopMatch==-1"><mat-icon>star_outline</mat-icon></button>
               <mat-icon matSuffix *ngIf="!selectedMatchdayHasBegun && votedTopMatch==match.matchId">star_half</mat-icon>
               <mat-icon matSuffix *ngIf="selectedMatchdayHasBegun && match.isTopMatch">star</mat-icon>
             </mat-form-field>

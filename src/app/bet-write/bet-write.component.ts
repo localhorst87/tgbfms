@@ -10,6 +10,7 @@ import { BetWriteData, SeasonBetWriteData } from '../UseCases/output_datastructu
 import { SEASON, MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
 
 const INTERVAL_TIME_REFRESH: number = 1 * 1000; // 1 sec
+const MATCHDAY_BEGUN_TOLERANCE: number = -60 * 60 // (seconds)
 
 @Component({
   selector: 'app-bet-write',
@@ -114,7 +115,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
     );
 
     // check if selected matchday has begun
-    this.fetchBasicService.matchdayHasBegun$(SEASON, matchday).subscribe(
+    this.fetchBasicService.matchdayHasBegun$(SEASON, matchday, MATCHDAY_BEGUN_TOLERANCE).subscribe(
       (isUnderway: boolean) => {
         this.selectedMatchdayHasBegun = isUnderway;
       }

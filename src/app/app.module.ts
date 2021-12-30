@@ -20,6 +20,8 @@ import { PointCalculatorService } from './Businessrules/point-calculator.service
 import { PointCalculatorTrendbasedService } from './Businessrules/point-calculator-trendbased.service';
 import { StatisticsCalculatorService } from './Businessrules/statistics-calculator.service';
 import { StatisticsCalculatorTrendbasedService } from './Businessrules/statistics-calculator-trendbased.service';
+import { UserInteractionService } from './Businessrules/user-interaction.service';
+import { UserInteractionVoteBasedService } from './Businessrules/user-interaction-vote-based.service';
 import { BetWriteComponent } from './bet-write/bet-write.component';
 import { BetOverviewComponent } from './bet-overview/bet-overview.component';
 import { HomeComponent } from './home/home.component';
@@ -60,6 +62,7 @@ import { MatMenuModule } from '@angular/material/menu';
 // Other UI components
 import { SwiperModule } from 'swiper/angular';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+// import { RulesComponent } from './rules/rules.component';
 
 @Injectable()
 export class NoCacheHeadersInterceptor implements HttpInterceptor {
@@ -85,7 +88,8 @@ export class NoCacheHeadersInterceptor implements HttpInterceptor {
     RegisterComponent,
     SyncDialogComponent,
     DashboardComponent,
-    PasswordResetComponent
+    PasswordResetComponent,
+    RulesComponent
   ],
   imports: [
     BrowserModule,
@@ -129,7 +133,8 @@ export class NoCacheHeadersInterceptor implements HttpInterceptor {
     { provide: AppdataAccessService, useClass: AppdataAccessFirestoreService },
     { provide: MatchdataAccessService, useClass: MatchdataAccessOpenligaService },
     { provide: PointCalculatorService, useClass: PointCalculatorTrendbasedService },
-    { provide: StatisticsCalculatorService, useClass: StatisticsCalculatorTrendbasedService }
+    { provide: StatisticsCalculatorService, useClass: StatisticsCalculatorTrendbasedService },
+    { provide: UserInteractionService, useClass: UserInteractionVoteBasedService }
   ],
   bootstrap: [AppComponent]
 })

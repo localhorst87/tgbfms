@@ -1,20 +1,21 @@
 import { Component, OnInit, EventEmitter, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { Observable, Subscription, combineLatest, timer, from, of } from 'rxjs';
-import { switchMap, mergeMap, pluck, delay, filter, map, tap, distinct } from 'rxjs/operators';
+import { switchMap, mergeMap, pluck, delay, filter, map, tap, distinct, toArray } from 'rxjs/operators';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { SynchronizeDataService } from '../UseCases/synchronize-data.service';
 import { AuthenticationService } from '../UseCases/authentication.service';
+import { SynchronizeTopMatchService } from '../UseCases/synchronize-top-match.service';
 import { SyncDialogComponent } from '../sync-dialog/sync-dialog.component';
 import { Bet, SeasonBet, User } from '../Businessrules/basic_datastructures';
 import { SEASON, MATCHDAYS_PER_SEASON } from '../Businessrules/rule_defined_values';
 
 const BET_FIX_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if Bets needs to be fixed
 const SYNC_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if new Data to synchronize is available
-const DURATION_SYNC_SNACKBAR: number = 2 * 1000; // duration in [ms] the snackbar for data sync shows up until dismissal
+const DURATION_SYNC_SNACKBAR: number = 2 * 1000; // duration in [ms] the snackbar for data sync shows up
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -34,11 +35,13 @@ export class HomeComponent implements OnInit {
   matchdaysToSync: number[];
   applyDarkTheme: FormControl;
   fixBetEvent: EventEmitter<number>;
+  syncTopMatchEvent: EventEmitter<number>;
   syncNeededEvent: EventEmitter<void>;
 
   constructor(
     private appData: AppdataAccessService,
     private fetchBasicService: FetchBasicDataService,
+    private syncTopMatchService: SynchronizeTopMatchService,
     public syncService: SynchronizeDataService,
     private authenticator: AuthenticationService,
     private renderer: Renderer2,
@@ -66,6 +69,7 @@ export class HomeComponent implements OnInit {
     this.matchdaysToSync = [];
     this.applyDarkTheme = this.formBuilder.control(false);
     this.fixBetEvent = new EventEmitter();
+    this.syncTopMatchEvent = new EventEmitter();
     this.syncNeededEvent = new EventEmitter();
   }
 
@@ -133,8 +137,8 @@ export class HomeComponent implements OnInit {
     // sets next and last matchday including a plausiblity check
 
     combineLatest(
-      this.getMatchdayOfLastMatch$(),
-      this.getMatchdayOfNextMatch$(),
+      this.fetchBasicService.getMatchdayOfLastMatch$(),
+      this.fetchBasicService.getMatchdayOfNextMatch$(),
       this.fetchBasicService.getClosestMatchday$()
     ).subscribe(
       ([matchdayLast, matchdayNext, matchdayClosest]) => {
@@ -174,26 +178,9 @@ export class HomeComponent implements OnInit {
         // of Bets for the matchday of the last match. This is only called once
         // in the beginning on ngOnInit
         this.fixBetEvent.emit(this.matchdayLastMatch);
+        this.syncTopMatchEvent.emit(this.matchdayLastMatch);
         this.subscribeToSyncCheck(this.matchdayLastMatch);
       }
-    );
-  }
-
-  getMatchdayOfNextMatch$(): Observable<number> {
-    // returns -1 if no matches are left in the current season (= season ended)
-
-    return this.appData.getNextMatch$(SEASON).pipe(
-      pluck("matchId"),
-      switchMap((idNextMatch: number) => this.appData.getMatchdayByMatchId$(idNextMatch))
-    );
-  }
-
-  getMatchdayOfLastMatch$(): Observable<number> {
-    // return -1 if no matches are completed in the current season (= season not yet started)
-
-    return this.appData.getLastMatch$(SEASON).pipe(
-      pluck("matchId"),
-      switchMap((idLastMatch: number) => this.appData.getMatchdayByMatchId$(idLastMatch))
     );
   }
 
@@ -251,6 +238,22 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  syncTopMatch(matchday: number): void {
+    // sets the top match, if the top match is not yet existing
+
+    this.syncTopMatchService.isTopMatchExisting$(SEASON, matchday).subscribe(
+      (isExisting: boolean) => {
+        if (!isExisting) {
+          this.syncTopMatchService.fetchTopMatchIdToSet$(SEASON, matchday).subscribe(
+            (topMatchId: number) => {
+              this.syncTopMatchService.setTopMatch(topMatchId);
+            }
+          );
+        }
+      }
+    );
+  }
+
   ngOnInit(): void {
 
     // set logged user as property
@@ -267,10 +270,17 @@ export class HomeComponent implements OnInit {
       }
     );
 
+    // fix overdue bets
     this.fixBetEvent.subscribe(
       (matchday: number) => this.fixOpenOverdueBets(matchday)
     );
 
+    // eavluate and set top match if required
+    this.syncTopMatchEvent.pipe(delay(5000)).subscribe(
+      (matchday: number) => this.syncTopMatch(matchday)
+    );
+
+    // snyc data
     this.syncNeededEvent.subscribe(
       () => {
         let message: string = "Neue Daten verfügbar";

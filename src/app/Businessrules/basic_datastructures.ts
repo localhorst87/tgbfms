@@ -67,3 +67,18 @@ export interface Score {
   extraOutsider: number;
   extraSeason: number;
 }
+
+export interface TopMatchVote {
+  documentId: string;
+  season: number;
+  matchday: number;
+  matchId: number;
+  userId: string;
+  timestamp: number;
+}
+
+export interface VoteCount {
+  matchId: number;
+  nVotes: number;
+  lastVoteTime: number;
+}

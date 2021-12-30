@@ -4,7 +4,7 @@ import { Observable, from } from 'rxjs';
 import { map, switchMap, distinct, take, pluck } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import firebase from 'firebase/compat/app';
-import { Bet, Match, Result, Team, User, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
+import { Bet, Match, Result, Team, User, SeasonBet, SeasonResult, TopMatchVote } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
 
 export const COLLECTION_NAME_BETS: string = 'bets';
@@ -16,6 +16,8 @@ export const COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT: string = 'matchday_score_s
 export const COLLECTION_NAME_SEASON_BETS: string = 'season_bets';
 export const COLLECTION_NAME_SEASON_RESULTS: string = 'season_results';
 export const COLLECTION_NAME_UPDATE_TIMES: string = 'sync_times';
+export const COLLECTION_NAME_TOPMATCH_VOTE: string = 'topmatch_votes';
+
 const SECONDS_PER_DAY: number = 86400;
 
 @Injectable()
@@ -135,13 +137,32 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
         .orderBy("timestamp"))
       .valueChanges({ idField: 'documentId' }); // requires additional index in firestore
 
-    let matches$: Observable<Match> = matchQuery$.pipe(
+    return matchQuery$.pipe(
       take(1),
       switchMap(matchArray => from(matchArray)),
       distinct(match => match.matchId)
     );
+  }
 
-    return matches$;
+  getFirstMatchOfMatchday$(season: number, matchday: number): Observable<Match> {
+    // returns the first match of the given matchday in terms of time
+
+    let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
+      ref.where("matchday", "==", matchday).where("season", "==", season)
+        .orderBy("timestamp")
+        .limit(1))
+      .valueChanges({ idField: 'documentId' });
+
+    return matchQuery$.pipe(
+      take(1),
+      map((matchArray: Match[]) => {
+        if (matchArray.length == 0) {
+          matchArray.push(this.makeUnknownMatch(-1));
+        }
+        return matchArray[0];
+      }),
+      distinct()
+    );
   }
 
   getNextMatchesByTime$(nextDays: number): Observable<Match> {
@@ -417,6 +438,30 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
+  getTopMatchVotes$(season: number, matchday: number, userId?: string): Observable<TopMatchVote> {
+    // returns the TopMatchVotes from the given matchday. If userId is given,
+    // the function returns only the TopMatchVote with given matchday and userId
+
+    let voteQuery$: Observable<TopMatchVote[]>;
+
+    if (userId) {
+      voteQuery$ = this.firestore.collection<TopMatchVote>(COLLECTION_NAME_TOPMATCH_VOTE, ref =>
+        ref.where("matchday", "==", matchday).where("userId", "==", userId))
+        .valueChanges({ idField: "documentId" });
+    }
+    else {
+      voteQuery$ = this.firestore.collection<TopMatchVote>(COLLECTION_NAME_TOPMATCH_VOTE, ref =>
+        ref.where("matchday", "==", matchday))
+        .valueChanges({ idField: "documentId" });
+    }
+
+    return voteQuery$.pipe(
+      take(1),
+      switchMap((voteArray: TopMatchVote[]) => from(voteArray)),
+      distinct()
+    );
+  }
+
   setBet(bet: Bet): Promise<void> {
     let betToUpdate: any = bet;
     let documentId: string = bet.documentId;
@@ -502,6 +547,15 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let syncTimeDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_UPDATE_TIMES + "/" + documentId);
     syncTimeDocument.set(syncTimeToUpdate);
+  }
+
+  setTopMatchVote(vote: TopMatchVote): Promise<void> {
+    let voteToSet: any = vote;
+    let documentId: string = vote.documentId;
+    delete voteToSet.documentId;
+
+    let voteDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_TOPMATCH_VOTE + "/" + documentId);
+    return voteDocument.set(voteToSet);
   }
 
   createDocumentId(): string {

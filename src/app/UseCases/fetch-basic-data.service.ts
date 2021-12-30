@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, from, range, concat, iif, combineLatest } from 'rxjs';
-import { tap, map, mergeMap, concatMap, pluck, distinct, filter, first, toArray } from 'rxjs/operators';
+import { tap, map, switchMap, mergeMap, concatMap, pluck, distinct, filter, first, last, toArray } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { PointCalculatorService } from '../Businessrules/point-calculator.service';
@@ -8,6 +8,8 @@ import { Bet, Result, Match, Team, SeasonBet } from '../Businessrules/basic_data
 import { MatchInfo, TeamStats } from './output_datastructures';
 import { TeamRankingImportData } from '../Dataaccess/import_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT, SEASON } from '../Businessrules/rule_defined_values';
+
+const THRESHOLD_POSTPONED_MATCH: number = 3 * 86400;
 
 @Injectable({
   providedIn: 'root'
@@ -115,6 +117,53 @@ export class FetchBasicDataService {
         let diffNextMatch: number = Math.abs(nextMatch.timestamp - timestampNow);
         let diffLastMatch: number = Math.abs(lastMatch.timestamp - timestampNow);
         return (diffNextMatch <= diffLastMatch ? nextMatch.matchday : lastMatch.matchday);
+      }
+    );
+  }
+
+  public getMatchdayOfNextMatch$(): Observable<number> {
+    // returns -1 if no matches are left in the current season (= season ended)
+
+    return this.appData.getNextMatch$(SEASON).pipe(
+      pluck("matchId"),
+      switchMap((idNextMatch: number) => this.appData.getMatchdayByMatchId$(idNextMatch))
+    );
+  }
+
+  public getMatchdayOfLastMatch$(): Observable<number> {
+    // return -1 if no matches are completed in the current season (= season not yet started)
+
+    return this.appData.getLastMatch$(SEASON).pipe(
+      pluck("matchId"),
+      switchMap((idLastMatch: number) => this.appData.getMatchdayByMatchId$(idLastMatch))
+    );
+  }
+
+  public matchdayIsFinished$(season: number, matchday: number): Observable<boolean> {
+    // returns true if the last match (that's not postponed) of the matchday is finished
+
+    return this.appData.getMatchesByMatchday$(season, matchday).pipe(
+      filter((match: Match) => match.timestamp > -1),
+      toArray(),
+      map((matches: Match[]) => matches.sort((a, b) => a.timestamp - b.timestamp)), // sort ascending)
+      map((matches: Match[]) => {
+        const timestampFirst: number = matches[0].timestamp;
+        return matches.filter(match => match.timestamp - timestampFirst < THRESHOLD_POSTPONED_MATCH);
+      }), // filter out postponed matches
+      switchMap((matches: Match[]) => from(matches)),
+      last(),
+      map((lastMatch: Match) => lastMatch.isFinished)
+    );
+  }
+
+  public matchdayHasBegun$(season: number, matchday: number): Observable<boolean> {
+    // returns true if any match of the given matchday has begun or finished
+
+    return combineLatest(
+      this.appData.getFirstMatchOfMatchday$(season, matchday),
+      this.getCurrentTimestamp$(),
+      (firstMatch: Match, currentTimestamp: number) => {
+        return firstMatch.timestamp > -1 && (currentTimestamp > firstMatch.timestamp);
       }
     );
   }

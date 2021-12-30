@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@ang
 import { interval } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { Bet, SeasonBet, Team } from '../Businessrules/basic_datastructures';
+import { Bet, SeasonBet, Team, TopMatchVote } from '../Businessrules/basic_datastructures';
 import { BetWriteData, SeasonBetWriteData } from '../UseCases/output_datastructures';
 import { SEASON, MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
 
@@ -35,6 +35,9 @@ export class BetWriteComponent implements OnInit, OnChanges {
   @Output() selectMatchdayEvent = new EventEmitter<number>(); // directs selected matchday to home component
   betForm: FormGroup; // formular for setting bets
   seasonBetForm: FormGroup; // formular for setting season bets
+  votedTopMatch: number; // for selected matchday
+  selectedMatchdayHasBegun: boolean;
+  precedingMatchdayIsFinished: boolean; // w.r.t. selected matchday
   isLoading: boolean;
 
   constructor(
@@ -67,6 +70,9 @@ export class BetWriteComponent implements OnInit, OnChanges {
     this.fetchBasicService.fetchActiveTeams$(SEASON).subscribe(
       (team: Team) => this.activeTeams.push(team)
     );
+    this.votedTopMatch = -1;
+    this.selectedMatchdayHasBegun = false;
+    this.precedingMatchdayIsFinished = false;
     this.isLoading = false;
   }
 
@@ -104,6 +110,33 @@ export class BetWriteComponent implements OnInit, OnChanges {
       },
       () => {
         this.isLoading = false;
+      }
+    );
+
+    // check if selected matchday has begun
+    this.fetchBasicService.matchdayHasBegun$(SEASON, matchday).subscribe(
+      (isUnderway: boolean) => {
+        this.selectedMatchdayHasBegun = isUnderway;
+      }
+    );
+
+    // check if preceding matchday (w.r.t. selected matchday) is finished
+    if (matchday > 1) {
+      this.precedingMatchdayIsFinished = true;
+    }
+    else {
+      this.fetchBasicService.matchdayIsFinished$(SEASON, matchday - 1).subscribe(
+        (isFinished: boolean) => {
+          this.precedingMatchdayIsFinished = isFinished;
+        }
+      );
+    }
+
+    // check if TopMatchVote is existing for this matchday, if yes, set the according matchId
+    this.votedTopMatch = -1; // reset first
+    this.appData.getTopMatchVotes$(SEASON, matchday, this.userId).subscribe(
+      (vote: TopMatchVote) => {
+        this.votedTopMatch = vote.matchId; // will be invoked only, if a vote is available!
       }
     );
 
@@ -296,6 +329,26 @@ export class BetWriteComponent implements OnInit, OnChanges {
       this.seasonBets[iBet].isBetFixed = true;
       this.places.controls[iBet].disable();
     }
+  }
+
+  voteTopMatch(matchday: number, matchId: number): void {
+    // sets the TopMatchVote with the given matchId
+
+    let vote: TopMatchVote = {
+      documentId: this.appData.createDocumentId(),
+      season: SEASON,
+      matchday: matchday,
+      matchId: matchId,
+      userId: this.userId,
+      timestamp: this.currentTime.getTime() / 1000 // no floor, due to precision
+    };
+
+    this.appData.setTopMatchVote(vote)
+      .then(() => {
+        let confirmMessage: string = "Topspiel-Vote eingetragen";
+        this.snackbar.open(confirmMessage, "", { duration: 1000 });
+        this.votedTopMatch = vote.matchId;
+      });
   }
 
   ngOnInit(): void {

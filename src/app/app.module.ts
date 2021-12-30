@@ -89,7 +89,7 @@ export class NoCacheHeadersInterceptor implements HttpInterceptor {
     SyncDialogComponent,
     DashboardComponent,
     PasswordResetComponent,
-    RulesComponent
+    // RulesComponent
   ],
   imports: [
     BrowserModule,

@@ -156,14 +156,14 @@ export class FetchBasicDataService {
     );
   }
 
-  public matchdayHasBegun$(season: number, matchday: number): Observable<boolean> {
+  public matchdayHasBegun$(season: number, matchday: number, toleranceSeconds: number = 0): Observable<boolean> {
     // returns true if any match of the given matchday has begun or finished
 
     return combineLatest(
       this.appData.getFirstMatchOfMatchday$(season, matchday),
       this.getCurrentTimestamp$(),
       (firstMatch: Match, currentTimestamp: number) => {
-        return firstMatch.timestamp > -1 && (currentTimestamp > firstMatch.timestamp);
+        return firstMatch.timestamp > -1 && (currentTimestamp > (firstMatch.timestamp + toleranceSeconds));
       }
     );
   }

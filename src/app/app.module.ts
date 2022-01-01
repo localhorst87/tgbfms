@@ -30,6 +30,7 @@ import { RegisterComponent } from './register/register.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { SyncDialogComponent } from './sync-dialog/sync-dialog.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { RulesComponent } from './rules/rules.component';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
@@ -58,11 +59,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 
-
 // Other UI components
 import { SwiperModule } from 'swiper/angular';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-// import { RulesComponent } from './rules/rules.component';
 
 @Injectable()
 export class NoCacheHeadersInterceptor implements HttpInterceptor {
@@ -89,7 +88,7 @@ export class NoCacheHeadersInterceptor implements HttpInterceptor {
     SyncDialogComponent,
     DashboardComponent,
     PasswordResetComponent,
-    // RulesComponent
+    RulesComponent
   ],
   imports: [
     BrowserModule,

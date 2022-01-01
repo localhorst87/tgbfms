@@ -1,0 +1,20 @@
+<div class="content-container">
+  <div class="rule-panel">
+    <mat-accordion [multi]="false">
+      <ng-container *ngFor="let chapter of chapters">
+        <p class="mat-h0 chapter-title">{{chapter.title}}</p>
+        <mat-expansion-panel *ngFor="let panel of chapter.panels">
+          <mat-expansion-panel-header class="right-aligned-header">
+            <mat-panel-title>{{panel.title}}</mat-panel-title>
+            <mat-panel-description> <mat-icon>{{panel.icon}}</mat-icon> </mat-panel-description>
+          </mat-expansion-panel-header>
+          <div class="rule-box" *ngFor="let paragraph of panel.paragraphs">
+            <p class="paragraph-title">{{paragraph.title}}</p>
+            <p class="rule">{{paragraph.content}}</p>
+            <p class="thin-text comment">{{paragraph.comment}}</p>
+          </div>
+        </mat-expansion-panel>
+      </ng-container>
+    </mat-accordion>
+  </div>
+</div>

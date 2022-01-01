@@ -1,0 +1,38 @@
+.content-container {
+  height: calc(100% - 2*56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.rule-panel {
+  width: 95%;
+  margin-bottom: 15px;
+}
+
+.rule-box {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.chapter-title {
+  margin-top: 20px;
+  margin-left: 15px;
+}
+
+.paragraph-title {
+  font-weight: bold;
+  margin: 5px;
+}
+
+.rule {
+  text-align: justify;
+  margin:2px;
+}
+
+.comment {
+  text-align: justify;
+  margin: 2px;
+}

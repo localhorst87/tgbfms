@@ -13,16 +13,18 @@ $fontConfig: (
   headline: mat.define-typography-level(24px, 32px, 400, 'Roboto', 0.0000em),
   title: mat.define-typography-level(20px, 20px, 500, 'Roboto', 0.0075em),
   subheading-2: mat.define-typography-level(16px, 28px, 400, 'Roboto', 0.0094em),
+  subheading-1-5: mat.define-typography-level(16px, 20px, 500, 'Roboto Condensed', 0.0094em),
   subheading-1: mat.define-typography-level(14px, 20px, 400, 'Roboto', 0.0067em),
-  body-2: mat.define-typography-level(14px, 24px, 500, 'Roboto', 0.0179em),
-  body-1: mat.define-typography-level(14px, 20px, 400, 'Roboto', 0.0179em),
+  body-2: mat.define-typography-level(14px, 24px, 500, 'Roboto', 0.0100em),
+  body-1: mat.define-typography-level(14px, 20px, 400, 'Roboto', 0.0075em),
   button: mat.define-typography-level(14px, 14px, 500, 'Roboto', 0.0893em),
   caption: mat.define-typography-level(2vh, 3vh, 400, 'Roboto Mono', 0.1667em),
   input: mat.define-typography-level(inherit, 1.2, 400, 'Roboto Mono', -0.0089em),
   big-mono-letters: mat.define-typography-level(10.0vh, 13vh, 500, 'Roboto Mono', -0.10em),
   small-mono-letters: mat.define-typography-level(2.2vh, 5.0vh, 400, 'Roboto Mono', -0.075em),
   subheading-1-mono: mat.define-typography-level(14px, 20px, 400, 'Roboto Mono', -0.075em),
-  subheading-2-mono: mat.define-typography-level(16px, 28px, 400, 'Roboto Mono', 0.0094em)
+  subheading-2-mono: mat.define-typography-level(16px, 28px, 400, 'Roboto Mono', 0.0094em),
+  thin-text: mat.define-typography-level(12px, 16px, 300, 'Roboto', 0.005em),
 );
 
 // Foreground Elements
@@ -330,12 +332,20 @@ body {
   @include mat.typography-level($fontConfig, 'small-mono-letters');
 }
 
+.mat-h0 {
+  @include mat.typography-level($fontConfig, 'subheading-1-5');
+}
+
 .subheading-mono-letters {
   @include mat.typography-level($fontConfig, 'subheading-1-mono');
 }
 
 .subheading-big-mono-letters {
   @include mat.typography-level($fontConfig, 'subheading-2-mono');
+}
+
+.thin-text {
+  @include mat.typography-level($fontConfig, 'thin-text');
 }
 
 .right-aligned-header > .mat-content {

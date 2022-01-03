@@ -123,14 +123,14 @@ export class BetWriteComponent implements OnInit, OnChanges {
 
     // check if preceding matchday (w.r.t. selected matchday) is finished
     if (matchday > 1) {
-      this.precedingMatchdayIsFinished = true;
-    }
-    else {
       this.fetchBasicService.matchdayIsFinished$(SEASON, matchday - 1).subscribe(
         (isFinished: boolean) => {
           this.precedingMatchdayIsFinished = isFinished;
         }
       );
+    }
+    else {
+      this.precedingMatchdayIsFinished = true;
     }
 
     // check if TopMatchVote is existing for this matchday, if yes, set the according matchId

@@ -16,6 +16,8 @@ import { SEASON, MATCHDAYS_PER_SEASON } from '../Businessrules/rule_defined_valu
 const BET_FIX_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if Bets needs to be fixed
 const SYNC_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if new Data to synchronize is available
 const DURATION_SYNC_SNACKBAR: number = 2 * 1000; // duration in [ms] the snackbar for data sync shows up
+const MATCHDAY_BEGUN_TOLERANCE: number = -60 * 60; // check top match votes one hour before matchday starts
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -30,6 +32,7 @@ export class HomeComponent implements OnInit {
   matchdayCompleted: number;
   matchdayClosestMatch: number;
   matchdayUserSelection: number;
+  matchdayTopMatchSync: number;
   nextFixTimestamp: number; // next time point to check if all Bets are fixed
   betsUpdateTime: number;
   matchdaysToSync: number[];
@@ -64,6 +67,7 @@ export class HomeComponent implements OnInit {
     this.matchdayClosestMatch = -1;
     this.matchdayCompleted = -1;
     this.matchdayUserSelection = -1;
+    this.matchdayTopMatchSync = -1;
     this.nextFixTimestamp = -1;
     this.betsUpdateTime = -1;
     this.matchdaysToSync = [];
@@ -139,36 +143,56 @@ export class HomeComponent implements OnInit {
     combineLatest(
       this.fetchBasicService.getMatchdayOfLastMatch$(),
       this.fetchBasicService.getMatchdayOfNextMatch$(),
-      this.fetchBasicService.getClosestMatchday$()
+      this.fetchBasicService.getClosestMatchday$(),
+      this.fetchBasicService.getMatchdayOfNextMatch$().pipe(
+        switchMap((nextMatch: number) => this.fetchBasicService.matchdayHasBegun$(SEASON, nextMatch, MATCHDAY_BEGUN_TOLERANCE))
+      )
     ).subscribe(
-      ([matchdayLast, matchdayNext, matchdayClosest]) => {
+      ([matchdayLast, matchdayNext, matchdayClosest, nextMatchdayBeginsWithinOneHour]) => {
         if (matchdayLast == -1 && matchdayNext == -1) { // no matches available
           this.matchdayLastMatch = 1;
           this.matchdayNextMatch = 1;
           this.matchdayClosestMatch = 1;
           this.matchdayCompleted = 0;
+          this.matchdayTopMatchSync = -1;
         }
         else if (matchdayLast > 0 && matchdayNext == -1) { // all matches played
           this.matchdayLastMatch = matchdayLast;
           this.matchdayNextMatch = matchdayLast;
           this.matchdayClosestMatch = matchdayLast;
           this.matchdayCompleted = matchdayLast;
+          this.matchdayTopMatchSync = matchdayLast;
         }
         else if (matchdayLast == -1 && matchdayNext > 0) { // no matches played yet
           this.matchdayLastMatch = matchdayNext;
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayNext;
           this.matchdayCompleted = -1;
+
+          if (nextMatchdayBeginsWithinOneHour) {
+            this.matchdayTopMatchSync = matchdayNext;
+          }
+          else {
+            this.matchdayTopMatchSync = -1;
+          }
         }
         else {
           this.matchdayLastMatch = matchdayLast;
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayClosest;
+
           if (matchdayNext > matchdayLast) {
             this.matchdayCompleted = matchdayLast;
           }
           else {
             this.matchdayCompleted = matchdayNext - 1;
+          }
+
+          if (nextMatchdayBeginsWithinOneHour) {
+            this.matchdayTopMatchSync = matchdayNext;
+          }
+          else {
+            this.matchdayTopMatchSync = matchdayLast;
           }
         }
       },
@@ -178,7 +202,7 @@ export class HomeComponent implements OnInit {
         // of Bets for the matchday of the last match. This is only called once
         // in the beginning on ngOnInit
         this.fixBetEvent.emit(this.matchdayLastMatch);
-        this.syncTopMatchEvent.emit(this.matchdayLastMatch);
+        this.syncTopMatchEvent.emit(this.matchdayTopMatchSync);
         this.subscribeToSyncCheck(this.matchdayLastMatch);
       }
     );

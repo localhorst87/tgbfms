@@ -1,6 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Router } from "@angular/router";
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { User } from '../Businessrules/basic_datastructures';
@@ -14,9 +15,10 @@ export class AuthenticationService {
     private fireAuth: AngularFireAuth,
     private appData: AppdataAccessService,
     private router: Router,
-    private ngZone: NgZone) { }
+    private ngZone: NgZone,
+    private snackbar: MatSnackBar) { }
 
-  public signUp(email: string, displayName: string, password: string): any {
+  public signUp(email: string, displayName: string, password: string): Promise<any> {
     // registers a user
 
     return this.fireAuth.createUserWithEmailAndPassword(email, password)
@@ -43,21 +45,55 @@ export class AuthenticationService {
         }
       })
       .catch(
-        err => { }
+        err => {
+          let snackbarMsg: string;
+          if (err.code == "auth/email-already-in-use") {
+            snackbarMsg = "E-Mail-Adresse existiert schon";
+          }
+          else if (err.code == "auth/weak-password") {
+            snackbarMsg = "Passwort zu schwach";
+          }
+          else {
+            snackbarMsg = err.message;
+          }
+          this.snackbar.open(snackbarMsg, "OK");
+        }
       );
   }
 
-  public sendResetMail(email: string): any {
+  public sendResetMail(email: string): Promise<any> {
     // sends a mail to reset the password
 
-    return this.fireAuth.sendPasswordResetEmail(email);
+    return this.fireAuth.sendPasswordResetEmail(email)
+      .then(() => {
+        let snackbarMsg: string = "E-Mail versendet. Bitte überprüfe dein Postfach.";
+        let confirmMsg: string = "OK";
+        this.snackbar.open(snackbarMsg, confirmMsg);
+      })
+      .catch(
+        err => {
+          let snackbarMsg: string;
+          let confirmMsg: string;
+
+          if (err.code == "auth/user-not-found") {
+            snackbarMsg = "Unbekannte E-Mail-Adresse";
+            confirmMsg = "OK";
+            this.snackbar.open(snackbarMsg, confirmMsg);
+          }
+          else {
+            snackbarMsg = err.message;
+            confirmMsg = "OK";
+            this.snackbar.open(snackbarMsg, confirmMsg);
+          }
+        }
+      );
   }
 
-  public login(email: string, password: string): any {
+  public login(email: string, password: string): Promise<any> {
     // login user and perform sync of activation status
 
-    return this.fireAuth.signInWithEmailAndPassword(email, password).then(
-      userCredential => {
+    return this.fireAuth.signInWithEmailAndPassword(email, password)
+      .then(userCredential => {
         if (userCredential.user) {
 
           // check and sync activation status of account
@@ -77,10 +113,34 @@ export class AuthenticationService {
             this.router.navigate(["main"]);
           });
         }
-      });
+      })
+      .catch(
+        err => {
+          let snackbarMsg: string;
+          let confirmMsg: string;
+
+          if (err.code == "auth/user-not-found") {
+            snackbarMsg = "Unbekannte E-Mail-Adresse";
+            confirmMsg = "OK";
+            this.snackbar.open(snackbarMsg, confirmMsg);
+          }
+          else if (err.code == "auth/wrong-password") {
+            snackbarMsg = "Falsches Passwort";
+            confirmMsg = "Passwort vergessen?";
+            this.snackbar.open(snackbarMsg, confirmMsg, { duration: 5000 })
+              .onAction()
+              .subscribe(() => this.router.navigateByUrl('/pw-reset'));
+          }
+          else {
+            snackbarMsg = err.message;
+            confirmMsg = "OK";
+            this.snackbar.open(snackbarMsg, confirmMsg);
+          }
+        }
+      );
   }
 
-  public logout(): any {
+  public logout(): Promise<void> {
     // logout the current user
 
     return this.fireAuth.signOut().then(

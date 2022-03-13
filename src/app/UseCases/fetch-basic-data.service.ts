@@ -139,6 +139,27 @@ export class FetchBasicDataService {
     );
   }
 
+  public getFinishedMatchday$(season: number): Observable<number> {
+    // returns the highest matchday that is finished
+
+    return this.matchData.getCurrentMatchday$().pipe(
+      switchMap((matchday: number) => {
+        if (matchday > -1) {
+          return of(matchday);
+        }
+        else {
+          return this.appData.getLastMatch$(season).pipe(pluck("matchday")); // fallback
+        }
+      }),
+      concatMap((matchday: number) => this.matchdayIsFinished$(season, matchday).pipe(
+        map((isFinished: boolean) => {
+          if (isFinished) return matchday;
+          else return matchday - 1;
+        })
+      ))
+    );
+  }
+
   public matchdayIsFinished$(season: number, matchday: number): Observable<boolean> {
     // returns true if the last match (that's not postponed) of the matchday is finished
 

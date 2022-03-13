@@ -144,11 +144,12 @@ export class HomeComponent implements OnInit {
       this.fetchBasicService.getMatchdayOfLastMatch$(),
       this.fetchBasicService.getMatchdayOfNextMatch$(),
       this.fetchBasicService.getClosestMatchday$(),
+      this.fetchBasicService.getFinishedMatchday$(SEASON),
       this.fetchBasicService.getMatchdayOfNextMatch$().pipe(
         switchMap((nextMatch: number) => this.fetchBasicService.matchdayHasBegun$(SEASON, nextMatch, MATCHDAY_BEGUN_TOLERANCE))
       )
     ).subscribe(
-      ([matchdayLast, matchdayNext, matchdayClosest, nextMatchdayBeginsWithinOneHour]) => {
+      ([matchdayLast, matchdayNext, matchdayClosest, matchdayFinished, nextMatchdayBeginsWithinOneHour]) => {
         if (matchdayLast == -1 && matchdayNext == -1) { // no matches available
           this.matchdayLastMatch = 1;
           this.matchdayNextMatch = 1;
@@ -180,13 +181,7 @@ export class HomeComponent implements OnInit {
           this.matchdayLastMatch = matchdayLast;
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayClosest;
-
-          if (matchdayNext > matchdayLast) {
-            this.matchdayCompleted = matchdayLast;
-          }
-          else {
-            this.matchdayCompleted = matchdayNext - 1;
-          }
+          this.matchdayCompleted = matchdayFinished;
 
           if (nextMatchdayBeginsWithinOneHour) {
             this.matchdayTopMatchSync = matchdayNext;
@@ -224,6 +219,7 @@ export class HomeComponent implements OnInit {
     // fix bet if this is the case
 
     timer(0, BET_FIX_CYCLE).pipe(
+      delay(2000),
       switchMap(() => this.fetchBasicService.getCurrentTimestamp$())
     ).subscribe(
       (currentTimestamp: number) => {

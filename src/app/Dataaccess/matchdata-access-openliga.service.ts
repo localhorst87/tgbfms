@@ -9,6 +9,7 @@ const URL_TRUNK_MATCHES: string = "https://www.openligadb.de/api/getmatchdata/bl
 const URL_TRUNK_RANKING: string = "https://www.openligadb.de/api/getbltable/bl1";
 const URL_TRUNK_TEAMS: string = "https://www.openligadb.de/api/getavailableteams/bl1"
 const URL_TRUNK_UPDATETIME: string = "https://www.openligadb.de/api/getlastchangedate/bl1";
+const URL_TRUNK_MATCHDAY: string = "https://www.openligadb.de/api/getcurrentgroup/bl1";
 
 @Injectable()
 export class MatchdataAccessOpenligaService implements MatchdataAccessService {
@@ -48,6 +49,14 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     let fullUrl: string = URL_TRUNK_UPDATETIME + "/" + String(season) + "/" + String(matchday);
     return this.http.get(fullUrl, { responseType: 'json' }).pipe(
       switchMap(updateTime => this.convertUpdateTime$(updateTime))
+    );
+  }
+
+  getCurrentMatchday$(): Observable<number> {
+    // returns the current matchday of the campaign
+
+    return this.http.get(URL_TRUNK_MATCHDAY, { responseType: 'json' }).pipe(
+      switchMap(currentMatchday => this.convertCurrentMatchdayJson$(currentMatchday))
     );
   }
 
@@ -125,7 +134,7 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
   }
 
   private convertTeamJson$(teamDataJson: any): Observable<number> {
-    //
+    // extracts the team ID from the structure
 
     let teamIds: number[] = [];
 
@@ -139,6 +148,20 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
     }
 
     return from(teamIds);
+  }
+
+  private convertCurrentMatchdayJson$(matchdayJson: any): Observable<number> {
+    // extracts the matchday from the JSON structure
+
+    if (!("error" in matchdayJson)) {
+      // http error throws object with error property
+      // error response will result in empty matchArray
+
+      return of(matchdayJson.GroupOrderID);
+    }
+    else {
+      return of(-1);
+    }
   }
 
   private extractResult(matchJson: any): number[] {

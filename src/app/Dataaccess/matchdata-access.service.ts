@@ -8,4 +8,5 @@ export abstract class MatchdataAccessService {
   public abstract importCurrentTeamRanking$(season: number): Observable<TeamRankingImportData>;
   public abstract getActiveTeams$(season: number): Observable<number>;
   public abstract getLastUpdateTime$(season: number, matchday: number): Observable<number>;
+  public abstract getCurrentMatchday$(): Observable<number>;
 }

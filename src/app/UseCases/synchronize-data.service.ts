@@ -234,8 +234,6 @@ export class SynchronizeDataService {
 
     return combineLatest(this.getResultArrayFromMatchArray$(matchArray), this.getBetArrayFromMatchArray$(matchArray),
       (resultArray: Result[], betArray: Bet[]) => {
-        // console.log(resultArray);
-        // console.log(betArray);
         return this.statCalculater.getScoreArray(matchArray, betArray, resultArray);
       }
     );
@@ -250,7 +248,6 @@ export class SynchronizeDataService {
       )),
       distinct(),
       toArray(),
-      // tap(val => console.log(val))
     );
   }
 
@@ -261,7 +258,6 @@ export class SynchronizeDataService {
       concatMap((match: Match) => this.appDataAccess.getResult$(match.matchId)),
       distinct(),
       toArray(),
-      // tap(val => console.log(val))
     );
   }
 

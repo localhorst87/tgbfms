@@ -238,7 +238,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return match$;
   }
 
-  getLastMatch$(season: number): Observable<Match> {
+  getLastMatch$(season: number, amount: number = 1): Observable<Match> {
     // returns the last match that took place. If no match has been played yet,
     // the function returns a dummy match
 
@@ -247,19 +247,18 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     let matchQuery$: Observable<Match[]> = this.firestore.collection<Match>(COLLECTION_NAME_MATCHES, ref =>
       ref.where("timestamp", "<", timestampNow).where("season", "==", season)
         .orderBy("timestamp", "desc")
-        .limit(1))
+        .limit(amount))
       .valueChanges({ idField: 'documentId' });
 
     let match$: Observable<Match> = matchQuery$.pipe(
       take(1),
       map(matchArray => {
         if (matchArray.length == 0) {
-          return this.makeUnknownMatch(-1);
+          matchArray.push(this.makeUnknownMatch(-1));
         }
-        else {
-          return matchArray[0];
-        }
+        return matchArray;
       }),
+      switchMap((matchArray: Match[]) => from(matchArray)),
       distinct()
     );
 

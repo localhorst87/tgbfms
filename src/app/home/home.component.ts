@@ -30,6 +30,7 @@ export class HomeComponent implements OnInit {
   matchdayNextMatch: number;
   matchdayLastMatch: number;
   matchdayCompleted: number;
+  matchdayCurrent: number;
   matchdayClosestMatch: number;
   matchdayUserSelection: number;
   matchdayTopMatchSync: number;
@@ -66,6 +67,7 @@ export class HomeComponent implements OnInit {
     this.matchdayLastMatch = -1;
     this.matchdayClosestMatch = -1;
     this.matchdayCompleted = -1;
+    this.matchdayCurrent = -1;
     this.matchdayUserSelection = -1;
     this.matchdayTopMatchSync = -1;
     this.nextFixTimestamp = -1;
@@ -144,16 +146,18 @@ export class HomeComponent implements OnInit {
       this.fetchBasicService.getMatchdayOfLastMatch$(),
       this.fetchBasicService.getMatchdayOfNextMatch$(),
       this.fetchBasicService.getClosestMatchday$(),
+      this.fetchBasicService.getCurrentMatchday$(SEASON),
       this.fetchBasicService.getFinishedMatchday$(SEASON),
       this.fetchBasicService.getMatchdayOfNextMatch$().pipe(
         switchMap((nextMatch: number) => this.fetchBasicService.matchdayHasBegun$(SEASON, nextMatch, MATCHDAY_BEGUN_TOLERANCE))
       )
     ).subscribe(
-      ([matchdayLast, matchdayNext, matchdayClosest, matchdayFinished, nextMatchdayBeginsWithinOneHour]) => {
+      ([matchdayLast, matchdayNext, matchdayClosest, matchdayCurrent, matchdayFinished, nextMatchdayBeginsWithinOneHour]) => {
         if (matchdayLast == -1 && matchdayNext == -1) { // no matches available
           this.matchdayLastMatch = 1;
           this.matchdayNextMatch = 1;
           this.matchdayClosestMatch = 1;
+          this.matchdayCurrent = 1;
           this.matchdayCompleted = 0;
           this.matchdayTopMatchSync = -1;
         }
@@ -161,6 +165,7 @@ export class HomeComponent implements OnInit {
           this.matchdayLastMatch = matchdayLast;
           this.matchdayNextMatch = matchdayLast;
           this.matchdayClosestMatch = matchdayLast;
+          this.matchdayCurrent = matchdayLast;
           this.matchdayCompleted = matchdayLast;
           this.matchdayTopMatchSync = matchdayLast;
         }
@@ -168,6 +173,7 @@ export class HomeComponent implements OnInit {
           this.matchdayLastMatch = matchdayNext;
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayNext;
+          this.matchdayCurrent = matchdayNext;
           this.matchdayCompleted = -1;
 
           if (nextMatchdayBeginsWithinOneHour) {
@@ -181,6 +187,7 @@ export class HomeComponent implements OnInit {
           this.matchdayLastMatch = matchdayLast;
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayClosest;
+          this.matchdayCurrent = matchdayCurrent;
           this.matchdayCompleted = matchdayFinished;
 
           if (nextMatchdayBeginsWithinOneHour) {

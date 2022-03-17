@@ -73,14 +73,14 @@
 <app-table
   *ngIf = "selectedPage == 'table'"
   [userId] = "loggedUser.id"
-  [currentMatchday] = "matchdayLastMatch">
+  [currentMatchday] = "matchdayCurrent">
 </app-table>
 
 <app-dashboard
   *ngIf = "selectedPage == 'dashboard'"
   [userId] = "loggedUser.id"
   [matchdayNextMatch] = "matchdayNextMatch"
-  [matchdayLastMatch] = "matchdayLastMatch"
+  [matchdayCurrent] = "matchdayCurrent"
   [matchdayCompleted] = "matchdayCompleted">
 </app-dashboard>
 

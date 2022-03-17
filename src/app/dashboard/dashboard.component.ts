@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   @Input() userId: string;
   @Input() matchdayNextMatch: number;
-  @Input() matchdayLastMatch: number;
+  @Input() matchdayCurrent: number;
   @Input() matchdayCompleted: number;
   elementsLoaded: number;
   currentForm: number;
@@ -67,7 +67,7 @@ export class DashboardComponent implements OnInit, OnChanges {
     this.userId = "";
     this.matchdayNextMatch = -1;
     this.matchdayCompleted = -1;
-    this.matchdayLastMatch = -1;
+    this.matchdayCurrent = -1;
     this.elementsLoaded = 0;
     this.currentForm = 0;
     this.nextMatchesInfo = [];
@@ -205,7 +205,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         startMatchday = Math.max(1, this.matchdayCompleted - HISTORY_MATCHES + 1);
         matchdayCount = Math.min(this.matchdayCompleted, HISTORY_MATCHES);
         endMatchday = this.matchdayCompleted;
-        currentMatchday = this.matchdayLastMatch;
+        currentMatchday = this.matchdayCurrent;
         matchdaysToFetch$ = range(startMatchday, matchdayCount);
       }
       else {

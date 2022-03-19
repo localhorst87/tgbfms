@@ -21,20 +21,20 @@ describe('UserInteractionVoteBasedService', () => {
   // sortVotes
   // ---------------------------------------------------------------------------
 
-  it("sortVotes, nVotes evaluated - should be < 0", () => {
+  it("sortVotes, nVotes evaluated - should be > 0", () => {
 
     const argument1: any = { nVotes: 5, lastVoteTime: 9000 };
     const argument2: any = { nVotes: 6, lastVoteTime: 9000 };
 
-    expect(service["sortVotes"](argument1, argument2)).toBeLessThan(0);
+    expect(service["sortVotes"](argument1, argument2)).toBeGreaterThan(0);
   });
 
-  it("sortVotes, nVotes evaluated - should be > 0", () => {
+  it("sortVotes, nVotes evaluated - should be < 0", () => {
 
     const argument1: any = { nVotes: 5, lastVoteTime: 9000 };
     const argument2: any = { nVotes: 3, lastVoteTime: 9000 };
 
-    expect(service["sortVotes"](argument1, argument2)).toBeGreaterThan(0);
+    expect(service["sortVotes"](argument1, argument2)).toBeLessThan(0);
   });
 
   it("sortVotes, lastVoteTime evaluated - should be > 0", () => {
@@ -57,7 +57,7 @@ describe('UserInteractionVoteBasedService', () => {
 
     const argument1: any = { nVotes: 5, lastVoteTime: 7000 };
     const argument2: any = { nVotes: 5, lastVoteTime: 7000 };
-    spyOn<any>(service, "getRandomInt").and.returnValue(1);
+    spyOn(Math, 'random').and.returnValue(0.999);
 
     expect(service["sortVotes"](argument1, argument2)).toEqual(0.5);
   });
@@ -145,7 +145,7 @@ describe('UserInteractionVoteBasedService', () => {
     ];
     const argument2: number[] = [65000, 65001, 65002];
 
-    expect(service["evaluateTopMatchVotes"](argument1, argument2)).toEqual(65001);
+    expect(service["evaluateTopMatchVotes"](argument1, argument2)).toEqual(65000);
   });
 
   it("evaluateTopMatchVotes, two matches absolutely identical, expect usage of random decision between two matches", () => {
@@ -157,7 +157,7 @@ describe('UserInteractionVoteBasedService', () => {
         matchday: 17,
         matchId: 65001,
         userId: "test_user_0",
-        timestamp: 5000
+        timestamp: 8999
       },
       {
         documentId: "test_doc_1",
@@ -173,7 +173,7 @@ describe('UserInteractionVoteBasedService', () => {
         matchday: 17,
         matchId: 65000,
         userId: "test_user_2",
-        timestamp: 9500
+        timestamp: 9000
       },
       {
         documentId: "test_doc_3",
@@ -181,7 +181,7 @@ describe('UserInteractionVoteBasedService', () => {
         matchday: 17,
         matchId: 65001,
         userId: "test_user_3",
-        timestamp: 9999
+        timestamp: 9000
       },
       {
         documentId: "test_doc_4",
@@ -192,8 +192,11 @@ describe('UserInteractionVoteBasedService', () => {
         timestamp: 4000
       },
     ];
-    const argument2: number[] = [65000, 65001, 65002, 65003];
-    spyOn<any>(service, "getRandomInt").and.returnValue(1);
+    const argument2: number[] = [65000, 65001, 65002];
+
+    // sortVotes will be called with (65000vote, 65001vote), so return 0.999 on the
+    // random function to have the 65001 vote sorted on a lower index
+    spyOn(Math, 'random').and.returnValue(0.999);
 
     expect(service["evaluateTopMatchVotes"](argument1, argument2)).toEqual(65001);
   });
@@ -201,9 +204,23 @@ describe('UserInteractionVoteBasedService', () => {
   it("evaluateTopMatchVotes, no votes available, expect usage of random decision between all matches", () => {
 
     const argument1: TopMatchVote[] = [];
-    const argument2: number[] = [65000, 65001, 65002, 65003];
-    spyOn<any>(service, "getRandomInt").and.returnValue(2);
+    const argument2: number[] = [65000, 65001, 65002];
 
-    expect(service["evaluateTopMatchVotes"](argument1, argument2)).toEqual(65002);
+    // make 65001 always to be sorted on lower index
+    spyOn<any>(service, "sortVotes")
+      .withArgs({ matchId: 65000, nVotes: 0, lastVoteTime: -1 }, { matchId: 65001, nVotes: 0, lastVoteTime: -1 })
+      .and.returnValue(1)
+      .withArgs({ matchId: 65000, nVotes: 0, lastVoteTime: -1 }, { matchId: 65002, nVotes: 0, lastVoteTime: -1 })
+      .and.returnValue(0)
+      .withArgs({ matchId: 65001, nVotes: 0, lastVoteTime: -1 }, { matchId: 65000, nVotes: 0, lastVoteTime: -1 })
+      .and.returnValue(-1)
+      .withArgs({ matchId: 65001, nVotes: 0, lastVoteTime: -1 }, { matchId: 65002, nVotes: 0, lastVoteTime: -1 })
+      .and.returnValue(-1)
+      .withArgs({ matchId: 65002, nVotes: 0, lastVoteTime: -1 }, { matchId: 65000, nVotes: 0, lastVoteTime: -1 })
+      .and.returnValue(0)
+      .withArgs({ matchId: 65002, nVotes: 0, lastVoteTime: -1 }, { matchId: 65001, nVotes: 0, lastVoteTime: -1 })
+      .and.returnValue(1);
+
+    expect(service["evaluateTopMatchVotes"](argument1, argument2)).toEqual(65001);
   });
 });

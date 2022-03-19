@@ -33,13 +33,13 @@ describe('StatisticsCalculatorTrendbasedService', () => {
 
   it("calculateForm, straight forward", () => {
 
-    const argument1: number[] = [5, 8, 9];
-    const argument2: number[][] = [[12, 7, 2, 2], [6, 6, 5, 4], [9, 9, 7, 4]];
-    const argument3: number[] = [0.8, 1.0, 1.2]
+    const points: number[] = [5, 8, 9];
+    const pointsOpp: number[][] = [[12, 7, 2, 2], [6, 6, 5, 4], [9, 9, 7, 4]];
+    const weights: number[] = [0.8, 1.0, 1.2]
 
-    const expectedValue: number = 5.3;
+    const expectedValue: number = 5.5;
 
-    expect(service["calculateForm"](argument1, argument2, argument3)).toEqual(expectedValue);
+    expect(service["calculateForm"](points, pointsOpp, weights)).toEqual(expectedValue);
   });
 
   it("calculateForm, pointsOpponents all 0", () => {
@@ -48,7 +48,7 @@ describe('StatisticsCalculatorTrendbasedService', () => {
     const argument2: number[][] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
     const argument3: number[] = [0.8, 1.0, 1.2]
 
-    const expectedValue: number = 10.0;
+    const expectedValue: number = 8.6;
 
     expect(service["calculateForm"](argument1, argument2, argument3)).toEqual(expectedValue);
   });

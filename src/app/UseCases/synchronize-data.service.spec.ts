@@ -5,6 +5,7 @@ import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { MatchImportData, TeamRankingImportData } from '../Dataaccess/import_datastructures';
 import { Bet, Match, Result, Team, SeasonResult } from '../Businessrules/basic_datastructures';
 import { SynchronizeDataService } from './synchronize-data.service';
+import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 
@@ -12,6 +13,7 @@ describe('SynchronizeDataService', () => {
   let service: SynchronizeDataService;
   let appDataSpy: jasmine.SpyObj<AppdataAccessService>;
   let matchDataSpy: jasmine.SpyObj<MatchdataAccessService>;
+  let statCalcSpy: jasmine.SpyObj<StatisticsCalculatorService>;
   let matchImportData: MatchImportData[];
 
   beforeEach(() => {
@@ -22,7 +24,8 @@ describe('SynchronizeDataService', () => {
       providers: [
         SynchronizeDataService,
         { provide: AppdataAccessService, useValue: appDataSpy },
-        { provide: MatchdataAccessService, useValue: matchDataSpy }
+        { provide: MatchdataAccessService, useValue: matchDataSpy },
+        { provide: StatisticsCalculatorService, useValue: statCalcSpy }
       ]
     });
 
@@ -103,17 +106,15 @@ describe('SynchronizeDataService', () => {
     spyOn<any>(service, "syncMatch").and.stub();
     spyOn<any>(service, "syncResult").and.stub();
     spyOn<any>(service, "syncSeasonResult").and.stub();
-    spyOn<any>(service, "refreshUpdateTime").and.stub();
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).toHaveBeenCalledWith(argument1, matchImportData[0]);
     expect(service["syncMatch"]).toHaveBeenCalledWith(argument1, matchImportData[1]);
     expect(service["syncMatch"]).toHaveBeenCalledWith(argument1, matchImportData[2]);
-    expect(service["syncResult"]).toHaveBeenCalledWith(matchImportData[0]);
-    expect(service["syncResult"]).toHaveBeenCalledWith(matchImportData[1]);
-    expect(service["syncResult"]).toHaveBeenCalledWith(matchImportData[2]);
-    expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, rankingImportData);
-    expect(service["refreshUpdateTime"]).toHaveBeenCalled();
+    expect(service["syncResult"]).toHaveBeenCalledWith(argument1, matchImportData[0]);
+    expect(service["syncResult"]).toHaveBeenCalledWith(argument1, matchImportData[1]);
+    expect(service["syncResult"]).toHaveBeenCalledWith(argument1, matchImportData[2]);
+    expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, argument2, rankingImportData);
   });
 
   it('syncData, import required but no match data available', () => {
@@ -149,13 +150,11 @@ describe('SynchronizeDataService', () => {
     spyOn<any>(service, "syncMatch").and.stub();
     spyOn<any>(service, "syncResult").and.stub();
     spyOn<any>(service, "syncSeasonResult").and.stub();
-    spyOn<any>(service, "refreshUpdateTime").and.stub();
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).not.toHaveBeenCalled();
     expect(service["syncResult"]).not.toHaveBeenCalled();
-    expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, rankingImportData);
-    expect(service["refreshUpdateTime"]).toHaveBeenCalled();
+    expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, argument2, rankingImportData);
   });
 
   it('syncData, import required but no match data available', () => {
@@ -191,13 +190,11 @@ describe('SynchronizeDataService', () => {
     spyOn<any>(service, "syncMatch").and.stub();
     spyOn<any>(service, "syncResult").and.stub();
     spyOn<any>(service, "syncSeasonResult").and.stub();
-    spyOn<any>(service, "refreshUpdateTime").and.stub();
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).not.toHaveBeenCalled();
     expect(service["syncResult"]).not.toHaveBeenCalled();
     expect(service["syncSeasonResult"]).not.toHaveBeenCalled();
-    expect(service["refreshUpdateTime"]).not.toHaveBeenCalled();
   });
 
   // ---------------------------------------------------------------------------
@@ -277,6 +274,7 @@ describe('SynchronizeDataService', () => {
       .withArgs(argument1, argument2, appDataMatch.isTopMatch).and.returnValue(transformedMatch);
     spyOn<any>(service, "isMatchEqual")
       .withArgs(transformedMatch, appDataMatch).and.returnValue(false);
+    spyOn<any>(service, "checkCounters").and.stub();
 
     service["syncMatch"](argument1, argument2);
     expect(appDataSpy.addMatch).toHaveBeenCalledWith(transformedMatch);
@@ -318,6 +316,7 @@ describe('SynchronizeDataService', () => {
       .withArgs(argument1, argument2, appDataMatch.isTopMatch).and.returnValue(transformedMatch);
     spyOn<any>(service, "isMatchEqual")
       .withArgs(transformedMatch, appDataMatch).and.returnValue(false);
+    spyOn<any>(service, "checkCounters").and.stub();
 
     service["syncMatch"](argument1, argument2);
     expect(appDataSpy.updateMatch).toHaveBeenCalledWith(appDataMatch.documentId, transformedMatch);
@@ -359,6 +358,7 @@ describe('SynchronizeDataService', () => {
       .withArgs(argument1, argument2, appDataMatch.isTopMatch).and.returnValue(transformedMatch);
     spyOn<any>(service, "isMatchEqual")
       .withArgs(transformedMatch, appDataMatch).and.returnValue(true);
+    spyOn<any>(service, "checkCounters").and.stub();
 
     service["syncMatch"](argument1, argument2);
     expect(appDataSpy.updateMatch).not.toHaveBeenCalled();
@@ -373,6 +373,7 @@ describe('SynchronizeDataService', () => {
     appDataSpy.addMatch.and.stub();
     appDataSpy.updateMatch.and.stub();
     spyOn<any>(service, "convertToMatch").and.callThrough();
+    spyOn<any>(service, "checkCounters").and.stub();
 
     service["syncMatch"](argument1, argument2);
     expect(service["convertToMatch"]).not.toHaveBeenCalled();
@@ -385,41 +386,44 @@ describe('SynchronizeDataService', () => {
   // ---------------------------------------------------------------------------
 
   it('syncResult, result available and new to app data', () => {
-    const argument: MatchImportData = matchImportData[1];
+    const argument1: number = 2021;
+    const argument2: MatchImportData = matchImportData[1];
 
     const appdataResult: Result = {
       documentId: "",
-      matchId: argument.matchId,
+      matchId: argument2.matchId,
       goalsHome: -1,
       goalsAway: -1
     };
 
     const transformedResult: Result = {
       documentId: "",
-      matchId: argument.matchId,
-      goalsHome: argument.goalsHome,
-      goalsAway: argument.goalsAway
+      matchId: argument2.matchId,
+      goalsHome: argument2.goalsHome,
+      goalsAway: argument2.goalsAway
     };
 
-    appDataSpy.getResult$.withArgs(argument.matchId).and.returnValue(of(appdataResult));
+    appDataSpy.getResult$.withArgs(argument2.matchId).and.returnValue(of(appdataResult));
     appDataSpy.addResult.and.stub();
     appDataSpy.updateResult.and.stub();
-    spyOn<any>(service, "convertToResult").withArgs(argument).and.returnValue(transformedResult);
+    spyOn<any>(service, "convertToResult").withArgs(argument2).and.returnValue(transformedResult);
     spyOn<any>(service, "isResultEqual").withArgs(transformedResult, appdataResult).and.returnValue(false);
+    spyOn<any>(service, "checkCounters").and.stub();
 
-    service["syncResult"](argument);
+    service["syncResult"](argument1, argument2);
     expect(appDataSpy.addResult).toHaveBeenCalledWith(transformedResult);
     expect(appDataSpy.updateResult).not.toHaveBeenCalled();
   });
 
   it('syncResult, result available and different than in app data', () => {
-    const argument: MatchImportData = matchImportData[1];
+    const argument1: number = 2021;
+    const argument2: MatchImportData = matchImportData[1];
 
     const appdataResult: Result = {
       documentId: "test_doc_id",
-      matchId: argument.matchId,
-      goalsHome: argument.goalsHome,
-      goalsAway: argument.goalsAway
+      matchId: argument2.matchId,
+      goalsHome: argument2.goalsHome,
+      goalsAway: argument2.goalsAway
     };
 
     const transformedResult: Result = {
@@ -429,25 +433,27 @@ describe('SynchronizeDataService', () => {
       goalsAway: appdataResult.goalsAway
     };
 
-    appDataSpy.getResult$.withArgs(argument.matchId).and.returnValue(of(appdataResult));
+    appDataSpy.getResult$.withArgs(argument2.matchId).and.returnValue(of(appdataResult));
     appDataSpy.addResult.and.stub();
     appDataSpy.updateResult.and.stub();
-    spyOn<any>(service, "convertToResult").withArgs(argument).and.returnValue(transformedResult);
+    spyOn<any>(service, "convertToResult").withArgs(argument2).and.returnValue(transformedResult);
     spyOn<any>(service, "isResultEqual").withArgs(transformedResult, appdataResult).and.returnValue(false);
+    spyOn<any>(service, "checkCounters").and.stub();
 
-    service["syncResult"](argument);
+    service["syncResult"](argument1, argument2);
     expect(appDataSpy.addResult).not.toHaveBeenCalled();
     expect(appDataSpy.updateResult).toHaveBeenCalledWith(appdataResult.documentId, transformedResult);
   });
 
   it('syncResult, result available and equal to app data', () => {
-    const argument: MatchImportData = matchImportData[1];
+    const argument1: number = 2021;
+    const argument2: MatchImportData = matchImportData[1];
 
     const appdataResult: Result = {
       documentId: "test_doc_id",
-      matchId: argument.matchId,
-      goalsHome: argument.goalsHome,
-      goalsAway: argument.goalsAway
+      matchId: argument2.matchId,
+      goalsHome: argument2.goalsHome,
+      goalsAway: argument2.goalsAway
     };
 
     const transformedResult: Result = {
@@ -457,25 +463,27 @@ describe('SynchronizeDataService', () => {
       goalsAway: appdataResult.goalsAway
     };
 
-    appDataSpy.getResult$.withArgs(argument.matchId).and.returnValue(of(appdataResult));
+    appDataSpy.getResult$.withArgs(argument2.matchId).and.returnValue(of(appdataResult));
     appDataSpy.addResult.and.stub();
     appDataSpy.updateResult.and.stub();
-    spyOn<any>(service, "convertToResult").withArgs(argument).and.returnValue(transformedResult);
+    spyOn<any>(service, "convertToResult").withArgs(argument2).and.returnValue(transformedResult);
     spyOn<any>(service, "isResultEqual").withArgs(transformedResult, appdataResult).and.returnValue(true);
+    spyOn<any>(service, "checkCounters").and.stub();
 
-    service["syncResult"](argument);
+    service["syncResult"](argument1, argument2);
     expect(appDataSpy.addResult).not.toHaveBeenCalled();
     expect(appDataSpy.updateResult).not.toHaveBeenCalled();
   });
 
   it('syncResult, result not available', () => {
-    const argument: MatchImportData = matchImportData[2]; // goalsHome == goalsAway == -1
+    const argument1: number = 2021;
+    const argument2: MatchImportData = matchImportData[2]; // goalsHome == goalsAway == -1
 
     const appdataResult: Result = {
       documentId: "test_doc_id",
-      matchId: argument.matchId,
-      goalsHome: argument.goalsHome,
-      goalsAway: argument.goalsAway
+      matchId: argument2.matchId,
+      goalsHome: argument2.goalsHome,
+      goalsAway: argument2.goalsAway
     };
 
     const transformedResult: Result = {
@@ -485,13 +493,14 @@ describe('SynchronizeDataService', () => {
       goalsAway: appdataResult.goalsAway
     };
 
-    appDataSpy.getResult$.withArgs(argument.matchId).and.returnValue(of(appdataResult));
+    appDataSpy.getResult$.withArgs(argument2.matchId).and.returnValue(of(appdataResult));
     appDataSpy.addResult.and.stub();
     appDataSpy.updateResult.and.stub();
-    spyOn<any>(service, "convertToResult").withArgs(argument).and.returnValue(transformedResult);
+    spyOn<any>(service, "convertToResult").withArgs(argument2).and.returnValue(transformedResult);
     spyOn<any>(service, "isResultEqual").withArgs(transformedResult, appdataResult).and.returnValue(true);
+    spyOn<any>(service, "checkCounters").and.stub();
 
-    service["syncResult"](argument);
+    service["syncResult"](argument1, argument2);
     expect(service["isResultEqual"]).not.toHaveBeenCalled();
     expect(appDataSpy.addResult).not.toHaveBeenCalled();
     expect(appDataSpy.updateResult).not.toHaveBeenCalled();
@@ -505,8 +514,9 @@ describe('SynchronizeDataService', () => {
     appDataSpy.updateResult.and.stub();
     spyOn<any>(service, "convertToResult").and.callThrough();
     spyOn<any>(service, "isResultEqual").and.callThrough();
+    spyOn<any>(service, "checkCounters").and.stub();
 
-    service["syncResult"](argument);
+    service["syncResult"](2021, argument);
     expect(service["convertToResult"]).not.toHaveBeenCalled();
     expect(service["isResultEqual"]).not.toHaveBeenCalled();
     expect(appDataSpy.addResult).not.toHaveBeenCalled();
@@ -519,7 +529,8 @@ describe('SynchronizeDataService', () => {
 
   it('syncSeasonResult, import data available, app data partly not available, partly different', () => {
     const argument1: number = 2020;
-    const argument2: TeamRankingImportData[] = [
+    const argument2: number = 20;
+    const argument3: TeamRankingImportData[] = [
       {
         teamId: 101,
         matches: 34,
@@ -597,31 +608,31 @@ describe('SynchronizeDataService', () => {
         documentId: "",
         season: argument1,
         place: 1,
-        teamId: argument2[0].teamId
+        teamId: argument3[0].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: 2,
-        teamId: argument2[1].teamId
+        teamId: argument3[1].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: -1,
-        teamId: argument2[argument2.length - 1].teamId
+        teamId: argument3[argument3.length - 1].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: -2,
-        teamId: argument2[argument2.length - 2].teamId
+        teamId: argument3[argument3.length - 2].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: -3,
-        teamId: argument2[argument2.length - 3].teamId
+        teamId: argument3[argument3.length - 3].teamId
       }
     ];
 
@@ -669,20 +680,22 @@ describe('SynchronizeDataService', () => {
     appDataSpy.updateSeasonResult.and.stub();
 
     spyOn<any>(service, "convertToSeasonResult")
-      .withArgs(argument1, 1, argument2[0]).and.returnValue(convertedResults[0])
-      .withArgs(argument1, 2, argument2[1]).and.returnValue(convertedResults[1])
-      .withArgs(argument1, -1, argument2[argument2.length - 1]).and.returnValue(convertedResults[2])
-      .withArgs(argument1, -2, argument2[argument2.length - 2]).and.returnValue(convertedResults[3])
-      .withArgs(argument1, -3, argument2[argument2.length - 3]).and.returnValue(convertedResults[4]);
+      .withArgs(argument1, 1, argument3[0]).and.returnValue(convertedResults[0])
+      .withArgs(argument1, 2, argument3[1]).and.returnValue(convertedResults[1])
+      .withArgs(argument1, -1, argument3[argument3.length - 1]).and.returnValue(convertedResults[2])
+      .withArgs(argument1, -2, argument3[argument3.length - 2]).and.returnValue(convertedResults[3])
+      .withArgs(argument1, -3, argument3[argument3.length - 3]).and.returnValue(convertedResults[4]);
+    spyOn<any>(service, "checkCounters").and.stub();
 
-    service["syncSeasonResult"](argument1, argument2);
+    service["syncSeasonResult"](argument1, argument2, argument3);
     expect(appDataSpy.addSeasonResult).toHaveBeenCalledTimes(3);
     expect(appDataSpy.updateSeasonResult).toHaveBeenCalledTimes(1);
   });
 
   it('syncSeasonResult, import data and app data available, but different', () => {
     const argument1: number = 2020;
-    const argument2: TeamRankingImportData[] = [
+    const argument2: number = 20;
+    const argument3: TeamRankingImportData[] = [
       {
         teamId: 101,
         matches: 34,
@@ -760,31 +773,31 @@ describe('SynchronizeDataService', () => {
         documentId: "",
         season: argument1,
         place: 1,
-        teamId: argument2[0].teamId
+        teamId: argument3[0].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: 2,
-        teamId: argument2[1].teamId
+        teamId: argument3[1].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: -1,
-        teamId: argument2[argument2.length - 1].teamId
+        teamId: argument3[argument3.length - 1].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: -2,
-        teamId: argument2[argument2.length - 2].teamId
+        teamId: argument3[argument3.length - 2].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: -3,
-        teamId: argument2[argument2.length - 3].teamId
+        teamId: argument3[argument3.length - 3].teamId
       }
     ];
 
@@ -831,13 +844,14 @@ describe('SynchronizeDataService', () => {
     appDataSpy.updateSeasonResult.and.stub();
 
     spyOn<any>(service, "convertToSeasonResult")
-      .withArgs(argument1, 1, argument2[0]).and.returnValue(convertedResults[0])
-      .withArgs(argument1, 2, argument2[1]).and.returnValue(convertedResults[1])
-      .withArgs(argument1, -1, argument2[argument2.length - 1]).and.returnValue(convertedResults[2])
-      .withArgs(argument1, -2, argument2[argument2.length - 2]).and.returnValue(convertedResults[3])
-      .withArgs(argument1, -3, argument2[argument2.length - 3]).and.returnValue(convertedResults[4]);
+      .withArgs(argument1, 1, argument3[0]).and.returnValue(convertedResults[0])
+      .withArgs(argument1, 2, argument3[1]).and.returnValue(convertedResults[1])
+      .withArgs(argument1, -1, argument3[argument3.length - 1]).and.returnValue(convertedResults[2])
+      .withArgs(argument1, -2, argument3[argument3.length - 2]).and.returnValue(convertedResults[3])
+      .withArgs(argument1, -3, argument3[argument3.length - 3]).and.returnValue(convertedResults[4]);
+    spyOn<any>(service, "checkCounters").and.stub();
 
-    service["syncSeasonResult"](argument1, argument2);
+    service["syncSeasonResult"](argument1, argument2, argument3);
     expect(appDataSpy.addSeasonResult).not.toHaveBeenCalled();
     expect(appDataSpy.updateSeasonResult).toHaveBeenCalledWith(appdataResult[0].documentId, convertedResults[0]);
     expect(appDataSpy.updateSeasonResult).not.toHaveBeenCalledWith(appdataResult[1].documentId, convertedResults[1]);
@@ -848,7 +862,8 @@ describe('SynchronizeDataService', () => {
 
   it('syncSeasonResult, import data and app data available and equal', () => {
     const argument1: number = 2020;
-    const argument2: TeamRankingImportData[] = [
+    const argument2: number = 20;
+    const argument3: TeamRankingImportData[] = [
       {
         teamId: 101,
         matches: 34,
@@ -926,31 +941,31 @@ describe('SynchronizeDataService', () => {
         documentId: "",
         season: argument1,
         place: 1,
-        teamId: argument2[0].teamId
+        teamId: argument3[0].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: 2,
-        teamId: argument2[1].teamId
+        teamId: argument3[1].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: -1,
-        teamId: argument2[argument2.length - 1].teamId
+        teamId: argument3[argument3.length - 1].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: -2,
-        teamId: argument2[argument2.length - 2].teamId
+        teamId: argument3[argument3.length - 2].teamId
       },
       {
         documentId: "",
         season: argument1,
         place: -3,
-        teamId: argument2[argument2.length - 3].teamId
+        teamId: argument3[argument3.length - 3].teamId
       }
     ];
 
@@ -997,20 +1012,22 @@ describe('SynchronizeDataService', () => {
     appDataSpy.updateSeasonResult.and.stub();
 
     spyOn<any>(service, "convertToSeasonResult")
-      .withArgs(argument1, 1, argument2[0]).and.returnValue(convertedResults[0])
-      .withArgs(argument1, 2, argument2[1]).and.returnValue(convertedResults[1])
-      .withArgs(argument1, -1, argument2[argument2.length - 1]).and.returnValue(convertedResults[2])
-      .withArgs(argument1, -2, argument2[argument2.length - 2]).and.returnValue(convertedResults[3])
-      .withArgs(argument1, -3, argument2[argument2.length - 3]).and.returnValue(convertedResults[4]);
+      .withArgs(argument1, 1, argument3[0]).and.returnValue(convertedResults[0])
+      .withArgs(argument1, 2, argument3[1]).and.returnValue(convertedResults[1])
+      .withArgs(argument1, -1, argument3[argument3.length - 1]).and.returnValue(convertedResults[2])
+      .withArgs(argument1, -2, argument3[argument3.length - 2]).and.returnValue(convertedResults[3])
+      .withArgs(argument1, -3, argument3[argument3.length - 3]).and.returnValue(convertedResults[4]);
+    spyOn<any>(service, "checkCounters").and.stub();
 
-    service["syncSeasonResult"](argument1, argument2);
+    service["syncSeasonResult"](argument1, argument2, argument3);
     expect(appDataSpy.addSeasonResult).not.toHaveBeenCalled();
     expect(appDataSpy.updateSeasonResult).not.toHaveBeenCalled();
   });
 
   it('syncSeasonResult, not enough import datasets', () => {
     const argument1: number = 2020;
-    const argument2: TeamRankingImportData[] = [
+    const argument2: number = 20;
+    const argument3: TeamRankingImportData[] = [
       {
         teamId: 101,
         matches: 34,
@@ -1033,7 +1050,7 @@ describe('SynchronizeDataService', () => {
       }
     ];
 
-    service["syncSeasonResult"](argument1, argument2);
+    service["syncSeasonResult"](argument1, argument2, argument3);
     expect(appDataSpy.getSeasonResult$).not.toHaveBeenCalled();
     expect(appDataSpy.addSeasonResult).not.toHaveBeenCalled();
     expect(appDataSpy.updateSeasonResult).not.toHaveBeenCalled();

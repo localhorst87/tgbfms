@@ -583,6 +583,45 @@ describe('MatchdataAccessOpenligaService', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // convertCurrentMatchdayJson$
+  // ---------------------------------------------------------------------------
+
+  it("convertCurrentMatchdayJson$, received http error as argument", (done: DoneFn) => {
+    const argument = new HttpErrorResponse({
+      error: 'test error',
+      status: 400,
+      statusText: 'bad request'
+    });
+    const expectedValue: number = -1;
+
+    let i: number = 0;
+    service["convertCurrentMatchdayJson$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  it("convertCurrentMatchdayJson$, received values", (done: DoneFn) => {
+    const argument: any = {
+      "GroupID": 38202,
+      "GroupName": "26. Spieltag",
+      "GroupOrderID": 26
+    };
+
+    const expectedValue: number = 26;
+
+    let i: number = 0;
+    service["convertCurrentMatchdayJson$"](argument).subscribe(
+      val => {
+        expect(val).toEqual(expectedValue);
+        done();
+      }
+    );
+  });
+
+  // ---------------------------------------------------------------------------
   // importMatchdata$
   // ---------------------------------------------------------------------------
 

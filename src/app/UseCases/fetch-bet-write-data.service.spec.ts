@@ -138,7 +138,8 @@ describe('FetchBetWriteDataService', () => {
         teamId: seasonBets[0].teamId,
         teamName: teamNames[0],
         isBetFixed: seasonBets[0].isFixed,
-        betDocumentId: seasonBets[0].documentId
+        betDocumentId: seasonBets[0].documentId,
+        dueDate: new Date()
       },
       {
         season: seasonBets[1].season,
@@ -146,7 +147,8 @@ describe('FetchBetWriteDataService', () => {
         teamId: seasonBets[1].teamId,
         teamName: teamNames[1],
         isBetFixed: seasonBets[1].isFixed,
-        betDocumentId: seasonBets[1].documentId
+        betDocumentId: seasonBets[1].documentId,
+        dueDate: new Date()
       },
       {
         season: seasonBets[2].season,
@@ -154,7 +156,8 @@ describe('FetchBetWriteDataService', () => {
         teamId: seasonBets[2].teamId,
         teamName: teamNames[2],
         isBetFixed: seasonBets[2].isFixed,
-        betDocumentId: seasonBets[2].documentId
+        betDocumentId: seasonBets[2].documentId,
+        dueDate: new Date()
       },
       {
         season: seasonBets[3].season,
@@ -162,7 +165,8 @@ describe('FetchBetWriteDataService', () => {
         teamId: seasonBets[3].teamId,
         teamName: teamNames[3],
         isBetFixed: seasonBets[3].isFixed,
-        betDocumentId: seasonBets[3].documentId
+        betDocumentId: seasonBets[3].documentId,
+        dueDate: new Date()
       },
       {
         season: seasonBets[4].season,
@@ -170,7 +174,8 @@ describe('FetchBetWriteDataService', () => {
         teamId: seasonBets[4].teamId,
         teamName: teamNames[4],
         isBetFixed: seasonBets[4].isFixed,
-        betDocumentId: seasonBets[4].documentId
+        betDocumentId: seasonBets[4].documentId,
+        dueDate: new Date()
       }
     ];
 
@@ -572,13 +577,15 @@ describe('FetchBetWriteDataService', () => {
       teamId: seasonBets[0].teamId,
       teamName: teamNames[0],
       isBetFixed: seasonBets[0].isFixed,
-      betDocumentId: seasonBets[0].documentId
+      betDocumentId: seasonBets[0].documentId,
+      dueDate: new Date(100 * 1000)
     };
 
     appDataSpy.getTeamNameByTeamId$
       .withArgs(seasonBets[0].teamId).and.returnValue(of(teamNames[0]))
       .withArgs(seasonBets[1].teamId).and.returnValue(of(teamNames[1]))
       .withArgs(seasonBets[2].teamId).and.returnValue(of(teamNames[2]));
+    spyOn<any>(service, "getFirstMatchTimestamp$").and.returnValue(of(100));
 
     service["makeSeasonBetWriteData$"](argument).subscribe(
       val => {
@@ -610,10 +617,12 @@ describe('FetchBetWriteDataService', () => {
       teamId: argument.teamId,
       teamName: teamName,
       isBetFixed: argument.isFixed,
-      betDocumentId: createdId
+      betDocumentId: createdId,
+      dueDate: new Date(100 * 1000)
     };
 
     appDataSpy.getTeamNameByTeamId$.withArgs(argument.teamId).and.returnValue(of(teamName));
+    spyOn<any>(service, "getFirstMatchTimestamp$").and.returnValue(of(100));
 
     service["makeSeasonBetWriteData$"](argument).subscribe(
       val => {
@@ -666,13 +675,15 @@ describe('FetchBetWriteDataService', () => {
       teamId: -1,
       teamName: "",
       isBetFixed: false,
-      betDocumentId: ""
+      betDocumentId: "",
+      dueDate: new Date(0)
     };
 
     appDataSpy.getTeamNameByTeamId$
       .withArgs(seasonBets[0].teamId).and.returnValue(of())
       .withArgs(seasonBets[1].teamId).and.returnValue(of())
       .withArgs(seasonBets[2].teamId).and.returnValue(of());
+    spyOn<any>(service, "getFirstMatchTimestamp$").and.returnValue(of(100));
 
     service["makeSeasonBetWriteData$"](argument).pipe(
       defaultIfEmpty(defaultValue)).subscribe(

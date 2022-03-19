@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, from, range, concat, iif, combineLatest } from 'rxjs';
-import { tap, map, switchMap, mergeMap, concatMap, pluck, distinct, filter, first, last, toArray, reduce } from 'rxjs/operators';
+import { delay, tap, map, switchMap, mergeMap, concatMap, pluck, distinct, filter, first, last, toArray, reduce } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { PointCalculatorService } from '../Businessrules/point-calculator.service';
@@ -158,7 +158,15 @@ export class FetchBasicDataService {
 
     return this.appData.getLastMatch$(season, 10).pipe(
       pluck("matchday"),
-      reduce((max, val) => val > max ? val : max)
+      reduce((max, val) => val > max ? val : max),
+      map((matchday: number) => {
+        if (matchday > -1) {
+          return matchday;
+        }
+        else { // no matches available
+          return 1;
+        }
+      })
     );
   }
 
@@ -260,7 +268,7 @@ export class FetchBasicDataService {
   }
 
   private getFirstMatchTimestamp$(season: number): Observable<number> {
-    // returns the timestamp of the
+    // returns the timestamp of the first match of the season
 
     return this.appData.getMatchesByMatchday$(season, 1).pipe(
       toArray(),

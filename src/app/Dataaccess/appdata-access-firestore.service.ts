@@ -233,7 +233,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
         return matchArray;
       }),
       switchMap((matchArray: Match[]) => from(matchArray)),
-      take(1),
+      take(amount),
       distinct()
     );
 
@@ -260,7 +260,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
         return matchArray;
       }),
       switchMap((matchArray: Match[]) => from(matchArray)),
-      take(1),
+      take(amount),
       distinct()
     );
 

@@ -174,7 +174,7 @@ export class HomeComponent implements OnInit {
           this.matchdayNextMatch = matchdayNext;
           this.matchdayClosestMatch = matchdayNext;
           this.matchdayCurrent = matchdayNext;
-          this.matchdayCompleted = -1;
+          this.matchdayCompleted = 0;
 
           if (nextMatchdayBeginsWithinOneHour) {
             this.matchdayTopMatchSync = matchdayNext;

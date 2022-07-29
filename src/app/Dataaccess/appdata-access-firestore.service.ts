@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AppdataAccessService } from './appdata-access.service';
-import { Observable, from } from 'rxjs';
-import { map, switchMap, distinct, take, pluck } from 'rxjs/operators';
+import { Observable, from, timer } from 'rxjs';
+import { map, switchMap, distinct, take, pluck, takeUntil } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import firebase from 'firebase/compat/app';
 import { Bet, Match, Result, Team, User, SeasonBet, SeasonResult, TopMatchVote } from '../Businessrules/basic_datastructures';
@@ -233,7 +233,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
         return matchArray;
       }),
       switchMap((matchArray: Match[]) => from(matchArray)),
-      take(amount),
+      takeUntil(timer(3000)),
       distinct()
     );
 
@@ -260,7 +260,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
         return matchArray;
       }),
       switchMap((matchArray: Match[]) => from(matchArray)),
-      take(amount),
+      takeUntil(timer(3000)),
       distinct()
     );
 

@@ -86,7 +86,7 @@
       <mat-expansion-panel
         class="bet-panel"
         (opened)="addUserBets(match.matchId)"
-        disabled="{{!match.isBetFixed}}">
+        disabled="{{!match.isBetFixed && currentTime < match.matchDate}}">
         <mat-expansion-panel-header class="right-aligned-header">
           <mat-panel-title>
             {{match.teamNameHome}} - {{match.teamNameAway}}

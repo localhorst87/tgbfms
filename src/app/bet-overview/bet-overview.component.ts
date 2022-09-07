@@ -1,5 +1,5 @@
 import { Component, OnInit, OnChanges, Input } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable, from, interval } from 'rxjs';
 import { toArray, concatMap } from 'rxjs/operators';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { FetchBetOverviewService } from '../UseCases/fetch-bet-overview.service';
@@ -7,6 +7,8 @@ import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { BetOverviewFrameData, BetOverviewUserData, SeasonBetOverviewFrameData, SeasonBetOverviewUserData } from '../UseCases/output_datastructures';
 import { User } from '../Businessrules/basic_datastructures';
 import { SEASON, MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
+
+const INTERVAL_TIME_REFRESH: number = 1 * 1000; // 1 sec
 
 @Component({
   selector: 'app-bet-overview',
@@ -17,6 +19,7 @@ export class BetOverviewComponent implements OnInit, OnChanges {
 
   @Input() userId: string;
   @Input() matchdayCompleted: number;
+  currentTime: Date;
   nTeams: number;
   nMatchdays: number;
   currentSeason: string;
@@ -40,6 +43,7 @@ export class BetOverviewComponent implements OnInit, OnChanges {
 
     this.userId = "";
     this.matchdayCompleted = -1;
+    this.currentTime = new Date();
     this.nTeams = NUMBER_OF_TEAMS;
     this.nMatchdays = MATCHDAYS_PER_SEASON;
     this.currentSeason = String(SEASON) + "/" + String(SEASON + 1);
@@ -60,6 +64,7 @@ export class BetOverviewComponent implements OnInit, OnChanges {
   resetData(): void {
     // resets frame and user Bet data to display
 
+    this.currentTime = new Date();
     this.frameData = [];
     this.seasonFrameData = [];
     this.seasonBetData = new Map();
@@ -166,6 +171,12 @@ export class BetOverviewComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    // refresh current time
+    interval(INTERVAL_TIME_REFRESH).subscribe(
+      val => {
+        this.currentTime = new Date();
+      }
+    );
   }
 
   ngOnChanges(): void {

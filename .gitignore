@@ -51,3 +51,9 @@ Thumbs.db
 
 # Cached data
 .firebase
+
+# Logs
+functions/firebase-debug.log
+functions/firestore-debug.log
+functions/pubsub-debug.log
+functions/ui-debug.log

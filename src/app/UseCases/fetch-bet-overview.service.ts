@@ -3,7 +3,7 @@ import { Observable, combineLatest, range, concat, from, of } from 'rxjs';
 import { map, mergeMap, concatMap, distinct, toArray } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { PointCalculatorService } from '../Businessrules/point-calculator.service';
-import { Bet, Match, Result, SeasonBet, SeasonResult, User, Team } from '../Businessrules/basic_datastructures';
+import { Bet, Match, SeasonBet, SeasonResult, User, Team } from '../Businessrules/basic_datastructures';
 import { BetOverviewFrameData, BetOverviewUserData, SeasonBetOverviewUserData, SeasonBetOverviewFrameData } from './output_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';
 
@@ -67,9 +67,8 @@ export class FetchBetOverviewService {
       this.appData.getTeamByTeamId$(match.teamIdHome),
       this.appData.getTeamByTeamId$(match.teamIdAway),
       this.appData.getBet$(match.matchId, userId),
-      this.appData.getResult$(match.matchId),
 
-      (teamHome: Team, teamAway: Team, betUser: Bet, result: Result) => {
+      (teamHome: Team, teamAway: Team, betUser: Bet) => {
         return {
           matchId: match.matchId,
           matchDate: new Date(match.timestamp * 1000),
@@ -78,8 +77,8 @@ export class FetchBetOverviewService {
           teamNameAway: teamAway.nameLong,
           teamNameShortHome: teamHome.nameShort,
           teamNameShortAway: teamAway.nameShort,
-          resultGoalsHome: result.goalsHome,
-          resultGoalsAway: result.goalsAway,
+          resultGoalsHome: match.goalsHome,
+          resultGoalsAway: match.goalsAway,
           isMatchFinished: match.isFinished,
           isBetFixed: betUser.isFixed
         };

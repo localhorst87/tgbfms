@@ -4,7 +4,7 @@ import { delay, tap, map, switchMap, mergeMap, concatMap, pluck, distinct, filte
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { PointCalculatorService } from '../Businessrules/point-calculator.service';
-import { Bet, Result, Match, Team, SeasonBet } from '../Businessrules/basic_datastructures';
+import { Bet, Match, Team, SeasonBet } from '../Businessrules/basic_datastructures';
 import { MatchInfo, TeamStats } from './output_datastructures';
 import { TeamRankingImportData } from '../Dataaccess/import_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT, SEASON } from '../Businessrules/rule_defined_values';
@@ -202,18 +202,12 @@ export class FetchBasicDataService {
   public isBetCorrect(betGoalsHome: number, betGoalsAway: number, resultGoalsHome: number, resultGoalsAway: number): boolean {
     // returns true if the Bet and Match tendecy correlate
 
-    let bet: Bet = {
-      documentId: "",
-      matchId: -1,
-      userId: "",
-      isFixed: false,
+    let bet: any = {
       goalsHome: betGoalsHome,
       goalsAway: betGoalsAway
     };
 
-    let result: Result = {
-      documentId: "",
-      matchId: -1,
+    let result: any = {
       goalsHome: resultGoalsHome,
       goalsAway: resultGoalsAway
     }

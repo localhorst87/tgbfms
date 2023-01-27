@@ -426,7 +426,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     if (userId) {
       voteQuery$ = this.firestore.collection<TopMatchVote>(COLLECTION_NAME_TOPMATCH_VOTE, ref =>
-        ref.where("matchday", "==", matchday).where("userId", "==", userId))
+        ref.where("season", "==", season).where("matchday", "==", matchday).where("userId", "==", userId))
         .valueChanges({ idField: "documentId" });
     }
     else {

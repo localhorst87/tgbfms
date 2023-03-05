@@ -4,7 +4,7 @@
  * @return {number} Unix timestamp in seconds
  */
 export function getCurrentTimestamp(): number {
-  return Math.floor((new Date()).getTime() / 1000);
+  return Math.floor((new Date()).getTime() / 1000); // alternatively Date.now()/1000
 }
 
 /**

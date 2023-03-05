@@ -1,7 +1,7 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
-import * as sync_matches from "../src/sync_matches";
+import * as sync_matches from "../src/sync_matchplan";
 import { NUMBER_OF_TEAMS } from "../../src/app/Businessrules/rule_defined_values";
 import * as appdata from "../src/data_access/appdata_access";
 // import * as matchdata from "../src/data_access/matchdata_access";
@@ -70,6 +70,8 @@ describe("getMatchdaysToUpdate, end-to-end test", () => {
       isTopMatch: false,
       teamIdHome: 16,
       teamIdAway: 115,
+      goalsHome: 5,
+      goalsAway: 1
     });
   });
 
@@ -85,6 +87,8 @@ describe("getMatchdaysToUpdate, end-to-end test", () => {
       isTopMatch: false,
       teamIdHome: 16,
       teamIdAway: 115,
+      goalsHome: 5,
+      goalsAway: 1
     });
   });
 
@@ -154,6 +158,8 @@ describe("updateMatchdays, end-to-end test", () => {
       isTopMatch: false,
       teamIdHome: 16,
       teamIdAway: 115,
+      goalsHome: 5,
+      goalsAway: 1
     });
 
     let updatedMatchdays = await sync_matches.updateMatchdays(2021, [1, 2]);
@@ -181,6 +187,8 @@ describe("updateMatchdays, end-to-end test", () => {
       isTopMatch: false,
       teamIdHome: 16,
       teamIdAway: 115,
+      goalsHome: 5,
+      goalsAway: 1
     });
 
     let updatedMatchdays = await sync_matches.updateMatchdays(2021, [1, 2]);

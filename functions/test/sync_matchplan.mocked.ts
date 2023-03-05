@@ -1,7 +1,7 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
-import * as sync_matches from "../src/sync_matches";
+import * as sync_matches from "../src/sync_matchplan";
 import * as appdata from "../src/data_access/appdata_access";
 import * as matchdata from "../src/data_access/matchdata_access";
 import * as util from "../src/util";
@@ -39,7 +39,9 @@ describe("MatchList", () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 200,
-        teamIdAway: 100
+        teamIdAway: 100,
+        goalsHome: 0,
+        goalsAway: 1
       },
       {
         documentId: "9cKcskEZ3nqlzMaALDtZ",
@@ -50,7 +52,9 @@ describe("MatchList", () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 20,
-        teamIdAway: 10
+        teamIdAway: 10,
+        goalsHome: 2,
+        goalsAway: 1
       }
     ];
 
@@ -94,7 +98,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: true,
         teamIdHome: 200,
-        teamIdAway: 100
+        teamIdAway: 100,
+        goalsHome: 0,
+        goalsAway: 1
       },
       {
         documentId: "6ncSX1DzT5mKg3wRfYr",
@@ -105,7 +111,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: true,
         teamIdHome: 210,
-        teamIdAway: 110
+        teamIdAway: 110,
+        goalsHome: 4,
+        goalsAway: 1
       },
       {
         documentId: "9cKcskEZ3nqlzMaALDtZ",
@@ -116,7 +124,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 20,
-        teamIdAway: 10
+        teamIdAway: 10,
+        goalsHome: 2,
+        goalsAway: 1
       },
       {
         documentId: "45tzskEZ3nqlzMaALDtZ",
@@ -127,7 +137,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 26,
-        teamIdAway: 16
+        teamIdAway: 16,
+        goalsHome: 2,
+        goalsAway: 2
       }
     ];
 
@@ -185,7 +197,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: true,
         teamIdHome: 200,
-        teamIdAway: 100
+        teamIdAway: 100,
+        goalsHome: 0,
+        goalsAway: 1
       },
       {
         documentId: "6ncSX1DzT5mKg3wRfYr",
@@ -196,7 +210,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: true,
         teamIdHome: 210,
-        teamIdAway: 110
+        teamIdAway: 110,
+        goalsHome: 2,
+        goalsAway: 1
       },
       {
         documentId: "9cKcskEZ3nqlzMaALDtZ",
@@ -207,7 +223,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 20,
-        teamIdAway: 10
+        teamIdAway: 10,
+        goalsHome: 1,
+        goalsAway: 1
       },
       {
         documentId: "45tzskEZ3nqlzMaALDtZ",
@@ -218,7 +236,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 26,
-        teamIdAway: 16
+        teamIdAway: 16,
+        goalsHome: 0,
+        goalsAway: 3
       },
       {
         documentId: "q5ttvdEZ3nqlzMaALDtZ",
@@ -229,7 +249,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 29,
-        teamIdAway: 996
+        teamIdAway: 996,
+        goalsHome: 2,
+        goalsAway: 0
       },
       {
         documentId: "gTztvdEZ3nqlzMaALDtZ",
@@ -240,7 +262,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 259,
-        teamIdAway: 46
+        teamIdAway: 46,
+        goalsHome: 0,
+        goalsAway: 0
       }
     ];
 
@@ -302,7 +326,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: true,
         teamIdHome: 97,
-        teamIdAway: 45
+        teamIdAway: 45,
+        goalsHome: 0,
+        goalsAway: 1
       },
       {
         documentId: "0ncSX1D6CH4mKg3wRfYr",
@@ -313,7 +339,9 @@ describe("MatchList", () => {
         isFinished: true,
         isTopMatch: true,
         teamIdHome: 90,
-        teamIdAway: 570
+        teamIdAway: 570,
+        goalsHome: 3,
+        goalsAway: 0
       },
       {
         documentId: "0ncSX1D6CH4mKg3wRfYr",
@@ -324,7 +352,9 @@ describe("MatchList", () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 200,
-        teamIdAway: 100
+        teamIdAway: 100,
+        goalsHome: 1,
+        goalsAway: 1
       },
       {
         documentId: "6ncSX1DzT5mKg3wRfYr",
@@ -335,7 +365,9 @@ describe("MatchList", () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 210,
-        teamIdAway: 110
+        teamIdAway: 110,
+        goalsHome: 4,
+        goalsAway: 2
       },
     ];
 
@@ -396,7 +428,9 @@ describe("createSyncPhases", () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 97,
-        teamIdAway: 45
+        teamIdAway: 45,
+        goalsHome: 0,
+        goalsAway: 1
       },
       {
         documentId: "0ncSX1D6CH4mKg3wRfYr",
@@ -407,7 +441,9 @@ describe("createSyncPhases", () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 90,
-        teamIdAway: 570
+        teamIdAway: 570,
+        goalsHome: 0,
+        goalsAway: 1
       },
       {
         documentId: "0ncSX1D6CH4mKg3wRfYr",
@@ -418,7 +454,9 @@ describe("createSyncPhases", () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 200,
-        teamIdAway: 100
+        teamIdAway: 100,
+        goalsHome: 1,
+        goalsAway: 1
       },
       {
         documentId: "0ncSX1D6CH4mKg3wRfYr",
@@ -429,7 +467,9 @@ describe("createSyncPhases", () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 120,
-        teamIdAway: 678
+        teamIdAway: 678,
+        goalsHome: 5,
+        goalsAway: 1
       },
       {
         documentId: "6ncSX1DzT5mKg3wRfYr",
@@ -440,7 +480,9 @@ describe("createSyncPhases", () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 210,
-        teamIdAway: 110
+        teamIdAway: 110,
+        goalsHome: 2,
+        goalsAway: 3
       },
       {
         documentId: "6ncSX1DzT5mKg3wRfYr",
@@ -451,7 +493,9 @@ describe("createSyncPhases", () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 904,
-        teamIdAway: 112
+        teamIdAway: 112,
+        goalsHome: 1,
+        goalsAway: 2
       },
     ];
 
@@ -723,7 +767,9 @@ describe("updateMatchdays", () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 2511,
-      teamIdAway: 2512
+      teamIdAway: 2512,
+      goalsHome: 1,
+      goalsAway: 0
     };
     var importAppData252: Match = {
       documentId: "252_id",
@@ -734,7 +780,9 @@ describe("updateMatchdays", () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 2521,
-      teamIdAway: 2522
+      teamIdAway: 2522,
+      goalsHome: 2,
+      goalsAway: 3
     };
     var importAppData261: Match = {
       documentId: "261_id",
@@ -745,7 +793,9 @@ describe("updateMatchdays", () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 2611,
-      teamIdAway: 2612
+      teamIdAway: 2612,
+      goalsHome: -1,
+      goalsAway: -1
     };
     var importAppData262: Match = {
       documentId: "262_id",
@@ -756,7 +806,9 @@ describe("updateMatchdays", () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 2621,
-      teamIdAway: 2622
+      teamIdAway: 2622,
+      goalsHome: -1,
+      goalsAway: -1
     };
 
     it("one match of one matchday to be updated, update successful => expect setMatch to be called once", async () => {
@@ -1017,7 +1069,9 @@ describe("updateMatchdays", () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 2521,
-      teamIdAway: 2522
+      teamIdAway: 2522,
+      goalsHome: 2,
+      goalsAway: 3
     };
     var importAppData261: Match = {
       documentId: "261_id",
@@ -1028,7 +1082,9 @@ describe("updateMatchdays", () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 2611,
-      teamIdAway: 2612
+      teamIdAway: 2612,
+      goalsHome: -1,
+      goalsAway: -1
     };
     var importAppData262: Match = {
       documentId: "262_id",
@@ -1039,7 +1095,9 @@ describe("updateMatchdays", () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 2621,
-      teamIdAway: 2622
+      teamIdAway: 2622,
+      goalsHome: -1,
+      goalsAway: -1
     };
 
     it("imported matchdata empty => expect to do nothing", async () => {

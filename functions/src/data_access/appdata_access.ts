@@ -1,12 +1,14 @@
 import * as admin from "firebase-admin";
 import { WhereFilterOp } from '@firebase/firestore-types';
-import { Match } from "../../../src/app/Businessrules/basic_datastructures";
+import { Match, SeasonBet, SeasonResult } from "../../../src/app/Businessrules/basic_datastructures";
 import { UpdateTime, SyncPhase } from "./import_datastructures";
 import * as helper from "./appdata_helpers";
 
 const COLLECTION_NAME_MATCHES = "matches";
 const COLLECTION_NAME_UPDATE_TIMES = "sync_times";
 const COLLECTION_NAME_SYNC_PHASES = "sync_phases";
+const COLLECTION_NAME_SEASON_BETS = "season_bets";
+const COLLECTION_NAME_SEASON_RESULTS = "season_results";
 
 // GOOGLE_APPLICATION_CREDENTIALS must be set as env variable and point to credentials file
 admin.initializeApp();
@@ -265,31 +267,69 @@ export async function deleteSyncPhases(operator: WhereFilterOp, startTimestamp: 
   return isDeleted;
 }
 
-// /**
-//  * Deletes all documents in the collection where the SyncPhases are hosted
-//  *
-//  * @return {Promise<boolean>} Feedback if operation was successful or not
-//  */
-// export async function deleteAllSyncPhases(): Promise<boolean> {
-//   return admin.firestore().collection(COLLECTION_NAME_SYNC_PHASES).listDocuments()
-//     .then(async documentRefs => {
-//       let isDeleted: boolean = true;
+/**
+ * Yields the season bets for the given user and season
+ * 
+ * @param season the season of the corresponding bets to request
+ * @param userId the corresponding user ID of the bets to request
+ * @returns all SeasonBets according to the requested season and userId
+ */
+export async function getSeasonBets(season: number, userId: string): Promise<SeasonBet[]> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_SEASON_BETS)
+    .where("season", "==", season)
+    .where("userId", "==", userId);
 
-//       for (let docRef of documentRefs) {
-//         isDeleted = await docRef.delete()
-//           .then(() => {
-//             return true;
-//           })
-//           .catch((err: any) => {
-//             return false;
-//           });
-//         if (isDeleted == false)
-//           break; // if deleting fails, cancel operation
-//       }
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      const bets: SeasonBet[] =  helper.processSnapshot<SeasonBet>(querySnapshot);
+      return helper.postProcessSeasonBets(bets, season, userId);
+    }
+  );
+}
 
-//       return isDeleted;
-//     })
-//     .catch((err: any) => {
-//       return false;
-//     });
-// }
+/**
+ * Yields the current season results for the given season
+ * 
+ * @param season the season of the corresponding results to request
+ * @returns all SeasonResults according to the requested season
+ */
+export async function getSeasonResults(season: number): Promise<SeasonResult[]> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_SEASON_RESULTS)
+  .where("season", "==", season);
+
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      const results: SeasonResult[] =  helper.processSnapshot<SeasonResult>(querySnapshot);
+      return helper.postProcessSeasonResults(results, season);
+    }
+  );
+}
+
+/**
+ * Sets a specific season result. If the dataset is already existing in the App DB
+ * it will update the result, else it will add a new dataset
+ * 
+ * @param result the result to set
+ * @returns true/false upon successful/failed operation
+ */
+export async function setSeasonResult(result: SeasonResult): Promise<boolean> {
+  let documentReference: admin.firestore.DocumentReference;
+  if (result.documentId == "") {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_SEASON_RESULTS).doc()
+  }
+  else {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_SEASON_RESULTS).doc(result.documentId);
+  }
+
+  // documentId should not be a property in the dataset itself, as it is meta-data
+  let resultToSet: any = { ...result };
+  delete resultToSet.documentId;
+
+  return documentReference.set(resultToSet)
+    .then(() => {
+      return true;
+    })
+    .catch((err: any) => {
+      return false;
+    });
+}

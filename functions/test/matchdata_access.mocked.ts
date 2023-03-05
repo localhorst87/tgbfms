@@ -1,7 +1,7 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
-import { MatchImportData } from "../src/data_access/import_datastructures";
+import { MatchImportData, TeamRankingImportData } from "../src/data_access/import_datastructures";
 import * as matchdata_access from "../src/data_access/matchdata_access";
 import * as matchdata_helpers from "../src/data_access/matchdata_helpers";
 import * as util from "../src/util";
@@ -52,7 +52,7 @@ describe("getLastUpdateTime", () => {
 
   describe("end-to-end-test with real http service", async () => {
 
-    it("Request existing data => expect converted timestamp", async () => {
+    it.only("Request existing data => expect converted timestamp", async () => {
       let updateTime: number = await matchdata_access.getLastUpdateTime(2021, 32);
       // 2022-05-02T22:23:54.503 should be returned, which equals unix timestamp 1651523034
       expect(updateTime).to.equal(1651523034);
@@ -515,6 +515,160 @@ describe("convertMatchdayJson", () => {
   });
 
 });
+
+describe('importCurrentTeamRanking', () => {
+
+  describe('mocked http service', () => {
+
+    var sandbox: any;
+
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it('Promise resolves and yields data (200) => expect TeamRankingImportData', async () => {
+      sandbox.stub(axios, "get").resolves({
+        status: 200,
+        data: [
+          {
+            "Draw": 5,
+            "Goals": 92,
+            "Lost": 4,
+            "Matches": 32,
+            "OpponentGoals": 40,
+            "Points": 74,
+            "TeamInfoId": 40,
+            "Won": 23
+          },
+          {
+            "Draw": 7,
+            "Goals": 57,
+            "Lost": 6,
+            "Matches": 32,
+            "OpponentGoals": 28,
+            "Points": 64,
+            "TeamInfoId": 1635,
+            "Won": 19
+          },
+          {
+            "Draw": 9,
+            "Goals": 57,
+            "Lost": 6,
+            "Matches": 32,
+            "OpponentGoals": 32,
+            "Points": 60,
+            "TeamInfoId": 131,
+            "Won": 17
+          }
+        ]
+      });
+
+      const expectedValues: TeamRankingImportData[] = [
+        {
+          teamId: 40,
+          matches: 32,
+          points: 74,
+          won: 23,
+          draw: 5,
+          lost: 4,
+          goals: 92,
+          goalsAgainst: 40
+        },
+        {
+          teamId: 1635,
+          matches: 32,
+          points: 64,
+          won: 19,
+          draw: 7,
+          lost: 6,
+          goals: 57,
+          goalsAgainst: 28
+        },
+        {
+          teamId: 131,
+          matches: 32,
+          points: 60,
+          won: 17,
+          draw: 9,
+          lost: 6,
+          goals: 57,
+          goalsAgainst: 32
+        }
+      ];
+
+      const importedData: TeamRankingImportData[] = await matchdata_access.importCurrentTeamRanking(2021);
+      expect(importedData).to.deep.equal(expectedValues);      
+    });
+
+    it('Promise resolves and yields internal server error (500) => expect empty array', async () => {
+      sandbox.stub(axios, "get").resolves({
+        status: 500,
+        data: "internal server error"
+      });
+
+      const importedData: TeamRankingImportData[] = await matchdata_access.importCurrentTeamRanking(2021);
+      expect(importedData).to.deep.equal([]);      
+    });
+
+    it('Promise rejects => expect empty array', async () => {
+      sandbox.stub(axios, "get").rejects("any error");
+
+      const importedData: TeamRankingImportData[] = await matchdata_access.importCurrentTeamRanking(2021);
+      expect(importedData).to.deep.equal([]);
+    });
+
+  });
+
+  describe("end-to-end-test with real http service", async () => {
+
+    it("Request existing data => expect converted TeamRankingImportData", async () => {
+      const importData: TeamRankingImportData[] = await matchdata_access.importCurrentTeamRanking(2021);
+      const expectedFirstResult: TeamRankingImportData = {
+        teamId: 40,
+        matches: 34,
+        points: 77,
+        won: 24,
+        draw: 5,
+        lost: 5,
+        goals: 97,
+        goalsAgainst: 37
+      };
+
+      const expectedLastResult: TeamRankingImportData = {
+        teamId: 115,
+        matches: 34,
+        points: 18,
+        won: 3,
+        draw: 9,
+        lost: 22,
+        goals: 28,
+        goalsAgainst: 82
+      };
+
+      expect(importData.length).to.equal(18);
+      expect(importData[0]).to.deep.equal(expectedFirstResult);
+      expect(importData[importData.length - 1]).to.deep.equal(expectedLastResult);
+    });
+
+    it("Request non existing data => expect empty array", async () => {
+      const importedData: TeamRankingImportData[] = await matchdata_access.importCurrentTeamRanking(1871);
+
+      expect(importedData).to.deep.equal([]);
+    });
+
+    it("Request future data => expect empty array", async () => {
+      const importedData: TeamRankingImportData[] = await matchdata_access.importCurrentTeamRanking(2090);
+
+      expect(importedData).to.deep.equal([]);
+    });
+
+  });
+
+})
 
 // describe("getLastUpdateTime", () => {
 //   var sandbox: any;

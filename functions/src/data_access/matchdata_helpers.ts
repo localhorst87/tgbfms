@@ -1,4 +1,4 @@
-import { MatchImportData } from "./import_datastructures";
+import { MatchImportData, TeamRankingImportData } from "./import_datastructures";
 import { isDstObserved, isDatestringUTC } from "../util";
 
 /**
@@ -126,4 +126,30 @@ function isMatchStarted(matchJson: any): boolean {
     let currentTimestamp: number = Date.now();
     return currentTimestamp >= matchTimestamp;
   }
+}
+
+export function convertRankingJson(rankingJson: any): TeamRankingImportData[] {
+  let rankingArray: TeamRankingImportData[] = [];
+
+  if (!("error" in rankingJson)) {
+    // http error throws object with error property
+    // error response will result in empty matchArray
+
+    for (let team of rankingJson) {
+      let rankingElement: TeamRankingImportData = {
+        teamId: team.TeamInfoId,
+        matches: team.Matches,
+        points: team.Points,
+        won: team.Won,
+        draw: team.Draw,
+        lost: team.Lost,
+        goals: team.Goals,
+        goalsAgainst: team.OpponentGoals
+      };
+      rankingArray.push(rankingElement);
+    }
+
+  }
+
+  return rankingArray;
 }

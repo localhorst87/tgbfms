@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 // import * as admin from "firebase-admin";
 // import { getLastUpdateTime } from "./matchdata_access";
 import { SEASON } from "../../src/app/Businessrules/rule_defined_values";
-import { MatchList, getMatchdaysToUpdate, updateMatchdays } from "./sync_matches";
+import { MatchList, getMatchdaysToUpdate, updateMatchdays } from "./sync_matchplan";
 
 export const syncMatchPlan = functions.pubsub.schedule("every day 10:00")
   .timeZone("Europe/Berlin")

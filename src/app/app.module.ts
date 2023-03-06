@@ -4,7 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule, HttpInterceptor, HttpRequest, HttpHandler, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import '@angular/common/locales/global/de';
 
 import { AngularFireModule } from '@angular/fire/compat';
@@ -63,19 +63,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { SwiperModule } from 'swiper/angular';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 
-@Injectable()
-export class NoCacheHeadersInterceptor implements HttpInterceptor {
-  intercept(req: HttpRequest<any>, next: HttpHandler) {
-    const authReq = req.clone({
-      setHeaders: {
-        "Cache-Control": "no-cache",
-        "Pragma": "no-cache"
-      }
-    });
-    return next.handle(authReq);
-  }
-}
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -128,7 +115,6 @@ export class NoCacheHeadersInterceptor implements HttpInterceptor {
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },
-    { provide: HTTP_INTERCEPTORS, useClass: NoCacheHeadersInterceptor, multi: true },
     { provide: AppdataAccessService, useClass: AppdataAccessFirestoreService },
     { provide: MatchdataAccessService, useClass: MatchdataAccessOpenligaService },
     { provide: PointCalculatorService, useClass: PointCalculatorTrendbasedService },

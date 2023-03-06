@@ -68,8 +68,8 @@ describe('MatchdataAccessOpenligaService', () => {
   it("isMatchStarted, time now greater", () => {
     jasmine.clock().install();
 
-    const argument: any = { "MatchDateTime": "2021-04-03T15:30:00" };
-    jasmine.clock().mockDate(new Date(argument.MatchDateTime));
+    const argument: any = { "matchDateTime": "2021-04-03T15:30:00" };
+    jasmine.clock().mockDate(new Date(argument.matchDateTime));
     jasmine.clock().tick(10);
 
     const expectedValue: boolean = true;
@@ -81,8 +81,8 @@ describe('MatchdataAccessOpenligaService', () => {
   it("isMatchStarted, time now lower", () => {
     jasmine.clock().install();
 
-    const argument: any = { "MatchDateTime": "2021-04-03T15:30:00" };
-    jasmine.clock().mockDate(new Date(argument.MatchDateTime));
+    const argument: any = { "matchDateTime": "2021-04-03T15:30:00" };
+    jasmine.clock().mockDate(new Date(argument.matchDateTime));
     jasmine.clock().tick(-10);
 
     const expectedValue: boolean = false;
@@ -94,8 +94,8 @@ describe('MatchdataAccessOpenligaService', () => {
   it("isMatchStarted, time now equal", () => {
     jasmine.clock().install();
 
-    const argument: any = { "MatchDateTime": "2021-04-03T15:30:00" };
-    jasmine.clock().mockDate(new Date(argument.MatchDateTime));
+    const argument: any = { "matchDateTime": "2021-04-03T15:30:00" };
+    jasmine.clock().mockDate(new Date(argument.matchDateTime));
 
     const expectedValue: boolean = true;
     expect(service["isMatchStarted"](argument)).toBe(expectedValue);
@@ -104,7 +104,7 @@ describe('MatchdataAccessOpenligaService', () => {
   });
 
   it("isMatchStarted, corrupt format", () => {
-    const argument: any = { "MatchDateTime": "2021-0403T15:30:00" };
+    const argument: any = { "matchDateTime": "2021-0403T15:30:00" };
     const expectedValue: boolean = false;
     expect(service["isMatchStarted"](argument)).toBe(expectedValue);
   });
@@ -113,96 +113,96 @@ describe('MatchdataAccessOpenligaService', () => {
   // extractResult
   // ---------------------------------------------------------------------------
 
-  it("extractResult, MatchResult and Goals available, match not yet started", () => {
+  it("extractResult, MatchResult and goals available, match not yet started", () => {
     spyOn<any>(service, "isMatchStarted").and.returnValue(false);
     const argument: any = {
-      "MatchResults": [
-        { "PointsTeam1": 2, "PointsTeam2": 1, "ResultTypeID": 2 },
-        { "PointsTeam1": 2, "PointsTeam2": 0, "ResultTypeID": 1 },
+      "matchResults": [
+        { "pointsTeam1": 2, "pointsTeam2": 1, "resultTypeID": 2 },
+        { "pointsTeam1": 2, "pointsTeam2": 0, "resultTypeID": 1 },
       ],
-      "Goals": [
-        { "ScoreTeam1": 1, "ScoreTeam2": 0 },
-        { "ScoreTeam1": 2, "ScoreTeam2": 0 },
-        { "ScoreTeam1": 2, "ScoreTeam2": 1 }
+      "goals": [
+        { "scoreTeam1": 1, "scoreTeam2": 0 },
+        { "scoreTeam1": 2, "scoreTeam2": 0 },
+        { "scoreTeam1": 2, "scoreTeam2": 1 }
       ]
     };
     const expectedValue: number[] = [-1, -1];
     expect(service["extractResult"](argument)).toEqual(expectedValue);
   });
 
-  it("extractResult, MatchResult and Goals available, match started", () => {
+  it("extractResult, MatchResult and goals available, match started", () => {
     spyOn<any>(service, "isMatchStarted").and.returnValue(true);
     const argument: any = {
-      "MatchResults": [
-        { "PointsTeam1": 2, "PointsTeam2": 1, "ResultTypeID": 2 },
-        { "PointsTeam1": 2, "PointsTeam2": 0, "ResultTypeID": 1 },
+      "matchResults": [
+        { "pointsTeam1": 2, "pointsTeam2": 1, "resultTypeID": 2 },
+        { "pointsTeam1": 2, "pointsTeam2": 0, "resultTypeID": 1 },
       ],
-      "Goals": [
-        { "ScoreTeam1": 1, "ScoreTeam2": 0 },
-        { "ScoreTeam1": 2, "ScoreTeam2": 0 },
-        { "ScoreTeam1": 2, "ScoreTeam2": 1 }
+      "goals": [
+        { "scoreTeam1": 1, "scoreTeam2": 0 },
+        { "scoreTeam1": 2, "scoreTeam2": 0 },
+        { "scoreTeam1": 2, "scoreTeam2": 1 }
       ]
     };
     const expectedValue: number[] = [2, 1];
     expect(service["extractResult"](argument)).toEqual(expectedValue);
   });
 
-  it("extractResult, only Goals available, match started", () => {
+  it("extractResult, only goals available, match started", () => {
     spyOn<any>(service, "isMatchStarted").and.returnValue(true);
     const argument: any = {
-      "MatchResults": [],
-      "Goals": [
-        { "ScoreTeam1": 1, "ScoreTeam2": 0 },
-        { "ScoreTeam1": 2, "ScoreTeam2": 0 },
-        { "ScoreTeam1": 2, "ScoreTeam2": 1 }
+      "matchResults": [],
+      "goals": [
+        { "scoreTeam1": 1, "scoreTeam2": 0 },
+        { "scoreTeam1": 2, "scoreTeam2": 0 },
+        { "scoreTeam1": 2, "scoreTeam2": 1 }
       ]
     };
     const expectedValue: number[] = [2, 1];
     expect(service["extractResult"](argument)).toEqual(expectedValue);
   });
 
-  it("extractResult, only MatchResults available, match started", () => {
+  it("extractResult, only matchResults available, match started", () => {
     spyOn<any>(service, "isMatchStarted").and.returnValue(true);
     const argument: any = {
-      "MatchResults": [
-        { "PointsTeam1": 2, "PointsTeam2": 1, "ResultTypeID": 2 },
-        { "PointsTeam1": 2, "PointsTeam2": 0, "ResultTypeID": 1 },
+      "matchResults": [
+        { "pointsTeam1": 2, "pointsTeam2": 1, "resultTypeID": 2 },
+        { "pointsTeam1": 2, "pointsTeam2": 0, "resultTypeID": 1 },
       ],
-      "Goals": []
+      "goals": []
     };
     const expectedValue: number[] = [2, 1];
     expect(service["extractResult"](argument)).toEqual(expectedValue);
   });
 
-  it("extractResult, ResultTypeId==1 and Goals available, match started", () => {
+  it("extractResult, ResultTypeId==1 and goals available, match started", () => {
     spyOn<any>(service, "isMatchStarted").and.returnValue(true);
     const argument: any = {
-      "MatchResults": [
-        { "PointsTeam1": 0, "PointsTeam2": 0, "ResultTypeID": 1 },
+      "matchResults": [
+        { "pointsTeam1": 0, "pointsTeam2": 0, "resultTypeID": 1 },
       ],
-      "Goals": [
-        { "ScoreTeam1": 1, "ScoreTeam2": 0 }
+      "goals": [
+        { "scoreTeam1": 1, "scoreTeam2": 0 }
       ]
     };
     const expectedValue: number[] = [1, 0];
     expect(service["extractResult"](argument)).toEqual(expectedValue);
   });
 
-  it("extractResult, nor MatchResults, nor Goals available, match started", () => {
+  it("extractResult, nor matchResults, nor goals available, match started", () => {
     spyOn<any>(service, "isMatchStarted").and.returnValue(true);
     const argument: any = {
-      "MatchResults": [],
-      "Goals": []
+      "matchResults": [],
+      "goals": []
     };
     const expectedValue: number[] = [0, 0];
     expect(service["extractResult"](argument)).toEqual(expectedValue);
   });
 
-  it("extractResult, nor MatchResults, nor Goals available, match not started", () => {
+  it("extractResult, nor matchResults, nor goals available, match not started", () => {
     spyOn<any>(service, "isMatchStarted").and.returnValue(false);
     const argument: any = {
-      "MatchResults": [],
-      "Goals": []
+      "matchResults": [],
+      "goals": []
     };
     const expectedValue: number[] = [-1, -1];
     expect(service["extractResult"](argument)).toEqual(expectedValue);
@@ -275,20 +275,20 @@ describe('MatchdataAccessOpenligaService', () => {
   it("convertMatchdayJson, two complete matches available", (done: DoneFn) => {
     const argument: any = [
       {
-        "MatchID": 58814,
-        "MatchDateTime": "2021-04-03T15:30:00",
-        "Group": { "GroupOrderID": 27 },
-        "Team1": { "TeamId": 10 },
-        "Team2": { "TeamId": 11 },
-        "MatchIsFinished": true,
+        "matchID": 58814,
+        "matchDateTime": "2021-04-03T15:30:00",
+        "group": { "groupOrderID": 27 },
+        "team1": { "teamId": 10 },
+        "team2": { "teamId": 11 },
+        "matchIsFinished": true,
       },
       {
-        "MatchID": 58815,
-        "MatchDateTime": "2021-04-03T18:30:00",
-        "Group": { "GroupOrderID": 27 },
-        "Team1": { "TeamId": 100 },
-        "Team2": { "TeamId": 101 },
-        "MatchIsFinished": false,
+        "matchID": 58815,
+        "matchDateTime": "2021-04-03T18:30:00",
+        "group": { "groupOrderID": 27 },
+        "team1": { "teamId": 100 },
+        "team2": { "teamId": 101 },
+        "matchIsFinished": false,
       }
     ];
 
@@ -297,23 +297,23 @@ describe('MatchdataAccessOpenligaService', () => {
       .withArgs(argument[1]).and.returnValue([0, 0]);
 
     const expectedValue0: MatchImportData = {
-      matchday: argument[0].Group.GroupOrderID,
-      matchId: argument[0].MatchID,
-      datetime: argument[0].MatchDateTime,
-      isFinished: argument[0].MatchIsFinished,
-      teamIdHome: argument[0].Team1.TeamId,
-      teamIdAway: argument[0].Team2.TeamId,
+      matchday: argument[0].group.groupOrderID,
+      matchId: argument[0].matchID,
+      datetime: argument[0].matchDateTime,
+      isFinished: argument[0].matchIsFinished,
+      teamIdHome: argument[0].team1.teamId,
+      teamIdAway: argument[0].team2.teamId,
       goalsHome: 3,
       goalsAway: 2
     };
 
     const expectedValue1: MatchImportData = {
-      matchday: argument[1].Group.GroupOrderID,
-      matchId: argument[1].MatchID,
-      datetime: argument[1].MatchDateTime,
-      isFinished: argument[1].MatchIsFinished,
-      teamIdHome: argument[1].Team1.TeamId,
-      teamIdAway: argument[1].Team2.TeamId,
+      matchday: argument[1].group.groupOrderID,
+      matchId: argument[1].matchID,
+      datetime: argument[1].matchDateTime,
+      isFinished: argument[1].matchIsFinished,
+      teamIdHome: argument[1].team1.teamId,
+      teamIdAway: argument[1].team2.teamId,
       goalsHome: 0,
       goalsAway: 0
     };
@@ -387,25 +387,25 @@ describe('MatchdataAccessOpenligaService', () => {
   it("convertTeamJson$, teams available", (done: DoneFn) => {
     const argument: any[] = [
       {
-        "ShortName": "Kölle",
-        "TeamGroupName": null,
-        "TeamIconUrl": "https://foo-bar-bla.de/logo_fc.png",
-        "TeamId": 65,
-        "TeamName": "1. FC Köln"
+        "shortName": "Kölle",
+        "teamgroupName": null,
+        "teamIconUrl": "https://foo-bar-bla.de/logo_fc.png",
+        "teamId": 65,
+        "teamName": "1. FC Köln"
       },
       {
-        "ShortName": "Dortmund",
-        "TeamGroupName": null,
-        "TeamIconUrl": "https://foo-bar-bla.de/logo_bvb.png",
-        "TeamId": 7,
-        "TeamName": "BV Borussia Dortmund 09"
+        "shortName": "Dortmund",
+        "teamgroupName": null,
+        "teamIconUrl": "https://foo-bar-bla.de/logo_bvb.png",
+        "teamId": 7,
+        "teamName": "BV Borussia Dortmund 09"
       },
       {
-        "ShortName": "Freiburch",
-        "TeamGroupName": null,
-        "TeamIconUrl": "https://foo-bar-bla.de/logo_scf.png",
-        "TeamId": 112,
-        "TeamName": "SC Freiburg"
+        "shortName": "Freiburch",
+        "teamgroupName": null,
+        "teamIconUrl": "https://foo-bar-bla.de/logo_scf.png",
+        "teamId": 112,
+        "teamName": "SC Freiburg"
       }
     ];
 
@@ -459,34 +459,34 @@ describe('MatchdataAccessOpenligaService', () => {
   it("convertRankingJson$, ranking available", (done: DoneFn) => {
     const argument: any[] = [
       {
-        "Draw": 5,
-        "Goals": 92,
-        "Lost": 4,
-        "Matches": 32,
-        "OpponentGoals": 40,
-        "Points": 74,
-        "TeamInfoId": 40,
-        "Won": 23
+        "draw": 5,
+        "goals": 92,
+        "lost": 4,
+        "matches": 32,
+        "opponentGoals": 40,
+        "points": 74,
+        "teamInfoId": 40,
+        "won": 23
       },
       {
-        "Draw": 7,
-        "Goals": 57,
-        "Lost": 6,
-        "Matches": 32,
-        "OpponentGoals": 28,
-        "Points": 64,
-        "TeamInfoId": 1635,
-        "Won": 19
+        "draw": 7,
+        "goals": 57,
+        "lost": 6,
+        "matches": 32,
+        "opponentGoals": 28,
+        "points": 64,
+        "teamInfoId": 1635,
+        "won": 19
       },
       {
-        "Draw": 9,
-        "Goals": 57,
-        "Lost": 6,
-        "Matches": 32,
-        "OpponentGoals": 32,
-        "Points": 60,
-        "TeamInfoId": 131,
-        "Won": 17
+        "draw": 9,
+        "goals": 57,
+        "lost": 6,
+        "matches": 32,
+        "opponentGoals": 32,
+        "points": 60,
+        "teamInfoId": 131,
+        "won": 17
       }
     ];
 
@@ -605,9 +605,9 @@ describe('MatchdataAccessOpenligaService', () => {
 
   it("convertCurrentMatchdayJson$, received values", (done: DoneFn) => {
     const argument: any = {
-      "GroupID": 38202,
-      "GroupName": "26. Spieltag",
-      "GroupOrderID": 26
+      "groupID": 38202,
+      "groupName": "26. Spieltag",
+      "groupOrderID": 26
     };
 
     const expectedValue: number = 26;
@@ -631,31 +631,31 @@ describe('MatchdataAccessOpenligaService', () => {
 
     const jsonArray: any[] = [
       {
-        "MatchID": 58814,
-        "MatchDateTime": "2021-04-03T15:30:00",
-        "Group": { "GroupOrderID": 27 },
-        "Team1": { "TeamId": 10 },
-        "Team2": { "TeamId": 11 },
-        "MatchIsFinished": true,
-        "MatchResults": [
-          { "PointsTeam1": 2, "PointsTeam2": 1, "ResultTypeID": 2 },
-          { "PointsTeam1": 2, "PointsTeam2": 0, "ResultTypeID": 1 },
+        "matchID": 58814,
+        "matchDateTime": "2021-04-03T15:30:00",
+        "group": { "groupOrderID": 27 },
+        "team1": { "teamId": 10 },
+        "team2": { "teamId": 11 },
+        "matchIsFinished": true,
+        "matchResults": [
+          { "pointsTeam1": 2, "pointsTeam2": 1, "resultTypeID": 2 },
+          { "pointsTeam1": 2, "pointsTeam2": 0, "resultTypeID": 1 },
         ],
-        "Goals": [
-          { "ScoreTeam1": 1, "ScoreTeam2": 0 },
-          { "ScoreTeam1": 2, "ScoreTeam2": 0 },
-          { "ScoreTeam1": 2, "ScoreTeam2": 1 }
+        "goals": [
+          { "scoreTeam1": 1, "scoreTeam2": 0 },
+          { "scoreTeam1": 2, "scoreTeam2": 0 },
+          { "scoreTeam1": 2, "scoreTeam2": 1 }
         ]
       },
       {
-        "MatchID": 58815,
-        "MatchDateTime": "2021-04-03T18:30:00",
-        "Group": { "GroupOrderID": 27 },
-        "Team1": { "TeamId": 100 },
-        "Team2": { "TeamId": 101 },
-        "MatchIsFinished": false,
-        "MatchResults": [],
-        "Goals": []
+        "matchID": 58815,
+        "matchDateTime": "2021-04-03T18:30:00",
+        "group": { "groupOrderID": 27 },
+        "team1": { "teamId": 100 },
+        "team2": { "teamId": 101 },
+        "matchIsFinished": false,
+        "matchResults": [],
+        "goals": []
       }
     ];
 
@@ -730,34 +730,34 @@ describe('MatchdataAccessOpenligaService', () => {
 
     const jsonArray: any[] = [
       {
-        "Draw": 5,
-        "Goals": 92,
-        "Lost": 4,
-        "Matches": 32,
-        "OpponentGoals": 40,
-        "Points": 74,
-        "TeamInfoId": 40,
-        "Won": 23
+        "draw": 5,
+        "goals": 92,
+        "lost": 4,
+        "matches": 32,
+        "opponentGoals": 40,
+        "points": 74,
+        "teamInfoId": 40,
+        "won": 23
       },
       {
-        "Draw": 7,
-        "Goals": 57,
-        "Lost": 6,
-        "Matches": 32,
-        "OpponentGoals": 28,
-        "Points": 64,
-        "TeamInfoId": 1635,
-        "Won": 19
+        "draw": 7,
+        "goals": 57,
+        "lost": 6,
+        "matches": 32,
+        "opponentGoals": 28,
+        "points": 64,
+        "teamInfoId": 1635,
+        "won": 19
       },
       {
-        "Draw": 9,
-        "Goals": 57,
-        "Lost": 6,
-        "Matches": 32,
-        "OpponentGoals": 32,
-        "Points": 60,
-        "TeamInfoId": 131,
-        "Won": 17
+        "draw": 9,
+        "goals": 57,
+        "lost": 6,
+        "matches": 32,
+        "opponentGoals": 32,
+        "points": 60,
+        "teamInfoId": 131,
+        "won": 17
       }
     ];
 
@@ -843,25 +843,25 @@ describe('MatchdataAccessOpenligaService', () => {
 
     const jsonArray: any[] = [
       {
-        "ShortName": "Kölle",
-        "TeamGroupName": null,
-        "TeamIconUrl": "https://foo-bar-bla.de/logo_fc.png",
-        "TeamId": 65,
-        "TeamName": "1. FC Köln"
+        "shortName": "Kölle",
+        "teamgroupName": null,
+        "teamIconUrl": "https://foo-bar-bla.de/logo_fc.png",
+        "teamId": 65,
+        "teamName": "1. FC Köln"
       },
       {
-        "ShortName": "Dortmund",
-        "TeamGroupName": null,
-        "TeamIconUrl": "https://foo-bar-bla.de/logo_bvb.png",
-        "TeamId": 7,
-        "TeamName": "BV Borussia Dortmund 09"
+        "shortName": "Dortmund",
+        "teamgroupName": null,
+        "teamIconUrl": "https://foo-bar-bla.de/logo_bvb.png",
+        "teamId": 7,
+        "teamName": "BV Borussia Dortmund 09"
       },
       {
-        "ShortName": "Freiburch",
-        "TeamGroupName": null,
-        "TeamIconUrl": "https://foo-bar-bla.de/logo_scf.png",
-        "TeamId": 112,
-        "TeamName": "SC Freiburg"
+        "shortName": "Freiburch",
+        "teamgroupName": null,
+        "teamIconUrl": "https://foo-bar-bla.de/logo_scf.png",
+        "teamId": 112,
+        "teamName": "SC Freiburg"
       }
     ];
 

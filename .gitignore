@@ -52,5 +52,8 @@ Thumbs.db
 # Cached data
 .firebase
 
-# temporarily ignore functions in this branch (too much files)
-/functions
+# Logs
+functions/firebase-debug.log
+functions/firestore-debug.log
+functions/pubsub-debug.log
+functions/ui-debug.log

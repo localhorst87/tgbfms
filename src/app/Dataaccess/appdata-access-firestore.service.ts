@@ -4,7 +4,7 @@ import { Observable, from, timer } from 'rxjs';
 import { map, switchMap, distinct, take, pluck, takeUntil } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import firebase from 'firebase/compat/app';
-import { Bet, Match, Result, Team, User, SeasonBet, SeasonResult, TopMatchVote } from '../Businessrules/basic_datastructures';
+import { Bet, Match, Team, User, SeasonBet, SeasonResult, TopMatchVote } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
 import { NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
 
@@ -47,28 +47,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
 
     return bet$;
-  }
-
-  getResult$(matchId: number): Observable<Result> {
-    // queries the result with the given matchId
-    // and returns the corresponding Observable
-
-    let resultQuery$: Observable<Result[]> = this.firestore.collection<Result>(COLLECTION_NAME_RESULTS, ref =>
-      ref.where("matchId", "==", matchId))
-      .valueChanges({ idField: 'documentId' });
-
-    let result$: Observable<Result> = resultQuery$.pipe(
-      map(resultArray => {
-        if (resultArray.length == 0) {
-          resultArray.push(this.makeUnknownResult(matchId));
-        }
-        return resultArray[0];
-      }),
-      take(1),
-      distinct()
-    );
-
-    return result$;
   }
 
   getMatch$(matchId: number): Observable<Match> {
@@ -497,12 +475,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     this.firestore.collection(COLLECTION_NAME_MATCHES).add(matchToWrite);
   }
 
-  addResult(result: Result): void {
-    let resultToWrite: any = result;
-    delete resultToWrite.documentId;
-    this.firestore.collection(COLLECTION_NAME_RESULTS).add(resultToWrite);
-  }
-
   addSeasonResult(result: SeasonResult): void {
     let resultToWrite: any = result;
     delete resultToWrite.documentId;
@@ -515,14 +487,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let matchDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_MATCHES + "/" + documentId);
     matchDocument.update(matchToUpdate);
-  }
-
-  updateResult(documentId: string, result: Result): void {
-    let resultToUpdate: any = result;
-    delete resultToUpdate.documentId;
-
-    let resultDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_RESULTS + "/" + documentId);
-    resultDocument.update(resultToUpdate);
   }
 
   updateSeasonResult(documentId: string, result: SeasonResult): void {
@@ -576,7 +540,9 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: -1,
-      teamIdAway: -1
+      teamIdAway: -1,
+      goalsHome: -1,
+      goalsAway: -1
     };
   }
 
@@ -588,17 +554,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       matchId: matchId,
       userId: userId,
       isFixed: false,
-      goalsHome: -1,
-      goalsAway: -1
-    };
-  }
-
-  private makeUnknownResult(matchId: number): Result {
-    // returns an unknown dummy Result
-
-    return {
-      documentId: "",
-      matchId: matchId,
       goalsHome: -1,
       goalsAway: -1
     };

@@ -3,7 +3,7 @@ import { Observable, of, from, iif, combineLatest, range, concat } from 'rxjs';
 import { map, tap, concatMap, toArray, reduce, scan, pluck, defaultIfEmpty } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
-import { Score, SeasonBet, SeasonResult, User } from '../Businessrules/basic_datastructures';
+import { Score, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot } from '../Dataaccess/import_datastructures';
 import { TableData } from './output_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { StatisticsCalculatorTrendbasedService } from './statistics-calculator-trendbased.service';
 import { PointCalculatorService } from './point-calculator.service';
-import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
+import { Bet, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
 
 describe('StatisticsCalculatorTrendbasedService', () => {
   let service: StatisticsCalculatorTrendbasedService;

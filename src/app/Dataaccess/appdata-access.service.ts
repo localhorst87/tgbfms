@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Bet, Match, Result, Team, User, SeasonBet, SeasonResult, TopMatchVote } from '../Businessrules/basic_datastructures';
+import { Bet, Match, Team, User, SeasonBet, SeasonResult, TopMatchVote } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
 
 @Injectable()
 export abstract class AppdataAccessService {
   public abstract getBet$(matchId: number, userId: string): Observable<Bet>;
-  public abstract getResult$(matchId: number): Observable<Result>
   public abstract getMatch$(matchId: number): Observable<Match>;
   public abstract getSeasonBet$(season: number, place: number, userId: string): Observable<SeasonBet>;
   public abstract getSeasonResult$(season: number, place: number): Observable<SeasonResult>;
@@ -30,10 +29,8 @@ export abstract class AppdataAccessService {
   public abstract setUser(user: User): void;
   public abstract setTopMatchVote(vote: TopMatchVote): Promise<void>;
   public abstract addMatch(match: Match): void;
-  public abstract addResult(result: Result): void;
   public abstract addSeasonResult(result: SeasonResult): void;
   public abstract updateMatch(documentId: string, match: Match): void;
-  public abstract updateResult(documentId: string, result: Result): void;
   public abstract updateSeasonResult(documentId: string, result: SeasonResult): void;
   public abstract setMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void;
   public abstract setSyncTime(syncTime: SyncTime): void;

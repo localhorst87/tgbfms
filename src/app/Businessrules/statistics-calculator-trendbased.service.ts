@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StatisticsCalculatorService } from './statistics-calculator.service';
-import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
+import { Bet, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
 import { PointCalculatorService } from './point-calculator.service';
 
 const WEIGHT_RELATIVE_TO_OPP: number = 0.67; // weight for points relative to opponents
@@ -11,7 +11,7 @@ const POINT_REFERENCE: number = 6; // a chosen mean point reference
 export class StatisticsCalculatorTrendbasedService implements StatisticsCalculatorService {
   constructor(private pointCalculator: PointCalculatorService) { }
 
-  getScoreArray(matchArray: Match[], betArray: Bet[], resultArray: Result[]): Score[] {
+  getScoreArray(matchArray: Match[], betArray: Bet[]): Score[] {
     // calculates all scores from the given bets, results for the matches given
     // in the matchArray, returns the Score sorted alphabetically by userId
 
@@ -22,11 +22,8 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
       let scoreUser: Score = this.initScore(userId);
 
       for (let match of matchArray) {
-        let betUser: Bet = this.extractBet(betArray, match.matchId, userId);
         let allMatchBets: Bet[] = betArray.filter(bet => bet.matchId == match.matchId);
-        let result: Result = this.extractResult(resultArray, match.matchId);
-        let matchScore: Score = this.pointCalculator.calcSingleMatchScore(userId, allMatchBets, result, match);
-
+        let matchScore: Score = this.pointCalculator.calcSingleMatchScore(userId, allMatchBets, match);
         scoreUser = this.addScores(scoreUser, matchScore);
       }
 
@@ -200,46 +197,6 @@ export class StatisticsCalculatorTrendbasedService implements StatisticsCalculat
         extraTop: 0,
         extraOutsider: 0,
         extraSeason: 0
-      };
-    }
-  }
-
-  private extractBet(betArray: Bet[], matchId: number, userId: string): Bet {
-    // extracts the Bet with the given matchId and userId from betArray.
-    // If the conditions are not met, a default value will be returned
-
-    let idx: number = betArray.findIndex(bet => bet.matchId == matchId && bet.userId == userId);
-
-    if (idx >= 0) {
-      return betArray[idx];
-    }
-    else {
-      return {
-        documentId: "",
-        matchId: matchId,
-        userId: userId,
-        isFixed: false,
-        goalsHome: -1,
-        goalsAway: -1
-      };
-    }
-  }
-
-  private extractResult(resultArray: Result[], matchId: number): Result {
-    // extracts the Result with the given matchId from resultArray.
-    // If the conditions are not met, a default value will be returned
-
-    let idx: number = resultArray.findIndex(result => result.matchId == matchId);
-
-    if (idx >= 0) {
-      return resultArray[idx];
-    }
-    else {
-      return {
-        documentId: "",
-        matchId: matchId,
-        goalsHome: -1,
-        goalsAway: -1
       };
     }
   }

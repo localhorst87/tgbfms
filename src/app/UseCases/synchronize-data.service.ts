@@ -5,11 +5,11 @@ import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
 import { MatchImportData, TeamRankingImportData, MatchdayScoreSnapshot, SyncTime } from '../Dataaccess/import_datastructures';
-import { Bet, Match, Result, Team, SeasonResult, Score } from '../Businessrules/basic_datastructures';
+import { Bet, Match, SeasonResult, Score } from '../Businessrules/basic_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT, NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
 
 const MATCHES_PER_MATCHDAY: number = Math.floor(NUMBER_OF_TEAMS / 2);
-export const REQUIRED_UPDATES_PER_MATCHDAY: number = 2 * MATCHES_PER_MATCHDAY + 2; // all matches, results (= 2*nMatchtes) one season result, one score snapshots
+export const REQUIRED_UPDATES_PER_MATCHDAY: number = MATCHES_PER_MATCHDAY + 2; // all matches, one season result, one score snapshots
 
 @Injectable({
   providedIn: 'root'
@@ -46,10 +46,7 @@ export class SynchronizeDataService {
           this.syncCounter.set(matchday, 0);
 
           this.matchDataAccess.importMatchdata$(season, matchday).subscribe(
-            (importedMatch: MatchImportData) => {
-              this.syncMatch(season, importedMatch);
-              this.syncResult(season, importedMatch);
-            }
+            (importedMatch: MatchImportData) => this.syncMatch(season, importedMatch)        
           );
 
           this.matchDataAccess.importCurrentTeamRanking$(season).pipe(toArray()).subscribe(
@@ -89,39 +86,6 @@ export class SynchronizeDataService {
         }
         else if (!this.isMatchEqual(importedMatch, appdataMatch)) { // available, but not up to date
           this.appDataAccess.updateMatch(appdataMatch.documentId, importedMatch);
-        }
-      },
-
-      err => { },
-
-      () => {
-        let currentMatchCounter = this.matchCounter.get(matchday);
-        let currentSyncCounter = this.syncCounter.get(matchday);
-        this.matchCounter.set(matchday, currentMatchCounter + 1);
-        this.syncCounter.set(matchday, currentSyncCounter + 1);
-        this.counterEvent.emit();
-        this.checkCounters(season, matchday);
-      }
-    );
-  }
-
-  private syncResult(season: number, importedData: MatchImportData): void {
-    // performs synchronization of Result data
-
-    let matchday: number = importedData.matchday;
-
-    this.appDataAccess.getResult$(importedData.matchId).subscribe(
-      (appdataResult: Result) => {
-
-        let importedResult: Result = this.convertToResult(importedData);
-
-        if (importedResult.goalsHome >= 0 && importedResult.goalsAway >= 0) { // result is available
-          if (appdataResult.documentId == "") { // result not yet exported to database
-            this.appDataAccess.addResult(importedResult);
-          }
-          else if (!this.isResultEqual(importedResult, appdataResult)) { // available, but not up to date
-            this.appDataAccess.updateResult(appdataResult.documentId, importedResult);
-          }
         }
       },
 
@@ -181,7 +145,7 @@ export class SynchronizeDataService {
     // checks if both updates have been done for each match and if this is the
     // case it triggers the updating of the MatchdayScoreSnapshot
 
-    if (this.matchCounter.get(matchday) == 2 * MATCHES_PER_MATCHDAY) {
+    if (this.matchCounter.get(matchday) == MATCHES_PER_MATCHDAY) {
       this.updateScoreSnapshot(season, matchday); // triggers update of Score data
       this.matchCounter.set(matchday, 0);
     }
@@ -230,12 +194,10 @@ export class SynchronizeDataService {
   }
 
   private getScoreArrayFromMatchArray$(matchArray: Match[]): Observable<Score[]> {
-    // retrieves Bet and Results and returns the calculated Scores
+    // retrieves Bets and returns the calculated Scores
 
-    return combineLatest(this.getResultArrayFromMatchArray$(matchArray), this.getBetArrayFromMatchArray$(matchArray),
-      (resultArray: Result[], betArray: Bet[]) => {
-        return this.statCalculater.getScoreArray(matchArray, betArray, resultArray);
-      }
+    return this.getBetArrayFromMatchArray$(matchArray).pipe(
+      map((betArray: Bet[]) => this.statCalculater.getScoreArray(matchArray, betArray))
     );
   }
 
@@ -246,16 +208,6 @@ export class SynchronizeDataService {
       concatMap((match: Match) => this.appDataAccess.getActiveUserIds$().pipe(
         concatMap((userId: string) => this.appDataAccess.getBet$(match.matchId, userId)),
       )),
-      distinct(),
-      toArray(),
-    );
-  }
-
-  private getResultArrayFromMatchArray$(matchArray: Match[]): Observable<Result[]> {
-    // returns all Results as array from the given Match array
-
-    return from(matchArray).pipe(
-      concatMap((match: Match) => this.appDataAccess.getResult$(match.matchId)),
       distinct(),
       toArray(),
     );
@@ -298,16 +250,7 @@ export class SynchronizeDataService {
       isFinished: importedData.isFinished,
       isTopMatch: isTopMatch,
       teamIdHome: importedData.teamIdHome,
-      teamIdAway: importedData.teamIdAway
-    };
-  }
-
-  private convertToResult(importedData: MatchImportData): Result {
-    // creates a new Result structure for writing to the app database
-
-    return {
-      documentId: "",
-      matchId: importedData.matchId,
+      teamIdAway: importedData.teamIdAway,
       goalsHome: importedData.goalsHome,
       goalsAway: importedData.goalsAway
     };
@@ -352,15 +295,9 @@ export class SynchronizeDataService {
       match1.isFinished == match2.isFinished &&
       match1.isTopMatch == match2.isTopMatch &&
       match1.teamIdHome == match2.teamIdHome &&
-      match1.teamIdAway == match2.teamIdAway);
-  }
-
-  private isResultEqual(result1: Result, result2: Result): boolean {
-    // checks if all properties are equal and leaves out the document ID !
-
-    return (result1.matchId == result2.matchId &&
-      result1.goalsHome == result2.goalsHome &&
-      result1.goalsAway == result2.goalsAway);
+      match1.teamIdAway == match2.teamIdAway &&
+      match1.goalsHome == match2.goalsHome &&
+      match1.goalsAway == match2.goalsAway);
   }
 
   private isSeasonResultEqual(result1: SeasonResult, result2: SeasonResult): boolean {

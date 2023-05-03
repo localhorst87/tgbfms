@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PointCalculatorService } from './point-calculator.service';
-import { Bet, Result, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
+import { Bet, Match, Score, SeasonBet, SeasonResult } from './basic_datastructures';
 import {
   POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH,
   POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE, POINTS_SEASON_FIRST_EXACT,
@@ -12,7 +12,7 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
 
   constructor() { }
 
-  calcSingleMatchScore(userId: string, betsAllUsers: Bet[], result: Result, match: Match): Score {
+  calcSingleMatchScore(userId: string, betsAllUsers: Bet[], match: Match): Score {
     // calculates the points of the user with the given user id for the specific match
 
     let score: Score = { userId: userId, points: 0, matches: 0, results: 0, extraTop: 0, extraOutsider: 0, extraSeason: 0 };
@@ -25,15 +25,15 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
       }
     }
 
-    if (betUser.matchId != result.matchId || betUser.matchId != match.matchId || result.matchId != match.matchId) {
+    if (betUser.matchId != match.matchId) {
       return score;
     }
 
-    if (this.isTendencyCorrect(betUser, result)) {
+    if (this.isTendencyCorrect(betUser, match)) {
       score.matches += 1;
       score.points += POINTS_TENDENCY;
     }
-    if (this.isResultCorrect(betUser, result)) {
+    if (this.isResultCorrect(betUser, match)) {
       score.results += 1;
       score.points += POINTS_ADDED_RESULT;
     }
@@ -130,42 +130,42 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     }
   }
 
-  isTendencyCorrect(bet: Bet, result: Result): boolean {
+  isTendencyCorrect(bet: Bet, match: Match): boolean {
     // returns true if the tendency of bet and result are the same
 
-    if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
+    if (!this.isAvailable(bet) || !this.isAvailable(match)) { // bet or result not set !
       return false;
     }
     else {
-      return this.getTendency(bet) == this.getTendency(result);
+      return this.getTendency(bet) == this.getTendency(match);
     }
   }
 
-  private isResultCorrect(bet: Bet, result: Result): boolean {
+  private isResultCorrect(bet: Bet, match: Match): boolean {
     // returns true if the results of bet and result are the same
 
-    if (!this.isAvailable(bet) || !this.isAvailable(result)) { // bet or result not set !
+    if (!this.isAvailable(bet) || !this.isAvailable(match)) { // bet or result not set !
       return false;
     }
     else {
-      return bet.goalsHome == result.goalsHome && bet.goalsAway == result.goalsAway;
+      return bet.goalsHome == match.goalsHome && bet.goalsAway == match.goalsAway;
     }
   }
 
-  private getTendency(betOrResult: any): number {
+  private getTendency(betOrMatch: any): number {
     // returns the tendeny of the bet or result:
     // 1 in case of home wins, 0 in case of draw, 2 in case of away wins.
     // if no goals set (goalsHome == goalsAway == -1) -1 is returned
-    // betOrResult must fulfill the number properties goalsHome and goalsAway
+    // betOrMatch must fulfill the number properties goalsHome and goalsAway
 
-    if (!this.isAvailable(betOrResult)) { // no result available
+    if (!this.isAvailable(betOrMatch)) { // no result available
       return -1;
     }
 
-    if (betOrResult.goalsHome > betOrResult.goalsAway) { // home win
+    if (betOrMatch.goalsHome > betOrMatch.goalsAway) { // home win
       return 1;
     }
-    else if (betOrResult.goalsHome < betOrResult.goalsAway) { // away win
+    else if (betOrMatch.goalsHome < betOrMatch.goalsAway) { // away win
       return 2;
     }
     else { // draw
@@ -173,11 +173,11 @@ export class PointCalculatorTrendbasedService implements PointCalculatorService 
     }
   }
 
-  private isAvailable(betOrResult: any): boolean {
+  private isAvailable(betOrMatch: any): boolean {
     // checks if bet or result is available (goals set)
-    // betOrResult must fulfill the number properties goalsHome and goalsAway
+    // betOrMatch must fulfill the number properties goalsHome and goalsAway
 
-    if (betOrResult.goalsHome > -1 && betOrResult.goalsAway > -1) { // result available
+    if (betOrMatch.goalsHome > -1 && betOrMatch.goalsAway > -1) { // result available
       return true;
     }
     else {

@@ -8,6 +8,8 @@ export interface Match {
   isTopMatch: boolean;
   teamIdHome: number;
   teamIdAway: number;
+  goalsHome: number;
+  goalsAway: number;
 }
 
 export interface Bet {
@@ -26,13 +28,6 @@ export interface SeasonBet {
   isFixed: boolean;
   place: number;
   teamId: number;
-}
-
-export interface Result {
-  documentId: string;
-  matchId: number;
-  goalsHome: number;
-  goalsAway: number;
 }
 
 export interface SeasonResult {

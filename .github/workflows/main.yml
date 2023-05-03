@@ -7,10 +7,14 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
+      - name: Install proper node version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
       - name: Install Dependencies
         run: npm install
       - name: Build
@@ -23,7 +27,7 @@ jobs:
   deploy:
     name: Deploy
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
@@ -35,6 +39,6 @@ jobs:
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --project tgbfms
+          args: deploy --project tgbfms --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { Observable, combineLatest, concat, range, from } from 'rxjs';
 import { map, mergeMap, distinct, concatMap, toArray, defaultIfEmpty, first } from 'rxjs/operators';
-import { Bet, Match, Result, SeasonBet } from '../Businessrules/basic_datastructures';
+import { Match, SeasonBet } from '../Businessrules/basic_datastructures';
 import { BetWriteData, SeasonBetWriteData } from './output_datastructures';
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from '../Businessrules/rule_defined_values';
 

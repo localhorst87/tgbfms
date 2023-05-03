@@ -1,4 +1,4 @@
-import { NgModule, Injectable, LOCALE_ID } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
@@ -28,7 +28,6 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
-import { SyncDialogComponent } from './sync-dialog/sync-dialog.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { RulesComponent } from './rules/rules.component';
 
@@ -72,7 +71,6 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     TableComponent,
     LoginComponent,
     RegisterComponent,
-    SyncDialogComponent,
     DashboardComponent,
     PasswordResetComponent,
     RulesComponent

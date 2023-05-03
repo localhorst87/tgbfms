@@ -1,21 +1,17 @@
 import { Component, OnInit, EventEmitter, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
-import { Observable, Subscription, combineLatest, timer, from, of } from 'rxjs';
-import { switchMap, mergeMap, pluck, delay, filter, map, tap, distinct, toArray } from 'rxjs/operators';
-import { MatSnackBar, MatSnackBarRef, SimpleSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { combineLatest, timer, of } from 'rxjs';
+import { switchMap, delay } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { SynchronizeDataService } from '../UseCases/synchronize-data.service';
 import { AuthenticationService } from '../UseCases/authentication.service';
 import { SynchronizeTopMatchService } from '../UseCases/synchronize-top-match.service';
-import { SyncDialogComponent } from '../sync-dialog/sync-dialog.component';
 import { Bet, SeasonBet, User } from '../Businessrules/basic_datastructures';
-import { SEASON, MATCHDAYS_PER_SEASON } from '../Businessrules/rule_defined_values';
+import { SEASON } from '../Businessrules/rule_defined_values';
 
 const BET_FIX_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if Bets needs to be fixed
-const SYNC_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if new Data to synchronize is available
-const DURATION_SYNC_SNACKBAR: number = 2 * 1000; // duration in [ms] the snackbar for data sync shows up
 const MATCHDAY_BEGUN_TOLERANCE: number = -60 * 60; // check top match votes one hour before matchday starts
 
 @Component({
@@ -50,7 +46,6 @@ export class HomeComponent implements OnInit {
     private authenticator: AuthenticationService,
     private renderer: Renderer2,
     private formBuilder: FormBuilder,
-    private snackbar: MatSnackBar,
     private dialog: MatDialog) {
 
     this.loggedUser = {
@@ -98,45 +93,6 @@ export class HomeComponent implements OnInit {
 
   logout(): void {
     this.authenticator.logout();
-  }
-
-  openSyncDialog(): void {
-    //
-
-    let dialogRef: MatDialogRef<SyncDialogComponent> = this.dialog.open(SyncDialogComponent, { minWidth: "60vw", data: { matchdaysToSync: this.matchdaysToSync } });
-    this.matchdaysToSync = [];
-  }
-
-  subscribeToSyncCheck(matchdayLastMatch: number): void {
-    // if the corresponding matchday has new data to sync, it inserts the
-    // matchday into the matchdaysToSync array and notifies via event
-
-    timer(0, SYNC_CYCLE)
-      .pipe(
-        switchMap(() => of(matchdayLastMatch, matchdayLastMatch + 1)),
-        filter((matchday: number) => matchday >= 1 && matchday <= MATCHDAYS_PER_SEASON),
-        mergeMap((matchday: number) => this.syncService.isSyncNeeded$(SEASON, matchday).pipe(
-          map((isNeeded: boolean) => {
-            if (isNeeded) {
-              return matchday;
-            }
-            else {
-              return -1;
-            }
-          }),
-          distinct()
-        ))
-      )
-      .subscribe(
-        (matchdayToSync: number) => {
-          if (matchdayToSync > 0) {
-            if (!this.matchdaysToSync.includes(matchdayToSync)) {
-              this.matchdaysToSync.push(matchdayToSync);
-              this.syncNeededEvent.emit();
-            }
-          }
-        }
-      );
   }
 
   setMatchdays(): void {
@@ -205,7 +161,6 @@ export class HomeComponent implements OnInit {
         // in the beginning on ngOnInit
         this.fixBetEvent.emit(this.matchdayLastMatch);
         this.syncTopMatchEvent.emit(this.matchdayTopMatchSync);
-        this.subscribeToSyncCheck(this.matchdayLastMatch);
       }
     );
   }
@@ -305,26 +260,6 @@ export class HomeComponent implements OnInit {
     // eavluate and set top match if required
     this.syncTopMatchEvent.pipe(delay(5000)).subscribe(
       (matchday: number) => this.syncTopMatch(matchday)
-    );
-
-    // snyc data
-    this.syncNeededEvent.subscribe(
-      () => {
-        let message: string = "Neue Daten verfügbar";
-        let action: string = "";
-        let config: MatSnackBarConfig<any> = {
-          horizontalPosition: "center",
-          verticalPosition: "bottom",
-          duration: DURATION_SYNC_SNACKBAR
-        };
-
-        let syncNotificationBar: MatSnackBarRef<any> = this.snackbar.open(message, action, config);
-        syncNotificationBar.onAction().subscribe(
-          () => {
-            this.openSyncDialog();
-          }
-        );
-      }
     );
 
     this.setMatchdays();

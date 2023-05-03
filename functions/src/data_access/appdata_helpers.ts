@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
-import { Match, Bet, SeasonBet, SeasonResult } from "../../../src/app/Businessrules/basic_datastructures";
-import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from "../../../src/app/Businessrules/rule_defined_values";
+import { Match, Bet, SeasonBet, SeasonResult } from "../business_rules/basic_datastructures";
+import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from "../business_rules/rule_defined_values"
 import { UpdateTime, MatchdayScoreSnapshot } from "./import_datastructures";
 
 /**

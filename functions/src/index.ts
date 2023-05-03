@@ -1,13 +1,15 @@
 import * as functions from "firebase-functions";
-import { SEASON } from "../../src/app/Businessrules/rule_defined_values";
-import { Match } from "../../src/app/Businessrules/basic_datastructures";
+import { SEASON } from "./business_rules/rule_defined_values";
+import { Match } from "./business_rules/basic_datastructures";
 import * as sync_live from "./sync_live/sync_live";
 import * as sync_live_helper from "./sync_live/sync_live_helpers";
 import * as sync_matchplan from "./sync_matchplan";
 import { SyncPhase } from "./data_access/import_datastructures";
 
-export const syncLiveData = functions.pubsub.schedule("every 15 minutes from 15:30 to 23:00")
-  .timeZone("Europe/Berlin")
+export const syncLiveData = functions
+  .region('europe-west3')
+  .pubsub.schedule('every 15 minutes from 15:30 to 23:00')
+  .timeZone('Europe/Berlin')
   .onRun(async (context: functions.EventContext) => {
     let matchesToSync: Match[] = await sync_live_helper.getRelevantMatchesToSync();
 
@@ -29,8 +31,10 @@ export const syncLiveData = functions.pubsub.schedule("every 15 minutes from 15:
     return null;
   });
 
-export const syncMatchPlan = functions.pubsub.schedule("every day 10:00")
-  .timeZone("Europe/Berlin")
+export const syncMatchPlan = functions
+  .region('europe-west3')
+  .pubsub.schedule('every day 10:00')
+  .timeZone('Europe/Berlin')
   .onRun(async (context: functions.EventContext) => {
     let matchList = new sync_matchplan.MatchList(SEASON);
     await matchList.fillMatchList();

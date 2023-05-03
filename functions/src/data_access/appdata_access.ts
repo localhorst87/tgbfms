@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import { WhereFilterOp } from '@firebase/firestore-types';
-import { Match, Bet, SeasonBet, SeasonResult, User } from "../../../src/app/Businessrules/basic_datastructures";
+import { Match, Bet, SeasonBet, SeasonResult, User } from "../business_rules/basic_datastructures";
 import { UpdateTime, SyncPhase, MatchdayScoreSnapshot } from "./import_datastructures";
 import * as helper from "./appdata_helpers";
 

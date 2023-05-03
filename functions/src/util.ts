@@ -4,7 +4,7 @@
  * @return {number} Unix timestamp in seconds
  */
 export function getCurrentTimestamp(): number {
-  return Math.floor((new Date()).getTime() / 1000); // alternatively Date.now()/1000
+  return Math.floor((new Date()).getTime() / 1000);
 }
 
 /**
@@ -16,11 +16,13 @@ export function getCurrentTimestamp(): number {
  * @return {boolean} returns true if currently DST in observed
  */
 export function isDstObserved(date?: string): boolean {
-  let observedDate: Date = typeof(date) === "undefined" ? new Date() : new Date(date);
-  
+  const observedDate: Date = typeof(date) === "undefined" ? 
+    new Date() : new Date(date);
+
   const jan = new Date(0, 1);
   const jul = new Date(6, 1);
-  const stdTimezoneOffset: number = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+  const stdTimezoneOffset: number = Math.max(jan.getTimezoneOffset(), 
+    jul.getTimezoneOffset());
 
   return observedDate.getTimezoneOffset() < stdTimezoneOffset;
 }
@@ -31,8 +33,9 @@ export function isDstObserved(date?: string): boolean {
  * @return {boolean} returns true if Date string is given for UTC time zone
  */
 export function isDatestringUTC(datestring: string): boolean {
-  let isNotationZ: boolean = datestring[datestring.length - 1] == "Z";
-  let isNotationPlus0: boolean = datestring.substring(datestring.length - 6, datestring.length) == "+00:00";
+  const isNotationZ: boolean = datestring[datestring.length - 1] == "Z";
+  const isNotationPlus0: boolean = datestring.substring(datestring.length - 6, 
+    datestring.length) == "+00:00";
 
   return isNotationZ || isNotationPlus0;
 }
@@ -43,12 +46,14 @@ export function isDatestringUTC(datestring: string): boolean {
  * If nextDays = 1, it will return 23:59:59 of the next day.
  * Everything in LOCAL time.
  *
- * @param nextDays The day span of the future date
- * @return future timestamp
+ * @param {number} nextDays The day span of the future date
+ * @return {number} future timestamp
  */
 export function getFutureEndDate(nextDays: number): number {
   let dateFuture: Date = new Date(Date.now() + nextDays * 86400 * 1000);
-  // const hOffset: number = dateFuture.getTimezoneOffset(); // following constructor is considering UTC
-  dateFuture = new Date(dateFuture.getFullYear(), dateFuture.getMonth(), dateFuture.getDate(), 23, 59, 59); // ceil to end of day
+  // const hOffset: number = dateFuture.getTimezoneOffset();
+  // following constructor is considering UTC
+  dateFuture = new Date(dateFuture.getFullYear(), dateFuture.getMonth(), 
+    dateFuture.getDate(), 23, 59, 59); // ceil to end of day
   return Math.floor(dateFuture.getTime() / 1000);
 }

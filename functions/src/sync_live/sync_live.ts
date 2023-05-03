@@ -1,8 +1,6 @@
-import { NUMBER_OF_TEAMS } from "../../../src/app/Businessrules/rule_defined_values";
-
-import { Match, Bet, User, SeasonResult, Score } from "../../../src/app/Businessrules/basic_datastructures";
+import { NUMBER_OF_TEAMS } from "../business_rules/rule_defined_values";
+import { Match, Bet, User, SeasonResult, Score } from "../business_rules/basic_datastructures";
 import { MatchImportData, TeamRankingImportData, MatchdayScoreSnapshot } from "../data_access/import_datastructures";
-
 import * as appdata from "../data_access/appdata_access";
 import * as matchdata from "../data_access/matchdata_access";
 import { PointCalculatorTrendbased } from "../business_rules/point_calculator_trendbased";

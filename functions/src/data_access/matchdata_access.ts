@@ -4,9 +4,7 @@ import * as helper from "./matchdata_helpers";
 
 const URL_TRUNK_MATCHES: string = "https://api.openligadb.de/getmatchdata/bl1";
 const URL_TRUNK_RANKING: string = "https://api.openligadb.de/getbltable/bl1";
-// // const URL_TRUNK_TEAMS: string = "https://www.openligadb.de/api/getavailableteams/bl1"
 const URL_TRUNK_UPDATETIME: string = "https://api.openligadb.de/getlastchangedate/bl1";
-// // const URL_TRUNK_MATCHDAY: string = "https://www.openligadb.de/api/getcurrentgroup/bl1";
 
 /**
  * Fetches the time when the data of the season/matchday was changed the last

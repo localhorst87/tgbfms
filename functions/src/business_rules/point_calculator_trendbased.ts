@@ -1,6 +1,6 @@
 import { PointCalculator } from "./point_calculator";
-import { Match, Bet, Score } from "../../../src/app/Businessrules/basic_datastructures";
-import { POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_ONE, POINTS_ADDED_OUTSIDER_TWO } from "../../../src/app/Businessrules/rule_defined_values";
+import { Match, Bet, Score } from "./basic_datastructures";
+import { POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_ONE, POINTS_ADDED_OUTSIDER_TWO } from "./rule_defined_values";
 
 export class PointCalculatorTrendbased implements PointCalculator {
     score: Score;

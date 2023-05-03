@@ -841,10 +841,10 @@ describe("updateMatchdays", () => {
       sandbox.stub(util, "getCurrentTimestamp").returns(1234567890);
       sandbox.stub(appdata, "setUpdateTime").resolves(true);
 
-      let syncedMatchdays: number[] = await sync_matches.updateMatchdays(2021, [25, 26]);
+      let syncedMatches: Match[] = await sync_matches.updateMatchdays(2021, [25, 26]);
 
       sinon.assert.calledOnce(setMatchSpy);
-      expect(syncedMatchdays).to.deep.equal([25]);
+      expect(syncedMatches.length).to.equal(2);
     });
 
     it("one match of one matchday to be updated, update successful => expect setUpdateTime to be called once", async () => {
@@ -876,10 +876,10 @@ describe("updateMatchdays", () => {
       sandbox.stub(util, "getCurrentTimestamp").returns(1234567890);
       let setUpdateTimeSpy: any = sandbox.stub(appdata, "setUpdateTime").resolves();
 
-      let syncedMatchdays: number[] = await sync_matches.updateMatchdays(2021, [25, 26]);
+      let syncedMatches: Match[] = await sync_matches.updateMatchdays(2021, [25, 26]);
 
       sinon.assert.calledOnce(setUpdateTimeSpy);
-      expect(syncedMatchdays).to.deep.equal([25]);
+      expect(syncedMatches.length).to.equal(2);
     });
 
     it("one match of one matchday to be updated, update not successful => expect setUpdateTime not to be called", async () => {
@@ -912,10 +912,10 @@ describe("updateMatchdays", () => {
       sandbox.stub(util, "getCurrentTimestamp").returns(1234567890);
       let setUpdateTimeSpy: any = sandbox.stub(appdata, "setUpdateTime").resolves();
 
-      let syncedMatchdays: number[] = await sync_matches.updateMatchdays(2021, [25, 26]);
+      let syncedMatches: Match[] = await sync_matches.updateMatchdays(2021, [25, 26]);
 
       sinon.assert.notCalled(setUpdateTimeSpy);
-      expect(syncedMatchdays).to.deep.equal([]);
+      expect(syncedMatches.length).to.equal(0);
     });
 
     it("both matches of one matchday to be updated, update of one match not successful => expect setUpdateTime not to be called", async () => {
@@ -952,10 +952,10 @@ describe("updateMatchdays", () => {
       sandbox.stub(util, "getCurrentTimestamp").returns(1234567890);
       let setUpdateTimeSpy: any = sandbox.stub(appdata, "setUpdateTime").resolves();
 
-      let syncedMatchdays: number[] = await sync_matches.updateMatchdays(2021, [25, 26]);
+      let syncedMatches: Match[] = await sync_matches.updateMatchdays(2021, [25, 26]);
 
       sinon.assert.notCalled(setUpdateTimeSpy);
-      expect(syncedMatchdays).to.deep.equal([]);
+      expect(syncedMatches.length).to.equal(0);
     });
 
     it("both matchdays to be updated, update of one match not successful => expect setUpdateTime to be called once", async () => {
@@ -994,10 +994,10 @@ describe("updateMatchdays", () => {
       sandbox.stub(util, "getCurrentTimestamp").returns(1234567890);
       let setUpdateTimeSpy: any = sandbox.stub(appdata, "setUpdateTime").resolves();
 
-      let syncedMatchdays: number[] = await sync_matches.updateMatchdays(2021, [25, 26]);
+      let syncedMatches: Match[] = await sync_matches.updateMatchdays(2021, [25, 26]);
 
       sinon.assert.calledOnce(setUpdateTimeSpy);
-      expect(syncedMatchdays).to.deep.equal([26]);
+      expect(syncedMatches.length).to.equal(2);
     });
 
   });
@@ -1105,11 +1105,11 @@ describe("updateMatchdays", () => {
       let setUpdateTimeSpy: any = sandbox.stub(appdata, "setUpdateTime").resolves();
       let setMatchSpy: any = sandbox.stub(appdata, "setMatch").resolves(true);
 
-      let syncedMatchdays: number[] = await sync_matches.updateMatchdays(2021, [25, 26]);
+      let syncedMatches: Match[] = await sync_matches.updateMatchdays(2021, [25, 26]);
 
       sinon.assert.notCalled(setUpdateTimeSpy);
       sinon.assert.notCalled(setMatchSpy);
-      expect(syncedMatchdays).to.deep.equal([]);
+      expect(syncedMatches.length).to.equal(0);
     });
 
     it("one match not from appdata not available => expect to update this matchday", async () => {
@@ -1152,10 +1152,10 @@ describe("updateMatchdays", () => {
       sandbox.stub(util, "getCurrentTimestamp").returns(1234567890);
       sandbox.stub(appdata, "setUpdateTime").resolves(true);
 
-      let syncedMatchdays: number[] = await sync_matches.updateMatchdays(2021, [25, 26]);
+      let syncedMatches: Match[] = await sync_matches.updateMatchdays(2021, [25, 26]);
 
       sinon.assert.calledOnce(setMatchSpy);
-      expect(syncedMatchdays).to.deep.equal([25]);
+      expect(syncedMatches.length).to.equal(2);
     });
 
   });

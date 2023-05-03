@@ -1,7 +1,8 @@
-import { SEASON } from "../../src/app/Businessrules/rule_defined_values";
-import { Match } from "../../src/app/Businessrules/basic_datastructures";
-import { MatchImportData, UpdateTime, SyncPhase } from "./data_access/import_datastructures";
-import { MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from "../../src/app/Businessrules/rule_defined_values";
+import {Match} from "./business_rules/basic_datastructures";
+import {MatchImportData, UpdateTime, SyncPhase}
+  from "./data_access/import_datastructures";
+import {SEASON, MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS}
+  from "./business_rules/rule_defined_values";
 import * as appdata from "./data_access/appdata_access";
 import * as matchdata from "./data_access/matchdata_access";
 import * as util from "./util";

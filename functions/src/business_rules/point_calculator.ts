@@ -1,4 +1,4 @@
-import { Match, Bet, Score } from "../../../src/app/Businessrules/basic_datastructures";
+import { Match, Bet, Score } from "./basic_datastructures";
 
 export interface PointCalculator {
     score: Score;

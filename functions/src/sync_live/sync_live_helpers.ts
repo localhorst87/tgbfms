@@ -1,6 +1,5 @@
-import { Match, Bet, User, Score } from "../../../src/app/Businessrules/basic_datastructures";
+import { Match, Bet, User, Score } from "../business_rules/basic_datastructures";
 import { MatchImportData, SyncPhase, UpdateTime, MatchdayScoreSnapshot } from "../data_access/import_datastructures";
-
 import * as appdata from "../data_access/appdata_access";
 import * as matchdata from "../data_access/matchdata_access";
 import { getCurrentTimestamp } from "../util";

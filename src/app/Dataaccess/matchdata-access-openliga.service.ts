@@ -5,11 +5,11 @@ import { HttpClient } from '@angular/common/http';
 import { MatchImportData, TeamRankingImportData } from './import_datastructures';
 import { MatchdataAccessService } from './matchdata-access.service';
 
-const URL_TRUNK_MATCHES: string = "https://www.openligadb.de/api/getmatchdata/bl1";
-const URL_TRUNK_RANKING: string = "https://www.openligadb.de/api/getbltable/bl1";
-const URL_TRUNK_TEAMS: string = "https://www.openligadb.de/api/getavailableteams/bl1"
-const URL_TRUNK_UPDATETIME: string = "https://www.openligadb.de/api/getlastchangedate/bl1";
-const URL_TRUNK_MATCHDAY: string = "https://www.openligadb.de/api/getcurrentgroup/bl1";
+const URL_TRUNK_MATCHES: string = "https://api.openligadb.de/getmatchdata/bl1";
+const URL_TRUNK_RANKING: string = "https://api.openligadb.de/getbltable/bl1";
+const URL_TRUNK_TEAMS: string = "https://api.openligadb.de/getavailableteams/bl1"
+const URL_TRUNK_UPDATETIME: string = "https://api.openligadb.de/getlastchangedate/bl1";
+const URL_TRUNK_MATCHDAY: string = "https://api.openligadb.de/getcurrentgroup/bl1";
 
 @Injectable()
 export class MatchdataAccessOpenligaService implements MatchdataAccessService {
@@ -72,12 +72,12 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
       for (let match of matchdayJson) { // no conversion if no match available
         let goals: number[] = this.extractResult(match);
         let matchImport: MatchImportData = {
-          matchday: match.Group.GroupOrderID,
-          matchId: match.MatchID,
-          datetime: match.MatchDateTime,
-          isFinished: match.MatchIsFinished,
-          teamIdHome: match.Team1.TeamId,
-          teamIdAway: match.Team2.TeamId,
+          matchday: match.group.groupOrderID,
+          matchId: match.matchID,
+          datetime: match.matchDateTime,
+          isFinished: match.matchIsFinished,
+          teamIdHome: match.team1.teamId,
+          teamIdAway: match.team2.teamId,
           goalsHome: goals[0],
           goalsAway: goals[1]
         }
@@ -100,14 +100,14 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
 
       for (let team of rankingJson) {
         let rankingElement: TeamRankingImportData = {
-          teamId: team.TeamInfoId,
-          matches: team.Matches,
-          points: team.Points,
-          won: team.Won,
-          draw: team.Draw,
-          lost: team.Lost,
-          goals: team.Goals,
-          goalsAgainst: team.OpponentGoals
+          teamId: team.teamInfoId,
+          matches: team.matches,
+          points: team.points,
+          won: team.won,
+          draw: team.draw,
+          lost: team.lost,
+          goals: team.goals,
+          goalsAgainst: team.opponentGoals
         };
         rankingArray.push(rankingElement);
       }
@@ -143,7 +143,7 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
       // error response will result in empty matchArray
 
       for (let team of teamDataJson) {
-        teamIds.push(team.TeamId);
+        teamIds.push(team.teamId);
       }
     }
 
@@ -157,7 +157,7 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
       // http error throws object with error property
       // error response will result in empty matchArray
 
-      return of(matchdayJson.GroupOrderID);
+      return of(matchdayJson.groupOrderID);
     }
     else {
       return of(-1);
@@ -172,18 +172,18 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
 
     if (this.isMatchStarted(matchJson)) {
 
-      if (matchJson.MatchResults.length == 2) { // final result available?
-        for (let result of matchJson.MatchResults) {
-          if (result.ResultTypeID == 2) { // ResultTypeID == 2 -> final result
-            extractedResult = [result.PointsTeam1, result.PointsTeam2];
+      if (matchJson.matchResults.length == 2) { // final result available?
+        for (let result of matchJson.matchResults) {
+          if (result.resultTypeID == 2) { // resultTypeID == 2 -> final result
+            extractedResult = [result.pointsTeam1, result.pointsTeam2];
             break;
           }
         }
       }
       else { // if final result not available, extract live score instead
         extractedResult = [0, 0]; // basic value if no goals scored, yet
-        for (let goal of matchJson.Goals) {
-          extractedResult = [goal.ScoreTeam1, goal.ScoreTeam2]; // last goal will be stored on variable
+        for (let goal of matchJson.goals) {
+          extractedResult = [goal.scoreTeam1, goal.scoreTeam2]; // last goal will be stored on variable
         }
       }
     }
@@ -192,7 +192,7 @@ export class MatchdataAccessOpenligaService implements MatchdataAccessService {
   }
 
   private isMatchStarted(matchJson: any): boolean {
-    let matchTimestamp: number = new Date(matchJson.MatchDateTime).getTime();
+    let matchTimestamp: number = new Date(matchJson.matchDateTime).getTime();
 
     if (matchTimestamp == null) { // corrupt format
       return false;

@@ -1,37 +1,54 @@
 import * as functions from "firebase-functions";
-// import * as admin from "firebase-admin";
-// import { getLastUpdateTime } from "./matchdata_access";
 import { SEASON } from "../../src/app/Businessrules/rule_defined_values";
-import { MatchList, getMatchdaysToUpdate, updateMatchdays } from "./sync_matchplan";
+import { Match } from "../../src/app/Businessrules/basic_datastructures";
+import * as sync_live from "./sync_live/sync_live";
+import * as sync_live_helper from "./sync_live/sync_live_helpers";
+import * as sync_matchplan from "./sync_matchplan";
+import { SyncPhase } from "./data_access/import_datastructures";
+
+export const syncLiveData = functions.pubsub.schedule("every 15 minutes from 15:30 to 23:00")
+  .timeZone("Europe/Berlin")
+  .onRun(async (context: functions.EventContext) => {
+    let matchesToSync: Match[] = await sync_live_helper.getRelevantMatchesToSync();
+
+    if (matchesToSync.length == 0) // nothing to sync...
+      return;
+  
+    // sync matches
+    const matchesSynced: Match[] = await sync_live.syncMatches(matchesToSync);
+  
+    // sync team ranking 
+    const season = matchesToSync[0].season;
+    await sync_live.syncTeamRanking(season);
+  
+    // sync user scores
+    const matchdaysSynced = matchesSynced.map((match: Match) => match.matchday).unique();
+    for (let matchday of matchdaysSynced)
+      await sync_live.updateScoreSnapshot(season, matchday);
+  
+    return null;
+  });
 
 export const syncMatchPlan = functions.pubsub.schedule("every day 10:00")
   .timeZone("Europe/Berlin")
   .onRun(async (context: functions.EventContext) => {
-    let matchList = new MatchList(SEASON);
+    let matchList = new sync_matchplan.MatchList(SEASON);
     await matchList.fillMatchList();
 
     // update Matches
-    let matchdaysToUpdate: number[] = await getMatchdaysToUpdate(matchList);
-    let matchdaysUpdated: number[] = await updateMatchdays(SEASON, matchdaysToUpdate);
+    const matchdaysToUpdate: number[] = await sync_matchplan.getMatchdaysToUpdate(matchList);
+    const updatedMatches: Match[] = await sync_matchplan.updateMatchdays(SEASON, matchdaysToUpdate);
+
+    // update MatchList
+    if (updatedMatches.length > 0) 
+      matchList.updateMatches(updatedMatches);
+
+    console.log(matchList.getNextMatches(5));
 
     // update SyncPhases
-
-
-    return null;
-  });
-
-export const test = functions.pubsub.schedule("every 5 hours from 10:00 to 20:00")
-  .timeZone("Europe/Berlin")
-  .onRun((context: functions.EventContext) => {
-    let dateString_local: string = "2022-05-06T20:30:00";
-    let dateString_utc: string = "2022-05-06T20:30:00Z";
-
-    let date_local: Date = new Date(dateString_local);
-    let date_utc: Date = new Date(dateString_utc);
-
-    console.log("date_local", date_local.getTime());
-    console.log("date_utc", date_utc.getTime());
-    console.log("offset", date_local.getTimezoneOffset())
+    const matchesNextDays: Match[] = matchList.getNextMatches(3);
+    const syncPhases: SyncPhase[] = sync_matchplan.createSyncPhases(matchesNextDays);
+    await sync_matchplan.updateSyncPhases(syncPhases);
 
     return null;
   });

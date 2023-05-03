@@ -1,0 +1,47 @@
+[debug] [2023-03-12T11:02:45.303Z] ----------------------------------------------------------------------
+[debug] [2023-03-12T11:02:45.304Z] Command:       /home/localhorst87/.nvm/versions/node/v16.14.2/bin/node /usr/local/bin/firebase emulators:start --only firestore --import=./test/emulator_test_data
+[debug] [2023-03-12T11:02:45.304Z] CLI Version:   10.4.2
+[debug] [2023-03-12T11:02:45.304Z] Platform:      linux
+[debug] [2023-03-12T11:02:45.304Z] Node Version:  v16.14.2
+[debug] [2023-03-12T11:02:45.314Z] Time:          Sun Mar 12 2023 12:02:45 GMT+0100 (Central European Standard Time)
+[debug] [2023-03-12T11:02:45.314Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-03-12T11:02:45.316Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2023-03-12T11:02:45.359Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-03-12T11:02:45.360Z] > authorizing via signed-in user (ironmanni87@gmail.com)
+[info] i  emulators: Starting emulators: firestore {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: firestore"}}
+[debug] [2023-03-12T11:02:45.369Z] [hub] writing locator at /tmp/hub-tgbfms.json
+[info] i  emulators: Shutting down emulators. {"metadata":{"emulator":{"name":"hub"},"message":"Shutting down emulators."}}
+[info] i  hub: Stopping emulator hub {"metadata":{"emulator":{"name":"hub"},"message":"Stopping emulator hub"}}
+[debug] [2023-03-12T11:02:45.504Z] Error: ENOENT: no such file or directory, lstat '/home/localhorst87/coding/tgbfms/test/emulator_test_data'
+    at Object.lstatSync (node:fs:1516:3)
+    at findExportMetadata (/usr/local/lib/node_modules/firebase-tools/lib/emulator/controller.js:177:32)
+    at Object.startAll (/usr/local/lib/node_modules/firebase-tools/lib/emulator/controller.js:252:31)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Command.actionFn (/usr/local/lib/node_modules/firebase-tools/lib/commands/emulators-start.js:26:9)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2023-03-12T11:02:45.728Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2023-03-12T11:02:45.728Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2023-03-12T11:26:46.780Z] ----------------------------------------------------------------------
+[debug] [2023-03-12T11:26:46.781Z] Command:       /home/localhorst87/.nvm/versions/node/v16.14.2/bin/node /usr/local/bin/firebase emulators:start --only firestore --import=./test/emulator_test_data
+[debug] [2023-03-12T11:26:46.781Z] CLI Version:   10.4.2
+[debug] [2023-03-12T11:26:46.781Z] Platform:      linux
+[debug] [2023-03-12T11:26:46.781Z] Node Version:  v16.14.2
+[debug] [2023-03-12T11:26:46.781Z] Time:          Sun Mar 12 2023 12:26:46 GMT+0100 (Central European Standard Time)
+[debug] [2023-03-12T11:26:46.781Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-03-12T11:26:46.819Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-03-12T11:26:46.819Z] > authorizing via signed-in user (ironmanni87@gmail.com)
+[info] i  emulators: Starting emulators: firestore {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: firestore"}}
+[debug] [2023-03-12T11:26:46.836Z] [hub] writing locator at /tmp/hub-tgbfms.json
+[info] i  emulators: Shutting down emulators. {"metadata":{"emulator":{"name":"hub"},"message":"Shutting down emulators."}}
+[info] i  hub: Stopping emulator hub {"metadata":{"emulator":{"name":"hub"},"message":"Stopping emulator hub"}}
+[debug] [2023-03-12T11:26:46.966Z] Error: ENOENT: no such file or directory, lstat '/home/localhorst87/coding/tgbfms/test/emulator_test_data'
+    at Object.lstatSync (node:fs:1516:3)
+    at findExportMetadata (/usr/local/lib/node_modules/firebase-tools/lib/emulator/controller.js:177:32)
+    at Object.startAll (/usr/local/lib/node_modules/firebase-tools/lib/emulator/controller.js:252:31)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Command.actionFn (/usr/local/lib/node_modules/firebase-tools/lib/commands/emulators-start.js:26:9)
+[error] 
+[error] Error: An unexpected error has occurred.

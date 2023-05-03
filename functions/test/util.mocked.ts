@@ -74,16 +74,16 @@ describe("getFutureEndDate", () => {
   it("nextDays = 0 => expect last second of same day", () => {
     clock = sinon.useFakeTimers(new Date("2022-09-25T00:00"));
 
-    const expectedDate = new Date("2022-09-25T23:59:59");
+    const expectedTimestamp: number = new Date("2022-09-25T23:59:59").getTime() / 1000;
 
-    expect(util.getFutureEndDate(0)).to.deep.equal(expectedDate);
+    expect(util.getFutureEndDate(0)).to.deep.equal(expectedTimestamp);
   });
 
   it("nextDays = 1 => expect last second of next day", () => {
     clock = sinon.useFakeTimers(new Date("2022-09-25T23:59:59"));
 
-    const expectedDate = new Date("2022-09-26T23:59:59");
+    const expectedTimestamp: number = new Date("2022-09-26T23:59:59").getTime() / 1000;;
 
-    expect(util.getFutureEndDate(1)).to.deep.equal(expectedDate);
+    expect(util.getFutureEndDate(1)).to.deep.equal(expectedTimestamp);
   });
 });

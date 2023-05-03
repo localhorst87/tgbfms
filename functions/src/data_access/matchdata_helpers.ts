@@ -56,12 +56,12 @@ export function convertMatchdayJson(matchdayJson: any, season: number): MatchImp
     let goals: number[] = extractResult(match);
     let matchImport: MatchImportData = {
       season: season,
-      matchday: match.Group.GroupOrderID,
-      matchId: match.MatchID,
-      datetime: match.MatchDateTimeUTC,
-      isFinished: match.MatchIsFinished,
-      teamIdHome: match.Team1.TeamId,
-      teamIdAway: match.Team2.TeamId,
+      matchday: match.group.groupOrderID,
+      matchId: match.matchID,
+      datetime: match.matchDateTimeUTC,
+      isFinished: match.matchIsFinished,
+      teamIdHome: match.team1.teamId,
+      teamIdAway: match.team2.teamId,
       goalsHome: goals[0],
       goalsAway: goals[1]
     }
@@ -87,18 +87,18 @@ function extractResult(matchJson: any): number[] {
 
   if (isMatchStarted(matchJson)) {
 
-    if (matchJson.MatchResults.length == 2) { // final result available?
-      for (let result of matchJson.MatchResults) {
-        if (result.ResultTypeID == 2) { // ResultTypeID == 2 -> final result
-          extractedResult = [result.PointsTeam1, result.PointsTeam2];
+    if (matchJson.matchResults.length == 2) { // final result available?
+      for (let result of matchJson.matchResults) {
+        if (result.resultTypeID == 2) { // ResultTypeID == 2 -> final result
+          extractedResult = [result.pointsTeam1, result.pointsTeam2];
           break;
         }
       }
     }
     else { // if final result not available, extract live score instead
-      if (matchJson.Goals.length > 0) {
-        let currentResult: any = matchJson.Goals[matchJson.Goals.length - 1];
-        extractedResult = [currentResult.ScoreTeam1, currentResult.ScoreTeam2];
+      if (matchJson.goals.length > 0) {
+        let currentResult: any = matchJson.goals[matchJson.goals.length - 1];
+        extractedResult = [currentResult.scoreTeam1, currentResult.scoreTeam2];
       }
       else {
         extractedResult = [0, 0];
@@ -117,7 +117,7 @@ function extractResult(matchJson: any): number[] {
  * @return {boolean} true if match is started, false if not started
  */
 function isMatchStarted(matchJson: any): boolean {
-  let matchTimestamp: number = new Date(matchJson.MatchDateTimeUTC).getTime();
+  let matchTimestamp: number = new Date(matchJson.matchDateTimeUTC).getTime();
 
   if (matchTimestamp == null) { // corrupt format
     return false;
@@ -137,14 +137,14 @@ export function convertRankingJson(rankingJson: any): TeamRankingImportData[] {
 
     for (let team of rankingJson) {
       let rankingElement: TeamRankingImportData = {
-        teamId: team.TeamInfoId,
-        matches: team.Matches,
-        points: team.Points,
-        won: team.Won,
-        draw: team.Draw,
-        lost: team.Lost,
-        goals: team.Goals,
-        goalsAgainst: team.OpponentGoals
+        teamId: team.teamInfoId,
+        matches: team.matches,
+        points: team.points,
+        won: team.won,
+        draw: team.draw,
+        lost: team.lost,
+        goals: team.goals,
+        goalsAgainst: team.opponentGoals
       };
       rankingArray.push(rankingElement);
     }

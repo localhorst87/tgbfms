@@ -43,10 +43,12 @@ export function isDatestringUTC(datestring: string): boolean {
  * If nextDays = 1, it will return 23:59:59 of the next day.
  * Everything in LOCAL time.
  *
- * @param {number} nextDays The day span of the future date
- * @return {Date}
+ * @param nextDays The day span of the future date
+ * @return future timestamp
  */
-export function getFutureEndDate(nextDays: number) {
+export function getFutureEndDate(nextDays: number): number {
   let dateFuture: Date = new Date(Date.now() + nextDays * 86400 * 1000);
-  return new Date(dateFuture.getFullYear(), dateFuture.getMonth(), dateFuture.getDate(), 23, 59, 59); // ceil to end of day
+  // const hOffset: number = dateFuture.getTimezoneOffset(); // following constructor is considering UTC
+  dateFuture = new Date(dateFuture.getFullYear(), dateFuture.getMonth(), dateFuture.getDate(), 23, 59, 59); // ceil to end of day
+  return Math.floor(dateFuture.getTime() / 1000);
 }

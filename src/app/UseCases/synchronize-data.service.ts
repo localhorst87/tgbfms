@@ -194,7 +194,7 @@ export class SynchronizeDataService {
   }
 
   private getScoreArrayFromMatchArray$(matchArray: Match[]): Observable<Score[]> {
-    // retrieves Bet and Results and returns the calculated Scores
+    // retrieves Bets and returns the calculated Scores
 
     return this.getBetArrayFromMatchArray$(matchArray).pipe(
       map((betArray: Bet[]) => this.statCalculater.getScoreArray(matchArray, betArray))

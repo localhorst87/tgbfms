@@ -4,10 +4,8 @@ import * as sinon from "sinon";
 import * as sync_matches from "../src/sync_matchplan";
 import { NUMBER_OF_TEAMS } from "../../src/app/Businessrules/rule_defined_values";
 import * as appdata from "../src/data_access/appdata_access";
-// import * as matchdata from "../src/data_access/matchdata_access";
-// import * as util from "../src/util";
 import { Match } from "../../src/app/Businessrules/basic_datastructures";
-import { UpdateTime } from "../src/data_access/import_datastructures";
+import { SyncPhase, UpdateTime } from "../src/data_access/import_datastructures";
 
 describe("MatchList, end-to-end tests", () => {
 
@@ -202,6 +200,42 @@ describe("updateMatchdays, end-to-end test", () => {
     expect(updatedMatch.teamIdHome).to.not.equal(-1);
     expect(updateTime1.timestamp > testStartTime).to.be.true;
     expect(updateTime2.timestamp < testStartTime).to.be.true;
+  });
+
+});
+
+describe("updateSyncPhases", () => {
+  const syncPhases: SyncPhase[] = [
+    { documentId: '', start: 1683311400, matchIds: [ 64136, 64142 ] },
+    { documentId: '', start: 1683390600, matchIds: [ 64143, 64144 ] },
+    { documentId: '', start: 1683473400, matchIds: [ 64137 ] },
+  ];
+
+  afterEach(() => {
+    appdata.deleteSyncPhases(">", 1680000000);
+  });
+
+  it('no sync phase existing => expect to add new sync phases', async () => {
+    await sync_matches.updateSyncPhases(syncPhases);
+
+    const allSyncPhases: SyncPhase[] = await appdata.getSyncPhases(">", 1680000000);
+    
+    expect(allSyncPhases.length).to.equal(3);
+  });
+
+  it('one sync phase already existing => expect to override sync phase', async () => {
+    appdata.setSyncPhase({
+      documentId: 'M2e2PeQZgLjnKsulRxYx',
+      start: 1683390600,
+      matchIds: [ 64143 ] 
+    });
+
+    await sync_matches.updateSyncPhases(syncPhases);
+
+    const allSyncPhases: SyncPhase[] = await appdata.getSyncPhases(">", 1680000000);
+    
+    expect(allSyncPhases.length).to.equal(3);
+    expect(allSyncPhases.filter(sp => sp.start == 1683390600)[0].matchIds).to.deep.equal([ 64143, 64144 ]);
   });
 
 });

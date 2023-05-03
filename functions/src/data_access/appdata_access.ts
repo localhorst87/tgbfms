@@ -1,15 +1,19 @@
 import * as admin from "firebase-admin";
 import { WhereFilterOp } from '@firebase/firestore-types';
-import { Match, SeasonBet, SeasonResult } from "../../../src/app/Businessrules/basic_datastructures";
-import { UpdateTime, SyncPhase } from "./import_datastructures";
+import { Match, Bet, SeasonBet, SeasonResult, User } from "../../../src/app/Businessrules/basic_datastructures";
+import { UpdateTime, SyncPhase, MatchdayScoreSnapshot } from "./import_datastructures";
 import * as helper from "./appdata_helpers";
 
-const COLLECTION_NAME_MATCHES = "matches";
-const COLLECTION_NAME_UPDATE_TIMES = "sync_times";
-const COLLECTION_NAME_SYNC_PHASES = "sync_phases";
-const COLLECTION_NAME_SEASON_BETS = "season_bets";
-const COLLECTION_NAME_SEASON_RESULTS = "season_results";
+const COLLECTION_NAME_MATCHES: string = "matches";
+const COLLECTION_NAME_BETS: string = "bets";
+const COLLECTION_NAME_UPDATE_TIMES: string = "sync_times";
+const COLLECTION_NAME_SYNC_PHASES: string = "sync_phases";
+const COLLECTION_NAME_SEASON_BETS: string = "season_bets";
+const COLLECTION_NAME_SEASON_RESULTS: string = "season_results";
+const COLLECTION_NAME_USERS: string = "users";
+const COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT: string = 'matchday_score_snapshots';
 
+// for testing with online Firebase services: 
 // GOOGLE_APPLICATION_CREDENTIALS must be set as env variable and point to credentials file
 admin.initializeApp();
 
@@ -17,11 +21,29 @@ admin.initializeApp();
  * Requests all matches of the given season and returns it as a Promise
  *
  * @param {number} season The season for which the matches should be requested
- * @return {Promise<Match[]>} All the matches of the selected season
+ * @returns {Promise<Match[]>} All the matches of the selected season
  */
 export function getAllMatches(season: number): Promise<Match[]> {
   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
     .where("season", "==", season);
+
+  return query.get().then(
+      (querySnapshot: admin.firestore.QuerySnapshot) => {
+        return helper.processSnapshot<Match>(querySnapshot);
+      }
+  );
+}
+
+/**
+ * 
+ * @param season The season for which the matches should be requested
+ * @param matchday The matchday for which the matches should be requested
+ * @returns All matches of the given matchday
+ */
+export function getMatchesByMatchday(season: number, matchday: number): Promise<Match[]> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
+    .where("season", "==", season)
+    .where("matchday", "==", matchday);
 
   return query.get().then(
       (querySnapshot: admin.firestore.QuerySnapshot) => {
@@ -85,52 +107,31 @@ export function setMatch(match: Match): Promise<boolean> {
     });
 }
 
-// export function getNextMatch(season: number, amount: number = 1): Promise<Match[]> {
-//   let currentTimestamp: number = getCurrentTimestamp();
-//
-//   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
-//     .where("timestamp", ">", currentTimestamp)
-//     .where("season", "==", season)
-//     .orderBy("timestamp")
-//     .limit(amount);
-//
-//   return query.get().then(
-//     (querySnapshot: admin.firestore.QuerySnapshot) => {
-//       return processSnapshot<Match>(querySnapshot);
-//     }
-//   );
-// }
+/**
+ * Requests a bet with the given match ID and user ID (combinatino is unique)
+ * If the bet is not existing in the app database, a dummy Bet will be returned
+ * 
+ * @param matchId the match ID of the target bet to request
+ * @param userId the user ID of the target bet to request
+ * @returns the requested bet
+ */
+export function getBet(matchId: number, userId: string): Promise<Bet> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_BETS)
+  .where("matchId", "==", matchId)
+  .where("userId", "==", userId);
 
-// export function getLastMatch(season: number, amount: number = 1): Promise<Match[]> {
-//   let currentTimestamp: number = getCurrentTimestamp();
-//
-//   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
-//     .where("timestamp", "<", currentTimestamp)
-//     .where("season", "==", season)
-//     .orderBy("timestamp", "desc")
-//     .limit(amount);
-//
-//   return query.get().then(
-//     (querySnapshot: admin.firestore.QuerySnapshot) => {
-//       return processSnapshot<Match>(querySnapshot);
-//     }
-//   );
-// }
-//
-// export function getPendingMatches(season: number, matchday: number, amount: number): Promise<Match[]> {
-//   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
-//     .where("season", "==", season)
-//     .where("matchday", "==", matchday)
-//     .where("isFinished", "==", false)
-//     .orderBy("matchday")
-//     .limit(amount)
-//
-//   return query.get().then(
-//     (querySnapshot: admin.firestore.QuerySnapshot) => {
-//       return processSnapshot<Match>(querySnapshot);
-//     }
-//   );
-// }
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      let betList: Bet[] = helper.processSnapshot<Bet>(querySnapshot);
+      if (betList.length > 0) {
+        return betList[0];
+      }
+      else {
+        return helper.makeUnknownBet(matchId, userId);
+      }
+    }
+  );
+}
 
 /**
  * Requests the time of when the last update of the match in the app database
@@ -295,7 +296,7 @@ export async function getSeasonBets(season: number, userId: string): Promise<Sea
  */
 export async function getSeasonResults(season: number): Promise<SeasonResult[]> {
   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_SEASON_RESULTS)
-  .where("season", "==", season);
+    .where("season", "==", season);
 
   return query.get().then(
     (querySnapshot: admin.firestore.QuerySnapshot) => {
@@ -333,3 +334,113 @@ export async function setSeasonResult(result: SeasonResult): Promise<boolean> {
       return false;
     });
 }
+
+/**
+ * Returns all active user profiles and returns them as an array
+ * 
+ * @returns active users
+ */
+export async function getActiveUsers(): Promise<User[]> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_USERS)
+    .where("isActive", "==", true);
+
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      return helper.processSnapshot<User>(querySnapshot);
+    }
+  );
+}
+
+/**
+ * Returns a snapshot of the current matchday Scores, that is all scores of all users of a specific
+ * matchday, non-sorted.
+ * 
+ * If the MatchdayScoreSnapshot is not existing, a dummy snapshot is returned.
+ * 
+ * @param season the corresponding season
+ * @param matchday the corresponding matchday of the snapshot
+ * @returns the requested MatchdayScoreSnapshot, if existet. Else, a dummy.
+ */
+export async function getMatchdayScoreSnapshot(season: number, matchday: number): Promise<MatchdayScoreSnapshot> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT)
+    .where("season", "==", season).where("matchday", "==", matchday);
+
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      let snapshot: MatchdayScoreSnapshot[] = helper.processSnapshot<MatchdayScoreSnapshot>(querySnapshot);
+      if (snapshot.length > 0)
+        return snapshot[0];
+      else
+        return helper.makeUnknownScoreSnapshot(season, matchday);
+    }
+  );
+}
+
+export async function setMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): Promise<boolean> {
+  let documentReference: admin.firestore.DocumentReference;
+  if (snapshot.documentId == "") {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT).doc()
+  }
+  else {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT).doc(snapshot.documentId);
+  }
+
+  // documentId should not be a property in the dataset itself, as it is meta-data
+  let snapshotToSet: any = { ...snapshot };
+  delete snapshotToSet.documentId;
+
+  return documentReference.set(snapshotToSet)
+    .then(() => {
+      return true;
+    })
+    .catch((err: any) => {
+      return false;
+    });
+}
+
+// export function getNextMatch(season: number, amount: number = 1): Promise<Match[]> {
+//   let currentTimestamp: number = getCurrentTimestamp();
+//
+//   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
+//     .where("timestamp", ">", currentTimestamp)
+//     .where("season", "==", season)
+//     .orderBy("timestamp")
+//     .limit(amount);
+//
+//   return query.get().then(
+//     (querySnapshot: admin.firestore.QuerySnapshot) => {
+//       return processSnapshot<Match>(querySnapshot);
+//     }
+//   );
+// }
+
+// export function getLastMatch(season: number, amount: number = 1): Promise<Match[]> {
+//   let currentTimestamp: number = getCurrentTimestamp();
+//
+//   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
+//     .where("timestamp", "<", currentTimestamp)
+//     .where("season", "==", season)
+//     .orderBy("timestamp", "desc")
+//     .limit(amount);
+//
+//   return query.get().then(
+//     (querySnapshot: admin.firestore.QuerySnapshot) => {
+//       return processSnapshot<Match>(querySnapshot);
+//     }
+//   );
+// }
+//
+// export function getPendingMatches(season: number, matchday: number, amount: number): Promise<Match[]> {
+//   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
+//     .where("season", "==", season)
+//     .where("matchday", "==", matchday)
+//     .where("isFinished", "==", false)
+//     .orderBy("matchday")
+//     .limit(amount)
+//
+//   return query.get().then(
+//     (querySnapshot: admin.firestore.QuerySnapshot) => {
+//       return processSnapshot<Match>(querySnapshot);
+//     }
+//   );
+// }

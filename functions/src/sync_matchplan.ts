@@ -1,9 +1,10 @@
+import { SEASON } from "../../src/app/Businessrules/rule_defined_values";
 import { Match } from "../../src/app/Businessrules/basic_datastructures";
 import { MatchImportData, UpdateTime, SyncPhase } from "./data_access/import_datastructures";
 import { MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from "../../src/app/Businessrules/rule_defined_values";
 import * as appdata from "./data_access/appdata_access";
 import * as matchdata from "./data_access/matchdata_access";
-import { getCurrentTimestamp, getFutureEndDate } from "./util";
+import * as util from "./util";
 
 declare global {
   interface Array<T> {
@@ -14,7 +15,7 @@ declare global {
 /**
  * deletes double entries from an array
  */
-Array.prototype.unique = function() {
+ Array.prototype.unique = function() {
   let arr = this.concat();
   for (let i = 0; i < arr.length; i++) {
     for (let j = i + 1; j < arr.length; j++) {
@@ -26,15 +27,39 @@ Array.prototype.unique = function() {
   return arr;
 };
 
+/**
+ * Adds and updates all Matches where new data is available and updates 
+ * SyncPhases, based on the available next matches
+ */
+export async function syncMatchplan(): Promise<void> {
+  let matchList = new MatchList(SEASON);
+  await matchList.fillMatchList();
+
+  // update Matches
+  const matchdaysToUpdate: number[] = await getMatchdaysToUpdate(matchList);
+  const updatedMatches: Match[] = await updateMatchdays(SEASON, matchdaysToUpdate);
+
+  // update MatchList
+  if (updatedMatches.length > 0) 
+    matchList.updateMatches(updatedMatches);
+
+  // update SyncPhases
+  const matchesNextDays: Match[] = matchList.getNextMatches(2);
+  console.log(matchesNextDays);
+  const syncPhases: SyncPhase[] = createSyncPhases(matchesNextDays);
+  console.log(syncPhases);
+  await updateSyncPhases(syncPhases);
+}
 
 /**
  * Updates all the given matchdays of the season
  *
- * @param {number} season The season of the matches to update (e.g. 2021 for 2021/22)
- * @param {number[]} matchdays All matchdays that shall be updated
+ * @param season The season of the matches to update (e.g. 2021 for 2021/22)
+ * @param matchdays All matchdays that shall be updated
+ * @returns all updated matches
  */
-export async function updateMatchdays(season: number, matchdays: number[]): Promise<number[]> {
-  let updatedMatchdays: number[] = [];
+export async function updateMatchdays(season: number, matchdays: number[]): Promise<Match[]> {
+  let updatedMatches: Match[] = [];
 
   for (let matchday of matchdays) {
     let updateRequired: boolean = false;
@@ -51,21 +76,24 @@ export async function updateMatchdays(season: number, matchdays: number[]): Prom
         updateSuccessful = await appdata.setMatch(matchImported);
       }
 
-      if (!updateSuccessful)
+      if (updateSuccessful) {
+        updatedMatches.push(matchImported);
+      }
+      else 
         break;
+        
     }
 
     // if at least one match has not been updated successfully, don't refresh the
     // update time in the app DB, as it will be used to check if an update is required
     if (updateRequired && updateSuccessful) {
       let updateTime: UpdateTime = await appdata.getLastUpdateTime(season, matchday);
-      updateTime.timestamp = getCurrentTimestamp();
+      updateTime.timestamp = util.getCurrentTimestamp();
       await appdata.setUpdateTime(updateTime);
-      updatedMatchdays.push(matchday);
     }
   }
 
-  return updatedMatchdays;
+  return updatedMatches;
 }
 
 /**
@@ -99,6 +127,24 @@ export async function getMatchdaysToUpdate(matchList: MatchList): Promise<number
   }
 
   return matchdaysToUpdate.unique();
+}
+
+export async function updateSyncPhases(syncPhases: SyncPhase[]): Promise<boolean> {
+  let updateSuccessful: boolean = true;
+
+  for (let syncPhase of syncPhases) {
+    // first, check if sync phase is already existing
+    let syncPhaseAppData: SyncPhase[] = await appdata.getSyncPhases("==", syncPhase.start);
+    if (syncPhaseAppData.length > 0) {
+      syncPhase.documentId = syncPhaseAppData[0].documentId;
+    }
+    updateSuccessful = await appdata.setSyncPhase(syncPhase);
+    
+    if (updateSuccessful === false)
+      break;
+  }
+  
+  return updateSuccessful;
 }
 
 /**
@@ -188,6 +234,15 @@ export class MatchList {
       });
   }
 
+  updateMatches(matches: Match[]): void {
+    for (let updatedMatch of matches) {
+      let idx: number = this._matches.findIndex(match => match.documentId == updatedMatch.documentId);
+      this._matches.splice(idx, 1, updatedMatch);
+    }
+
+    return;
+  }
+
   /**
    * Extracts all pending matchdays from the matches list. That is: All
    * matchdays that haven't been completely finished so far
@@ -239,8 +294,8 @@ export class MatchList {
    * @return {Match[]} all pending matchdays
    */
   getNextMatches(days: number): Match[] {
-    let startTimestamp = Date.now() / 1000;
-    let endTimestamp = getFutureEndDate(days).getTime() / 1000;
+    let startTimestamp = util.getCurrentTimestamp();
+    let endTimestamp = util.getFutureEndDate(days);
     const filterCondition = (match: Match) => (match.timestamp <= endTimestamp && match.timestamp > startTimestamp);
 
     return this._matches.filter(filterCondition);

@@ -52,7 +52,7 @@ describe("getLastUpdateTime", () => {
 
   describe("end-to-end-test with real http service", async () => {
 
-    it.only("Request existing data => expect converted timestamp", async () => {
+    it("Request existing data => expect converted timestamp", async () => {
       let updateTime: number = await matchdata_access.getLastUpdateTime(2021, 32);
       // 2022-05-02T22:23:54.503 should be returned, which equals unix timestamp 1651523034
       expect(updateTime).to.equal(1651523034);
@@ -93,28 +93,28 @@ describe("importMatchdata", () => {
         status: 200,
         data: [
           {
-            "MatchID": 58814,
-            "MatchDateTimeUTC": "2021-04-03T13:30:00Z",
-            "Group": { "GroupOrderID": 27 },
-            "Team1": { "TeamId": 10 },
-            "Team2": { "TeamId": 11 },
-            "MatchResults": [
-              { "PointsTeam1": 0, "PointsTeam2": 0, "ResultTypeID": 2 },
-              { "PointsTeam1": 0, "PointsTeam2": 0, "ResultTypeID": 1 },
+            "matchID": 58814,
+            "matchDateTimeUTC": "2021-04-03T13:30:00Z",
+            "group": { "groupOrderID": 27 },
+            "team1": { "teamId": 10 },
+            "team2": { "teamId": 11 },
+            "matchResults": [
+              { "pointsTeam1": 0, "pointsTeam2": 0, "resultTypeID": 2 },
+              { "pointsTeam1": 0, "pointsTeam2": 0, "resultTypeID": 1 },
             ],
-            "MatchIsFinished": true,
+            "matchIsFinished": true,
           },
           {
-            "MatchID": 58815,
-            "MatchDateTimeUTC": "2021-04-03T18:30:00Z",
-            "Group": { "GroupOrderID": 27 },
-            "Team1": { "TeamId": 20 },
-            "Team2": { "TeamId": 21 },
-            "MatchResults": [
-              { "PointsTeam1": 2, "PointsTeam2": 1, "ResultTypeID": 2 },
-              { "PointsTeam1": 2, "PointsTeam2": 0, "ResultTypeID": 1 },
+            "matchID": 58815,
+            "matchDateTimeUTC": "2021-04-03T18:30:00Z",
+            "group": { "groupOrderID": 27 },
+            "team1": { "teamId": 20 },
+            "team2": { "teamId": 21 },
+            "matchResults": [
+              { "pointsTeam1": 2, "pointsTeam2": 1, "resultTypeID": 2 },
+              { "pointsTeam1": 2, "pointsTeam2": 0, "resultTypeID": 1 },
             ],
-            "MatchIsFinished": true,
+            "matchIsFinished": true,
           }
         ]
       });
@@ -321,28 +321,28 @@ describe("convertMatchdayJson", () => {
     it("multiple match imports => expect to return multiple matches", () => {
       let matchdayJson: any = [
         {
-          "MatchID": 58814,
-          "MatchDateTimeUTC": "2021-04-03T13:30:00Z",
-          "Group": { "GroupOrderID": 27 },
-          "Team1": { "TeamId": 10 },
-          "Team2": { "TeamId": 11 },
-          "MatchResults": [
-            { "PointsTeam1": 0, "PointsTeam2": 0, "ResultTypeID": 2 },
-            { "PointsTeam1": 0, "PointsTeam2": 0, "ResultTypeID": 1 },
+          "matchID": 58814,
+          "matchDateTimeUTC": "2021-04-03T13:30:00Z",
+          "group": { "groupOrderID": 27 },
+          "team1": { "teamId": 10 },
+          "team2": { "teamId": 11 },
+          "matchResults": [
+            { "pointsTeam1": 0, "pointsTeam2": 0, "resultTypeID": 2 },
+            { "pointsTeam1": 0, "pointsTeam2": 0, "resultTypeID": 1 },
           ],
-          "MatchIsFinished": true,
+          "matchIsFinished": true,
         },
         {
-          "MatchID": 58815,
-          "MatchDateTimeUTC": "2021-04-03T18:30:00Z",
-          "Group": { "GroupOrderID": 27 },
-          "Team1": { "TeamId": 20 },
-          "Team2": { "TeamId": 21 },
-          "MatchResults": [
-            { "PointsTeam1": 2, "PointsTeam2": 1, "ResultTypeID": 2 },
-            { "PointsTeam1": 2, "PointsTeam2": 0, "ResultTypeID": 1 },
+          "matchID": 58815,
+          "matchDateTimeUTC": "2021-04-03T18:30:00Z",
+          "group": { "groupOrderID": 27 },
+          "team1": { "teamId": 20 },
+          "team2": { "teamId": 21 },
+          "matchResults": [
+            { "pointsTeam1": 2, "pointsTeam2": 1, "resultTypeID": 2 },
+            { "pointsTeam1": 2, "pointsTeam2": 0, "resultTypeID": 1 },
           ],
-          "MatchIsFinished": true,
+          "matchIsFinished": true,
         }
       ];
 
@@ -379,16 +379,16 @@ describe("convertMatchdayJson", () => {
     it("match started and final result available => expect to extract final results", () => {
       let matchdayJson: any = [
         {
-          "MatchID": 58814,
-          "MatchDateTimeUTC": "2021-04-03T13:30:00Z",
-          "Group": { "GroupOrderID": 27 },
-          "Team1": { "TeamId": 10 },
-          "Team2": { "TeamId": 11 },
-          "MatchResults": [
-            { "PointsTeam1": 3, "PointsTeam2": 2, "ResultTypeID": 2 },
-            { "PointsTeam1": 2, "PointsTeam2": 1, "ResultTypeID": 1 },
+          "matchID": 58814,
+          "matchDateTimeUTC": "2021-04-03T13:30:00Z",
+          "group": { "groupOrderID": 27 },
+          "team1": { "teamId": 10 },
+          "team2": { "teamId": 11 },
+          "matchResults": [
+            { "pointsTeam1": 3, "pointsTeam2": 2, "resultTypeID": 2 },
+            { "pointsTeam1": 2, "pointsTeam2": 1, "resultTypeID": 1 },
           ],
-          "MatchIsFinished": true,
+          "matchIsFinished": true,
         }
       ];
 
@@ -414,18 +414,18 @@ describe("convertMatchdayJson", () => {
     it("match started and only half-time result available. Goal entries available => expect to extract live score", () => {
       let matchdayJson: any = [
         {
-          "MatchID": 58814,
-          "MatchDateTimeUTC": "2021-04-03T13:30:00Z",
-          "Group": { "GroupOrderID": 27 },
-          "Team1": { "TeamId": 10 },
-          "Team2": { "TeamId": 11 },
-          "MatchResults": [
-            { "PointsTeam1": 2, "PointsTeam2": 1, "ResultTypeID": 1 },
+          "matchID": 58814,
+          "matchDateTimeUTC": "2021-04-03T13:30:00Z",
+          "group": { "groupOrderID": 27 },
+          "team1": { "teamId": 10 },
+          "team2": { "teamId": 11 },
+          "matchResults": [
+            { "pointsTeam1": 2, "pointsTeam2": 1, "resultTypeID": 1 },
           ],
-          "Goals": [
-            { "ScoreTeam1": 1, "ScoreTeam2": 0 }
+          "goals": [
+            { "scoreTeam1": 1, "scoreTeam2": 0 }
           ],
-          "MatchIsFinished": false,
+          "matchIsFinished": false,
         }
       ];
 
@@ -451,14 +451,14 @@ describe("convertMatchdayJson", () => {
     it("match started. No goal entries available => expect to extract 0:0", () => {
       let matchdayJson: any = [
         {
-          "MatchID": 58814,
-          "MatchDateTimeUTC": "2021-04-03T13:30:00Z",
-          "Group": { "GroupOrderID": 27 },
-          "Team1": { "TeamId": 10 },
-          "Team2": { "TeamId": 11 },
-          "MatchResults": [],
-          "Goals": [],
-          "MatchIsFinished": false,
+          "matchID": 58814,
+          "matchDateTimeUTC": "2021-04-03T13:30:00Z",
+          "group": { "groupOrderID": 27 },
+          "team1": { "teamId": 10 },
+          "team2": { "teamId": 11 },
+          "matchResults": [],
+          "goals": [],
+          "matchIsFinished": false,
         }
       ];
 
@@ -484,12 +484,12 @@ describe("convertMatchdayJson", () => {
     it("match not started => expect -1 for goal properties", () => {
       let matchdayJson: any = [
         {
-          "MatchID": 58814,
-          "MatchDateTimeUTC": "2021-04-03T13:30:00Z",
-          "Group": { "GroupOrderID": 27 },
-          "Team1": { "TeamId": 10 },
-          "Team2": { "TeamId": 11 },
-          "MatchIsFinished": false,
+          "matchID": 58814,
+          "matchDateTimeUTC": "2021-04-03T13:30:00Z",
+          "group": { "groupOrderID": 27 },
+          "team1": { "teamId": 10 },
+          "team2": { "teamId": 11 },
+          "matchIsFinished": false,
         }
       ];
 
@@ -535,34 +535,34 @@ describe('importCurrentTeamRanking', () => {
         status: 200,
         data: [
           {
-            "Draw": 5,
-            "Goals": 92,
-            "Lost": 4,
-            "Matches": 32,
-            "OpponentGoals": 40,
-            "Points": 74,
-            "TeamInfoId": 40,
-            "Won": 23
+            "draw": 5,
+            "goals": 92,
+            "lost": 4,
+            "matches": 32,
+            "opponentGoals": 40,
+            "points": 74,
+            "teamInfoId": 40,
+            "won": 23
           },
           {
-            "Draw": 7,
-            "Goals": 57,
-            "Lost": 6,
-            "Matches": 32,
-            "OpponentGoals": 28,
-            "Points": 64,
-            "TeamInfoId": 1635,
-            "Won": 19
+            "draw": 7,
+            "goals": 57,
+            "lost": 6,
+            "matches": 32,
+            "opponentGoals": 28,
+            "points": 64,
+            "teamInfoId": 1635,
+            "won": 19
           },
           {
-            "Draw": 9,
-            "Goals": 57,
-            "Lost": 6,
-            "Matches": 32,
-            "OpponentGoals": 32,
-            "Points": 60,
-            "TeamInfoId": 131,
-            "Won": 17
+            "draw": 9,
+            "goals": 57,
+            "lost": 6,
+            "matches": 32,
+            "opponentGoals": 32,
+            "points": 60,
+            "teamInfoId": 131,
+            "won": 17
           }
         ]
       });

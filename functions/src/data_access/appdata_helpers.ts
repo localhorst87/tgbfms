@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
-import { Match, SeasonBet, SeasonResult } from "../../../src/app/Businessrules/basic_datastructures";
+import { Match, Bet, SeasonBet, SeasonResult } from "../../../src/app/Businessrules/basic_datastructures";
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from "../../../src/app/Businessrules/rule_defined_values";
-import { UpdateTime } from "./import_datastructures";
+import { UpdateTime, MatchdayScoreSnapshot } from "./import_datastructures";
 
 /**
  * Is processing the QuerySnapshot into the desired data type
@@ -88,6 +88,25 @@ export function makeUnknownMatch(matchId: number): Match {
 }
 
 /**
+ * Creates a dummy bet with the given match ID and user ID
+ * 
+ * @param matchId The unique ID the dummy bet should be assigned to
+ * @param userId The user ID the dummy bet should be assigned to
+ * @returns A dummy bet with the given IDs
+ */
+export function makeUnknownBet(matchId: number, userId: string): Bet {
+  return {
+    documentId: "",
+    matchId: matchId,
+    userId: userId,
+    goalsHome: -1,
+    goalsAway: -1,
+    isFixed: false
+  };
+}
+
+
+/**
  * Creates an UpdateTime instance with the current timestamp for the given
  * season and matchday
  *
@@ -102,6 +121,29 @@ export function makeUnknownUpdateTime(season: number, matchday: number): UpdateT
     matchday: matchday,
     timestamp: -1
   }
+}
+
+/**
+ * Creates a dummy MatchdayScoreSnapshot
+ * 
+ * @param season corresponding season of the snapshot
+ * @param matchday the matchday the snapshot is generated for
+ * @returns the dummy snapshot
+ */
+export function makeUnknownScoreSnapshot(season: number, matchday: number): MatchdayScoreSnapshot {
+
+  return {
+    documentId: "",
+    season: season,
+    matchday: matchday,
+    userId: [],
+    points: [],
+    matches: [],
+    results: [],
+    extraTop: [],
+    extraOutsider: [],
+    extraSeason: []
+  };
 }
 
 function makeUnknownSeasonBet(season: number, place: number, userId: string): SeasonBet {

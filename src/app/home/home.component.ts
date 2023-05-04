@@ -2,17 +2,14 @@ import { Component, OnInit, EventEmitter, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { combineLatest, timer, of } from 'rxjs';
 import { switchMap, delay } from 'rxjs/operators';
-import { MatDialog } from '@angular/material/dialog';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { SynchronizeDataService } from '../UseCases/synchronize-data.service';
 import { AuthenticationService } from '../UseCases/authentication.service';
-import { SynchronizeTopMatchService } from '../UseCases/synchronize-top-match.service';
 import { Bet, SeasonBet, User } from '../Businessrules/basic_datastructures';
 import { SEASON } from '../Businessrules/rule_defined_values';
 
 const BET_FIX_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if Bets needs to be fixed
-const MATCHDAY_BEGUN_TOLERANCE: number = -60 * 60; // check top match votes one hour before matchday starts
 
 @Component({
   selector: 'app-home',
@@ -35,18 +32,14 @@ export class HomeComponent implements OnInit {
   matchdaysToSync: number[];
   applyDarkTheme: FormControl;
   fixBetEvent: EventEmitter<number>;
-  syncTopMatchEvent: EventEmitter<number>;
-  syncNeededEvent: EventEmitter<void>;
 
   constructor(
     private appData: AppdataAccessService,
     private fetchBasicService: FetchBasicDataService,
-    private syncTopMatchService: SynchronizeTopMatchService,
     public syncService: SynchronizeDataService,
     private authenticator: AuthenticationService,
     private renderer: Renderer2,
-    private formBuilder: FormBuilder,
-    private dialog: MatDialog) {
+    private formBuilder: FormBuilder) {
 
     this.loggedUser = {
       documentId: "",
@@ -70,8 +63,6 @@ export class HomeComponent implements OnInit {
     this.matchdaysToSync = [];
     this.applyDarkTheme = this.formBuilder.control(false);
     this.fixBetEvent = new EventEmitter();
-    this.syncTopMatchEvent = new EventEmitter();
-    this.syncNeededEvent = new EventEmitter();
   }
 
   switchTheme(): void {
@@ -103,19 +94,15 @@ export class HomeComponent implements OnInit {
       this.fetchBasicService.getMatchdayOfNextMatch$(),
       this.fetchBasicService.getClosestMatchday$(),
       this.fetchBasicService.getCurrentMatchday$(SEASON),
-      this.fetchBasicService.getFinishedMatchday$(SEASON),
-      this.fetchBasicService.getMatchdayOfNextMatch$().pipe(
-        switchMap((nextMatch: number) => this.fetchBasicService.matchdayHasBegun$(SEASON, nextMatch, MATCHDAY_BEGUN_TOLERANCE))
-      )
+      this.fetchBasicService.getFinishedMatchday$(SEASON)
     ).subscribe(
-      ([matchdayLast, matchdayNext, matchdayClosest, matchdayCurrent, matchdayFinished, nextMatchdayBeginsWithinOneHour]) => {
+      ([matchdayLast, matchdayNext, matchdayClosest, matchdayCurrent, matchdayFinished]) => {
         if (matchdayLast == -1 && matchdayNext == -1) { // no matches available
           this.matchdayLastMatch = 1;
           this.matchdayNextMatch = 1;
           this.matchdayClosestMatch = 1;
           this.matchdayCurrent = 1;
           this.matchdayCompleted = 0;
-          this.matchdayTopMatchSync = -1;
         }
         else if (matchdayLast > 0 && matchdayNext == -1) { // all matches played
           this.matchdayLastMatch = matchdayLast;
@@ -123,7 +110,6 @@ export class HomeComponent implements OnInit {
           this.matchdayClosestMatch = matchdayLast;
           this.matchdayCurrent = matchdayLast;
           this.matchdayCompleted = matchdayLast;
-          this.matchdayTopMatchSync = matchdayLast;
         }
         else if (matchdayLast == -1 && matchdayNext > 0) { // no matches played yet
           this.matchdayLastMatch = matchdayNext;
@@ -131,13 +117,6 @@ export class HomeComponent implements OnInit {
           this.matchdayClosestMatch = matchdayNext;
           this.matchdayCurrent = matchdayNext;
           this.matchdayCompleted = 0;
-
-          if (nextMatchdayBeginsWithinOneHour) {
-            this.matchdayTopMatchSync = matchdayNext;
-          }
-          else {
-            this.matchdayTopMatchSync = -1;
-          }
         }
         else {
           this.matchdayLastMatch = matchdayLast;
@@ -145,13 +124,6 @@ export class HomeComponent implements OnInit {
           this.matchdayClosestMatch = matchdayClosest;
           this.matchdayCurrent = matchdayCurrent;
           this.matchdayCompleted = matchdayFinished;
-
-          if (nextMatchdayBeginsWithinOneHour) {
-            this.matchdayTopMatchSync = matchdayNext;
-          }
-          else {
-            this.matchdayTopMatchSync = matchdayLast;
-          }
         }
       },
       err => { },
@@ -160,7 +132,6 @@ export class HomeComponent implements OnInit {
         // of Bets for the matchday of the last match. This is only called once
         // in the beginning on ngOnInit
         this.fixBetEvent.emit(this.matchdayLastMatch);
-        this.syncTopMatchEvent.emit(this.matchdayTopMatchSync);
       }
     );
   }
@@ -220,22 +191,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  syncTopMatch(matchday: number): void {
-    // sets the top match, if the top match is not yet existing
-
-    this.syncTopMatchService.isTopMatchExisting$(SEASON, matchday).subscribe(
-      (isExisting: boolean) => {
-        if (!isExisting) {
-          this.syncTopMatchService.fetchTopMatchIdToSet$(SEASON, matchday).subscribe(
-            (topMatchId: number) => {
-              this.syncTopMatchService.setTopMatch(topMatchId);
-            }
-          );
-        }
-      }
-    );
-  }
-
   ngOnInit(): void {
 
     // set logged user as property
@@ -255,11 +210,6 @@ export class HomeComponent implements OnInit {
     // fix overdue bets
     this.fixBetEvent.subscribe(
       (matchday: number) => this.fixOpenOverdueBets(matchday)
-    );
-
-    // eavluate and set top match if required
-    this.syncTopMatchEvent.pipe(delay(5000)).subscribe(
-      (matchday: number) => this.syncTopMatch(matchday)
     );
 
     this.setMatchdays();

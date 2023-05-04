@@ -1,49 +1,20 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import * as admin from "firebase-admin";
-import { Match, Bet, SeasonBet, SeasonResult, User } from "../../src/app/Businessrules/basic_datastructures";
+import { Match, Bet, SeasonBet, SeasonResult, User, TopMatchVote } from "../../src/app/Businessrules/basic_datastructures";
 import { UpdateTime, SyncPhase, MatchdayScoreSnapshot } from "../src/data_access/import_datastructures";
 import * as appdata_access from "../src/data_access/appdata_access";
 
 describe("getAllMatches, end-to-end-test", () => {
 
-  var allMatches: Match[] = [
-    {
-      documentId: "0ncSX1D6CH4mKg3wRfYr",
-      season: 2022,
-      matchday: 1,
-      matchId: 1001,
-      timestamp: 1234567890,
-      isFinished: false,
-      isTopMatch: true,
-      teamIdHome: 200,
-      teamIdAway: 100,
-      goalsHome: 0,
-      goalsAway: 1
-    },
-    {
-      documentId: "9cKcskEZ3nqlzMaALDtZ",
-      season: 2022,
-      matchday: 1,
-      matchId: 1000,
-      timestamp: 1234567890,
-      isFinished: false,
-      isTopMatch: false,
-      teamIdHome: 20,
-      teamIdAway: 10,
-      goalsHome: 2,
-      goalsAway: 1
-    }
-  ];
-
   it("More than one data sample available => expect correct samples in array", async () => {
-    let matches = await appdata_access.getAllMatches(2022);
+    let matches = await appdata_access.getAllMatches(2019);
 
-    expect(matches).to.deep.equal(allMatches);
+    expect(matches.length).to.equal(4);
   });
 
   it("No data samples available => expect empty array", async () => {
-    let matches = await appdata_access.getAllMatches(2019);
+    let matches = await appdata_access.getAllMatches(2129);
 
     expect(matches).to.deep.equal([]);
   });
@@ -119,8 +90,8 @@ describe("getMatch, end-to-end test", () => {
     isTopMatch: false,
     teamIdHome: -1,
     teamIdAway: -1,
-    goalsHome: 2,
-    goalsAway: 1
+    goalsHome: -1,
+    goalsAway: -1
   };
 
   it("Match is available => expect correct match to be returned", async () => {
@@ -284,7 +255,7 @@ describe("getSyncPhases, end-to-end test", () => {
   it("get SyncPhases < timestamp, data available => expect two SyncPhases in array", async () => {
     let syncPhases: SyncPhase[] = await appdata_access.getSyncPhases("<", 1629560000);
 
-    expect(syncPhases.length).to.equal(2)
+    expect(syncPhases.length).to.equal(4)
   });
 
   it("get SyncPhases == timestamp, data available => expect exactly one SyncPhase in array", async () => {
@@ -651,4 +622,43 @@ describe('setMatchdayScoreSnapshot, end-to-end-test', () => {
     expect(snapshotAfter.points).to.deep.equal([7, 14, 9]);   
   });
   
+});
+
+describe('getTopMatch, end-to-end-test', () => {
+
+  it('top match existing => expect to return real match', async () => {
+    const topMatch: Match = await appdata_access.getTopMatch(2099, 1);
+    expect(topMatch.matchId).to.equal(99001);    
+  });
+
+  it('top match not existing => expect to return dummy match', async () => {
+    const topMatch: Match = await appdata_access.getTopMatch(2099, 2);
+    expect(topMatch.matchId).to.equal(-1);
+  });
+
+  it('no match at all existing for requested combination => expect to return dummy match', async () => {
+    const topMatch: Match = await appdata_access.getTopMatch(2099, 3);
+    expect(topMatch.matchId).to.equal(-1);
+  });
+  
+});
+
+describe('getTopMatchVotes, end-to-end-test', () => {
+  it('votes available => expect to return all votes', async () => {
+    const votes: TopMatchVote[] = await appdata_access.getTopMatchVotes(2099, 1);
+    expect(votes.length).to.equal(3);
+  });
+
+  it('votes available => expect to return correct documents', async () => {
+    const votes: TopMatchVote[] = await appdata_access.getTopMatchVotes(2099, 1);
+    expect(votes
+      .map(vote => vote.documentId)
+      .sort())
+    .to.deep.equal(["MvNhIcwvQikZkKxQYXVt", "QRw1DbX3w684eMnnXa1C", "eg2vwLf9rnShulRta5dD"]);
+  });
+
+  it('votes not available => expect to return empty array', async () => {
+    const votes: TopMatchVote[] = await appdata_access.getTopMatchVotes(2099, 2);
+    expect(votes).to.deep.equal([]);
+  });
 });

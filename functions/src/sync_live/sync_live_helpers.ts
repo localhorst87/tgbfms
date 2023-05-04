@@ -4,6 +4,28 @@ import * as appdata from "../data_access/appdata_access";
 import * as matchdata from "../data_access/matchdata_access";
 import { getCurrentTimestamp } from "../util";
 
+
+declare global {
+    interface Array<T> {
+        unique(): Array<T>;
+    }
+}
+  
+/**
+ * deletes double entries from an array
+ */
+Array.prototype.unique = function() {
+    let arr = this.concat();
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = i + 1; j < arr.length; j++) {
+        if (arr[i] === arr[j])
+            arr.splice(j--, 1);
+        }
+    }
+
+    return arr;
+};
+
 /**
  * Returns the bets of the given users for the given matches. Results will not be ordered.
  * 

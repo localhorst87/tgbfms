@@ -46,9 +46,7 @@ export async function syncMatchplan(): Promise<void> {
 
   // update SyncPhases
   const matchesNextDays: Match[] = matchList.getNextMatches(2);
-  console.log(matchesNextDays);
   const syncPhases: SyncPhase[] = createSyncPhases(matchesNextDays);
-  console.log(syncPhases);
   await updateSyncPhases(syncPhases);
 }
 
@@ -72,17 +70,14 @@ export async function updateMatchdays(season: number, matchdays: number[]): Prom
       let matchImported: Match = convertToMatch(refMatch, matchAppData);
 
       // Match unknown to App DB or Match available in App DB, but not up to date
-      if (matchAppData.documentId == "" || !isMatchEqual(matchAppData, matchImported)) {
+      if (matchAppData.documentId === "" || !isMatchEqual(matchAppData, matchImported)) {
         updateRequired = true;
         updateSuccessful = await appdata.setMatch(matchImported);
-      }
-
-      if (updateSuccessful) {
-        updatedMatches.push(matchImported);
-      }
-      else 
-        break;
-        
+        if (updateSuccessful)
+          updatedMatches.push(matchImported);
+        else 
+          break;
+      }        
     }
 
     // if at least one match has not been updated successfully, don't refresh the

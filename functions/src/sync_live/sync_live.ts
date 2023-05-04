@@ -1,4 +1,4 @@
-import { NUMBER_OF_TEAMS } from "../business_rules/rule_defined_values";
+import {SEASON, NUMBER_OF_TEAMS } from "../business_rules/rule_defined_values";
 import { Match, Bet, User, SeasonResult, Score } from "../business_rules/basic_datastructures";
 import { MatchImportData, TeamRankingImportData, MatchdayScoreSnapshot } from "../data_access/import_datastructures";
 import * as appdata from "../data_access/appdata_access";
@@ -42,13 +42,12 @@ export async function syncLive(): Promise<void> {
   const matchesSynced: Match[] = await syncMatches(matchesToSync);
 
   // sync team ranking 
-  const season = matchesToSync[0].season;
-  await syncTeamRanking(season);
+  await syncTeamRanking(SEASON);
 
   // sync user scores
   const matchdaysSynced = matchesSynced.map((match: Match) => match.matchday).unique();
   for (let matchday of matchdaysSynced)
-    await updateScoreSnapshot(season, matchday);
+    await updateScoreSnapshot(SEASON, matchday);
 
   return;
 }
@@ -79,10 +78,9 @@ export async function syncMatches(matchesToSync: Match[]): Promise<Match[]> {
 
   // refresh update times for matchdays of synced matches
   if (syncedMatches.length > 0) {
-    const season: number = syncedMatches[0].season;
     const matchdaysSynced: number[] = syncedMatches.map((match: Match) => match.matchday).unique();
 
-    await helper.setNewUpdateTimes(season, matchdaysSynced);
+    await helper.setNewUpdateTimes(SEASON, matchdaysSynced);
   }
 
   // return matchIds of synced matches

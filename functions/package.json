@@ -16,7 +16,7 @@
   "engines": {
     "node": "16"
   },
-  "main": "lib/functions/src/index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "@firebase/firestore-types": "^2.5.1",
     "axios": "^0.26.1",

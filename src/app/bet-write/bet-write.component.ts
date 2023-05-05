@@ -197,7 +197,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
         this.appData.setBet(updatedBet)
           .then(() => {
             let confirmMessage: string = String(value.betHome) + ":" + String(value.betAway) + " eingetragen";
-            this.snackbar.open(confirmMessage, "", { duration: 500 });
+            this.snackbar.open(confirmMessage, "", { verticalPosition: "top", duration: 800 });
           });
       }
     });
@@ -345,7 +345,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
     this.appData.setTopMatchVote(vote)
       .then(() => {
         let confirmMessage: string = "Topspiel-Vote eingetragen";
-        this.snackbar.open(confirmMessage, "", { duration: 1000 });
+        this.snackbar.open(confirmMessage, "", { verticalPosition: "top", duration: 1000 });
         this.votedTopMatch = vote.matchId;
       });
   }

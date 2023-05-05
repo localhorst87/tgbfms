@@ -20,7 +20,6 @@ const MATCHDAY_BEGUN_TOLERANCE: number = -60 * 60 // (seconds)
 export class BetWriteComponent implements OnInit, OnChanges {
 
   @Input() userId: string;
-  @Input() lastUpdateTime: number;
   currentSeason: string; // current season name, e.g. "2021/2022"
   nTeams: number; // total number of teams in the campaign
   nMatchdays: number; // total number of matchdays per season
@@ -50,7 +49,6 @@ export class BetWriteComponent implements OnInit, OnChanges {
 
     this.userId = "";
     this.currentSeason = String(SEASON) + "/" + String(SEASON + 1);
-    this.lastUpdateTime = -1;
     this.nTeams = NUMBER_OF_TEAMS;
     this.nMatchdays = MATCHDAYS_PER_SEASON;
     this.currentTime = new Date();
@@ -362,7 +360,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    if (this.selectedMatchday > 0 || this.lastUpdateTime > 0) {
+    if (this.selectedMatchday > 0) {
       this.matchdayForm.setValue(this.selectedMatchday);
       this.showMatchesByMatchday(this.selectedMatchday);
     }

@@ -1,7 +1,8 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
-import * as sync_matches from "../src/sync_matchplan";
+import * as sync_matches from "../src/sync_matchplan/sync_matchplan";
+import * as sync_matches_helpers from "../src/sync_matchplan/sync_matchplan_helpers";
 import { NUMBER_OF_TEAMS } from "../../src/app/Businessrules/rule_defined_values";
 import * as appdata from "../src/data_access/appdata_access";
 import { Match } from "../../src/app/Businessrules/basic_datastructures";
@@ -26,8 +27,8 @@ describe('sync_matchplan', () => {
       });
   
       it("request matches, matches are available => expect to receive all matches", async () => {
-        sandbox.stub(sync_matches.MatchList, 'MATCHDAYS_PER_SEASON').value(MOCKED_MATCHDAYS_PER_SEASON);
-        let matchList = new sync_matches.MatchList(2021);
+        sandbox.stub(sync_matches_helpers.MatchList, 'MATCHDAYS_PER_SEASON').value(MOCKED_MATCHDAYS_PER_SEASON);
+        let matchList = new sync_matches_helpers.MatchList(2021);
   
         // await matchList.fillMatchList();
         await matchList.fillMatchList();
@@ -38,7 +39,7 @@ describe('sync_matchplan', () => {
       });
   
       it("request matches, no matches available => expect to receive nothing", async () => {
-        let matchList = new sync_matches.MatchList(2025);
+        let matchList = new sync_matches_helpers.MatchList(2025);
   
         await matchList.fillMatchList();
   
@@ -55,7 +56,7 @@ describe('sync_matchplan', () => {
   
     before(() => {
       sandbox = sinon.createSandbox();
-      sandbox.stub(sync_matches.MatchList, 'MATCHDAYS_PER_SEASON').value(MOCKED_MATCHDAYS_PER_SEASON);
+      sandbox.stub(sync_matches_helpers.MatchList, 'MATCHDAYS_PER_SEASON').value(MOCKED_MATCHDAYS_PER_SEASON);
     });
   
     beforeEach(async () => {
@@ -105,7 +106,7 @@ describe('sync_matchplan', () => {
         timestamp: 1629391220 // matchdata update time is 1629391221
       });
   
-      let matchList = new sync_matches.MatchList(2021);
+      let matchList = new sync_matches_helpers.MatchList(2021);
       await matchList.fillMatchList();
   
       let matchdaysToUpdate = await sync_matches.getMatchdaysToUpdate(matchList);
@@ -122,7 +123,7 @@ describe('sync_matchplan', () => {
         timestamp: 1629391222 // matchdata update time is 1629391221
       });
   
-      let matchList = new sync_matches.MatchList(2021);
+      let matchList = new sync_matches_helpers.MatchList(2021);
       await matchList.fillMatchList();
   
       let matchdaysToUpdate = await sync_matches.getMatchdaysToUpdate(matchList);

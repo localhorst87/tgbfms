@@ -1,7 +1,7 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
-import * as sync_matchplan from "../src/sync_matchplan";
+import * as sync_matchplan from "../src/sync_matchplan/sync_matchplan";
 import * as appdata from "../src/data_access/appdata_access";
 import * as matchdata from "../src/data_access/matchdata_access";
 import * as util from "../src/util";

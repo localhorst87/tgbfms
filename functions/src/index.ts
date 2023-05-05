@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import { SEASON } from "./business_rules/rule_defined_values";
 import { Match } from "./business_rules/basic_datastructures";
 import * as sync_live from "./sync_live/sync_live";
-import * as sync_matchplan from "./sync_matchplan";
+import * as sync_matchplan from "./sync_matchplan/sync_matchplan";
 import * as sync_topmatch from "./sync_topmatch/sync_topmatch";
 import * as fix_bets from "./fix_bets/fix_bets";
 import { SyncPhase } from "./data_access/import_datastructures";
@@ -53,21 +53,7 @@ export const syncMatchPlan = functions
   .schedule('every day 10:00')
   .timeZone('Europe/Berlin')
   .onRun(async (context: functions.EventContext) => {
-    let matchList = new sync_matchplan.MatchList(SEASON);
-    await matchList.fillMatchList();
-
-    // update Matches
-    const matchdaysToUpdate: number[] = await sync_matchplan.getMatchdaysToUpdate(matchList);
-    const updatedMatches: Match[] = await sync_matchplan.updateMatchdays(SEASON, matchdaysToUpdate);
-
-    // update MatchList
-    if (updatedMatches.length > 0) 
-      matchList.updateMatches(updatedMatches);
-
-    // update SyncPhases
-    const matchesNextDays: Match[] = matchList.getNextMatches(3);
-    const syncPhases: SyncPhase[] = sync_matchplan.createSyncPhases(matchesNextDays);
-    await sync_matchplan.updateSyncPhases(syncPhases);
+    await sync_matchplan.syncMatchplan();
 
     return null;
   });

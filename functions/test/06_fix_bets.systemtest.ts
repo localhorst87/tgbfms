@@ -205,7 +205,7 @@ describe('fix_bets_helper', () => {
     
 });
 
-describe.only('fixBets', () => {
+describe('fixBets', () => {
     var sandbox: any;
 
     before(async () => {

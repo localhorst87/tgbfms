@@ -144,7 +144,7 @@ export function setMatch(match: Match): Promise<boolean> {
 }
 
 /**
- * Requests a bet with the given match ID and user ID (combinatino is unique)
+ * Requests a bet with the given match ID and user ID (combination is unique)
  * If the bet is not existing in the app database, a dummy Bet will be returned
  * 
  * @param matchId the match ID of the target bet to request
@@ -167,6 +167,51 @@ export function getBet(matchId: number, userId: string): Promise<Bet> {
       }
     }
   );
+}
+
+/**
+ * Requests the Bets of all users with the given match ID
+ * 
+ * @param matchId the match ID of the target bets to request
+ * @returns all bets of the given match ID
+ */
+export function getAllBets(matchId: number): Promise<Bet[]> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_BETS)
+    .where("matchId", "==", matchId);
+
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      return helper.processSnapshot<Bet>(querySnapshot);
+    }
+  );
+}
+
+/**
+ * Sets the given Bet in the app database
+ * 
+ * @param bet the bet to set
+ * @returns operation successful
+ */
+export function setBet(bet: Bet): Promise<boolean> {
+  let documentReference: admin.firestore.DocumentReference;
+  if (bet.documentId == "") {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_BETS).doc()
+  }
+  else {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_BETS).doc(bet.documentId);
+  }
+
+  // documentId should not be a property in the dataset itself, as it is meta-data
+  let betToSet: any = { ...bet };
+  delete betToSet.documentId;
+
+  return documentReference.set(betToSet)
+    .then(() => {
+      return true;
+    })
+    .catch((err: any) => {
+      return false;
+    });
 }
 
 /**

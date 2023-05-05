@@ -1,0 +1,22 @@
+[debug] [2023-05-05T09:08:14.320Z] ----------------------------------------------------------------------
+[debug] [2023-05-05T09:08:14.321Z] Command:       /home/localhorst87/.nvm/versions/node/v16.20.0/bin/node /usr/local/bin/firebase emulators:start --only firestore --import=./test/emulator_test_data/online_mirror
+[debug] [2023-05-05T09:08:14.322Z] CLI Version:   10.4.2
+[debug] [2023-05-05T09:08:14.322Z] Platform:      linux
+[debug] [2023-05-05T09:08:14.322Z] Node Version:  v16.20.0
+[debug] [2023-05-05T09:08:14.324Z] Time:          Fri May 05 2023 11:08:14 GMT+0200 (Central European Summer Time)
+[debug] [2023-05-05T09:08:14.324Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-05-05T09:08:14.363Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-05-05T09:08:14.364Z] > authorizing via signed-in user (ironmanni87@gmail.com)
+[info] i  emulators: Starting emulators: firestore {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: firestore"}}
+[debug] [2023-05-05T09:08:14.382Z] [hub] writing locator at /tmp/hub-tgbfms.json
+[info] i  emulators: Shutting down emulators. {"metadata":{"emulator":{"name":"hub"},"message":"Shutting down emulators."}}
+[info] i  hub: Stopping emulator hub {"metadata":{"emulator":{"name":"hub"},"message":"Stopping emulator hub"}}
+[debug] [2023-05-05T09:08:14.501Z] Error: ENOENT: no such file or directory, lstat '/home/localhorst87/coding/tgbfms/test/emulator_test_data/online_mirror'
+    at Object.lstatSync (node:fs:1561:3)
+    at findExportMetadata (/usr/local/lib/node_modules/firebase-tools/lib/emulator/controller.js:177:32)
+    at Object.startAll (/usr/local/lib/node_modules/firebase-tools/lib/emulator/controller.js:252:31)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Command.actionFn (/usr/local/lib/node_modules/firebase-tools/lib/commands/emulators-start.js:26:9)
+[error] 
+[error] Error: An unexpected error has occurred.

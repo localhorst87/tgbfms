@@ -355,6 +355,18 @@ export class BetWriteComponent implements OnInit, OnChanges {
     interval(INTERVAL_TIME_REFRESH).subscribe(
       val => {
         this.currentTime = new Date();
+        // if a matchday is selected and bets are loaded, check if a kickoff is now
+        // if yes => refresh the view, to disable the input field 
+        if (this.selectedMatchday > 0 && this.matches.length > 0) {
+          const matchTimestamps: number[] = this.matches
+            .map(betWriteData => betWriteData.matchDate)
+            .map(matchDate => Math.floor(matchDate.getTime() / 1000));
+          const timestampNow = Math.floor(this.currentTime.getTime() / 1000);
+
+          // refresh view if one of the timestamps of the matches is reached
+          if (matchTimestamps.some(matchTimestamp => matchTimestamp == timestampNow))
+            this.showMatchesByMatchday(this.selectedMatchday);
+        }
       }
     );
   }

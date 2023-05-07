@@ -4,7 +4,7 @@ import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { FetchBetWriteDataService } from './fetch-bet-write-data.service';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
-import { Bet, Match, Result, SeasonBet } from '../Businessrules/basic_datastructures';
+import { Bet, Match, SeasonBet } from '../Businessrules/basic_datastructures';
 import { BetWriteData, SeasonBetWriteData } from './output_datastructures';
 
 describe('FetchBetWriteDataService', () => {
@@ -52,7 +52,9 @@ describe('FetchBetWriteDataService', () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 211,
-        teamIdAway: 93
+        teamIdAway: 93,
+        goalsHome: 1,
+        goalsAway: 0
       },
       {
         documentId: "doc_id_1",
@@ -63,7 +65,9 @@ describe('FetchBetWriteDataService', () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 13,
-        teamIdAway: 6
+        teamIdAway: 6,
+        goalsHome: 1,
+        goalsAway: 0
       }
     ];
   });
@@ -76,7 +80,7 @@ describe('FetchBetWriteDataService', () => {
   // fetchSeasonData$
   // ---------------------------------------------------------------------------
 
-  it('fetchSeasonData$, bets available', (done: DoneFn) => {
+  it('fetchSeasonData$, bets available', (done) => {
     const argument1: number = 2021;
     const argument2: string = "test_user_id";
 
@@ -206,7 +210,7 @@ describe('FetchBetWriteDataService', () => {
   // fetchDataByMatchday$
   // ---------------------------------------------------------------------------
 
-  it('fetchDataByMatchday$, matches available', (done: DoneFn) => {
+  it('fetchDataByMatchday$, matches available', (done) => {
     const argument1: number = 2020;
     const argument2: number = 28;
     const argument3: string = "test_user_id";
@@ -258,7 +262,7 @@ describe('FetchBetWriteDataService', () => {
     );
   });
 
-  it('fetchDataByMatchday$, emitting BetWriteData twice', (done: DoneFn) => {
+  it('fetchDataByMatchday$, emitting BetWriteData twice', (done) => {
     const argument1: number = 2020;
     const argument2: number = 28;
     const argument3: string = "test_user_id";
@@ -310,7 +314,7 @@ describe('FetchBetWriteDataService', () => {
     );
   });
 
-  it('fetchDataByMatchday$, no matches available', (done: DoneFn) => {
+  it('fetchDataByMatchday$, no matches available', (done) => {
     const argument1: number = 2020;
     const argument2: number = 28;
     const argument3: string = "test_user_id";
@@ -346,7 +350,7 @@ describe('FetchBetWriteDataService', () => {
   // fetchDataByTime$
   // ---------------------------------------------------------------------------
 
-  it('fetchDataByTime$, matches available', (done: DoneFn) => {
+  it('fetchDataByTime$, matches available', (done) => {
     const argument1: number = 2;
     const argument2: string = "test_user_id";
 
@@ -397,7 +401,7 @@ describe('FetchBetWriteDataService', () => {
     );
   });
 
-  it('fetchDataByTime$, negative argument', (done: DoneFn) => {
+  it('fetchDataByTime$, negative argument', (done) => {
     const argument1: number = -1;
     const argument2: string = "test_user_id";
 
@@ -448,7 +452,7 @@ describe('FetchBetWriteDataService', () => {
 
   });
 
-  it('fetchDataByTime$, emitting BetWriteData twice', (done: DoneFn) => {
+  it('fetchDataByTime$, emitting BetWriteData twice', (done) => {
     const argument1: number = 2;
     const argument2: string = "test_user_id";
 
@@ -499,7 +503,7 @@ describe('FetchBetWriteDataService', () => {
     );
   });
 
-  it('fetchDataByTime$, no matches available', (done: DoneFn) => {
+  it('fetchDataByTime$, no matches available', (done) => {
     const argument1: number = 2;
     const argument2: string = "test_user_id";
 
@@ -534,7 +538,7 @@ describe('FetchBetWriteDataService', () => {
   // makeSeasonBetWriteData$
   // ---------------------------------------------------------------------------
 
-  it('makeSeasonBetWriteData$, service is emitting data', (done: DoneFn) => {
+  it('makeSeasonBetWriteData$, service is emitting data', (done) => {
     const seasonBets: SeasonBet[] = [
       {
         documentId: "doc_id_0",
@@ -595,7 +599,7 @@ describe('FetchBetWriteDataService', () => {
     );
   });
 
-  it('makeSeasonBetWriteData$, service is emitting data, documentId empty', (done: DoneFn) => {
+  it('makeSeasonBetWriteData$, service is emitting data, documentId empty', (done) => {
     const argument: SeasonBet = {
       documentId: "",
       season: 2021,
@@ -632,7 +636,7 @@ describe('FetchBetWriteDataService', () => {
     );
   });
 
-  it('makeSeasonBetWriteData$, service is not emitting data', (done: DoneFn) => {
+  it('makeSeasonBetWriteData$, service is not emitting data', (done) => {
     const seasonBets: SeasonBet[] = [
       {
         documentId: "doc_id_0",
@@ -698,7 +702,7 @@ describe('FetchBetWriteDataService', () => {
   // makeBetWriteData$
   // ---------------------------------------------------------------------------
 
-  it('makeBetWriteData$, all services emitting', (done: DoneFn) => {
+  it('makeBetWriteData$, all services emitting', (done) => {
     const argument1: Match = matches[0];
     const argument2: string = "test_user_id";
 
@@ -734,7 +738,7 @@ describe('FetchBetWriteDataService', () => {
     );
   });
 
-  it('makeBetWriteData$, all services emitting, documentId empty', (done: DoneFn) => {
+  it('makeBetWriteData$, all services emitting, documentId empty', (done) => {
     const argument1: Match = matches[0];
     const argument2: string = "test_user_id";
 
@@ -782,7 +786,7 @@ describe('FetchBetWriteDataService', () => {
     );
   });
 
-  it('makeBetWriteData$, one data service not emitting', (done: DoneFn) => {
+  it('makeBetWriteData$, one data service not emitting', (done) => {
     const argument1: Match = matches[0];
     const argument2: string = "test_user_id";
 
@@ -835,7 +839,7 @@ describe('FetchBetWriteDataService', () => {
       );
   });
 
-  it('makeBetWriteData$, one service emitting multiple values', (done: DoneFn) => {
+  it('makeBetWriteData$, one service emitting multiple values', (done) => {
     const argument1: Match = matches[1];
     const argument2: string = "test_user_id";
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, from, range, concat, iif, combineLatest } from 'rxjs';
-import { delay, tap, map, switchMap, mergeMap, concatMap, pluck, distinct, filter, first, last, toArray, reduce } from 'rxjs/operators';
+import { map, switchMap, mergeMap, concatMap, pluck, distinct, filter, first, last, toArray, reduce } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { PointCalculatorService } from '../Businessrules/point-calculator.service';

@@ -53,7 +53,7 @@ describe('FetchBasicDataService', () => {
   // fetchNumberOfUsers$
   // ---------------------------------------------------------------------------
 
-  it('fetchNumberOfUsers$, users available', (done: DoneFn) => {
+  it('fetchNumberOfUsers$, users available', (done) => {
     appDataSpy.getActiveUserIds$.and.returnValue(of("id_1", "id_2", "id_3"));
 
     const expectedValue: number = 3;
@@ -66,7 +66,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('fetchNumberOfUsers$, no users available', (done: DoneFn) => {
+  it('fetchNumberOfUsers$, no users available', (done) => {
     appDataSpy.getActiveUserIds$.and.returnValue(of());
 
     const expectedValue: number = 0;
@@ -83,7 +83,7 @@ describe('FetchBasicDataService', () => {
   // fetchActiveTeams$
   // ---------------------------------------------------------------------------
 
-  it('fetchActiveTeams$, teams available', (done: DoneFn) => {
+  it('fetchActiveTeams$, teams available', (done) => {
     const argument: number = 2020;
 
     const teamIds: number[] = [56, 70, 7];
@@ -129,7 +129,7 @@ describe('FetchBasicDataService', () => {
   // fetchNextMatchInfos$
   // ---------------------------------------------------------------------------
 
-  it('fetchNextMatchInfos$, no amount given', (done: DoneFn) => {
+  it('fetchNextMatchInfos$, no amount given', (done) => {
     const season: number = 2021;
     const userId: string = "test_user_id";
 
@@ -172,7 +172,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('fetchNextMatchInfos$, amount argument given', (done: DoneFn) => {
+  it('fetchNextMatchInfos$, amount argument given', (done) => {
     const season: number = 2021;
     const userId: string = "test_user_id";
     const amount: number = 2;
@@ -187,7 +187,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 100,
-        teamIdAway: 40
+        teamIdAway: 40,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "test_doc_id_1",
@@ -198,7 +200,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 17,
-        teamIdAway: 35
+        teamIdAway: 35,
+        goalsAway: -1,
+        goalsHome: -1
       },
     ];
 
@@ -253,7 +257,7 @@ describe('FetchBasicDataService', () => {
   // fetchTopMatchInfos$
   // ---------------------------------------------------------------------------
 
-  it('fetchTopMatchInfos$, top match available', (done: DoneFn) => {
+  it('fetchTopMatchInfos$, top match available', (done) => {
     const season: number = 2021;
     const userId: string = "test_user_id";
     const matchday: number = 19;
@@ -301,7 +305,7 @@ describe('FetchBasicDataService', () => {
   // fetchNextFixTime$
   // ---------------------------------------------------------------------------
 
-  it('fetchNextFixTime$', (done: DoneFn) => {
+  it('fetchNextFixTime$', (done) => {
     const season: number = 2021;
 
     const nextMatch: Match = {
@@ -313,7 +317,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 100,
-      teamIdAway: 40
+      teamIdAway: 40,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     appDataSpy.getNextMatch$.withArgs(season).and.returnValue(of(nextMatch));
@@ -330,7 +336,7 @@ describe('FetchBasicDataService', () => {
   // fetchOpenOverdueBets$
   // ---------------------------------------------------------------------------
 
-  it('fetchOpenOverdueBets$, bets available from two matches', (done: DoneFn) => {
+  it('fetchOpenOverdueBets$, bets available from two matches', (done) => {
     const season: number = 2021;
     const matchday: number = 19;
 
@@ -344,7 +350,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 100,
-        teamIdAway: 40
+        teamIdAway: 40,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "test_doc_id_1",
@@ -355,7 +363,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 17,
-        teamIdAway: 35
+        teamIdAway: 35,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "test_doc_id_2",
@@ -366,7 +376,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 21,
-        teamIdAway: 55
+        teamIdAway: 55,
+        goalsAway: -1,
+        goalsHome: -1
       }
     ];
 
@@ -420,7 +432,7 @@ describe('FetchBasicDataService', () => {
     jasmine.clock().uninstall();
   });
 
-  it('fetchOpenOverdueBets$, bets available from one match', (done: DoneFn) => {
+  it('fetchOpenOverdueBets$, bets available from one match', (done) => {
     const season: number = 2021;
     const matchday: number = 19;
 
@@ -434,7 +446,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 100,
-        teamIdAway: 40
+        teamIdAway: 40,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "test_doc_id_1",
@@ -445,7 +459,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 17,
-        teamIdAway: 35
+        teamIdAway: 35,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "test_doc_id_2",
@@ -456,7 +472,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 21,
-        teamIdAway: 55
+        teamIdAway: 55,
+        goalsAway: -1,
+        goalsHome: -1
       }
     ];
 
@@ -501,7 +519,7 @@ describe('FetchBasicDataService', () => {
     jasmine.clock().uninstall();
   });
 
-  it('fetchOpenOverdueBets$, no open bets available', (done: DoneFn) => {
+  it('fetchOpenOverdueBets$, no open bets available', (done) => {
     const season: number = 2021;
     const matchday: number = 19;
 
@@ -515,7 +533,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 100,
-        teamIdAway: 40
+        teamIdAway: 40,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "test_doc_id_1",
@@ -526,7 +546,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 17,
-        teamIdAway: 35
+        teamIdAway: 35,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "test_doc_id_2",
@@ -537,7 +559,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 21,
-        teamIdAway: 55
+        teamIdAway: 55,
+        goalsAway: -1,
+        goalsHome: -1
       }
     ];
 
@@ -576,7 +600,7 @@ describe('FetchBasicDataService', () => {
   // fetchOpenOverdueSeasonBets$
   // ---------------------------------------------------------------------------
 
-  it('fetchOpenOverdueSeasonBets$, open bets available', (done: DoneFn) => {
+  it('fetchOpenOverdueSeasonBets$, open bets available', (done) => {
     const season: number = 2021;
 
     const seasonBets_user_0: SeasonBet[] = [
@@ -700,7 +724,7 @@ describe('FetchBasicDataService', () => {
   // getClosestMatchday$
   // ---------------------------------------------------------------------------
 
-  it('getClosestMatchday$, next match closest', (done: DoneFn) => {
+  it('getClosestMatchday$, next match closest', (done) => {
     const nextMatch: Match = {
       documentId: "test_id_0",
       season: 2021,
@@ -710,7 +734,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 10,
-      teamIdAway: 35
+      teamIdAway: 35,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     const lastMatch: Match = {
@@ -722,7 +748,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 167,
-      teamIdAway: 54
+      teamIdAway: 54,
+      goalsAway: 1,
+      goalsHome: 1
     };
     appDataSpy.getNextMatch$.and.returnValue(of(nextMatch));
     appDataSpy.getLastMatch$.and.returnValue(of(lastMatch));
@@ -738,7 +766,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('getClosestMatchday$, last match closest', (done: DoneFn) => {
+  it('getClosestMatchday$, last match closest', (done) => {
     const nextMatch: Match = {
       documentId: "test_id_0",
       season: 2021,
@@ -748,7 +776,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 10,
-      teamIdAway: 35
+      teamIdAway: 35,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     const lastMatch: Match = {
@@ -760,7 +790,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 167,
-      teamIdAway: 54
+      teamIdAway: 54,
+      goalsAway: 1,
+      goalsHome: 1
     };
     appDataSpy.getNextMatch$.and.returnValue(of(nextMatch));
     appDataSpy.getLastMatch$.and.returnValue(of(lastMatch));
@@ -776,7 +808,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('getClosestMatchday$, time difference equals, must return next matchday', (done: DoneFn) => {
+  it('getClosestMatchday$, time difference equals, must return next matchday', (done) => {
     const nextMatch: Match = {
       documentId: "test_id_0",
       season: 2021,
@@ -786,7 +818,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 10,
-      teamIdAway: 35
+      teamIdAway: 35,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     const lastMatch: Match = {
@@ -798,7 +832,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 167,
-      teamIdAway: 54
+      teamIdAway: 54,
+      goalsAway: 1,
+      goalsHome: 1
     };
     appDataSpy.getNextMatch$.and.returnValue(of(nextMatch));
     appDataSpy.getLastMatch$.and.returnValue(of(lastMatch));
@@ -818,7 +854,7 @@ describe('FetchBasicDataService', () => {
   // matchdayIsFinished$
   // ---------------------------------------------------------------------------
 
-  it('matchdayIsFinished$, last match not finished', (done: DoneFn) => {
+  it('matchdayIsFinished$, last match not finished', (done) => {
     const matches: Match[] = [
       {
         documentId: "first_match",
@@ -829,7 +865,9 @@ describe('FetchBasicDataService', () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 10,
-        teamIdAway: 35
+        teamIdAway: 35,
+        goalsAway: 1,
+        goalsHome: 2
       },
       {
         documentId: "another_match",
@@ -840,7 +878,9 @@ describe('FetchBasicDataService', () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 11,
-        teamIdAway: 39
+        teamIdAway: 39,
+        goalsAway: 1,
+        goalsHome: 2
       },
       {
         documentId: "last_match",
@@ -851,7 +891,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 12,
-        teamIdAway: 50
+        teamIdAway: 50,
+        goalsAway: 1,
+        goalsHome: 2
       },
     ];
 
@@ -867,7 +909,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('matchdayIsFinished$, last match finished', (done: DoneFn) => {
+  it('matchdayIsFinished$, last match finished', (done) => {
     const matches: Match[] = [
       {
         documentId: "first_match",
@@ -878,7 +920,9 @@ describe('FetchBasicDataService', () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 10,
-        teamIdAway: 35
+        teamIdAway: 35,
+        goalsAway: 1,
+        goalsHome: 2
       },
       {
         documentId: "another_match",
@@ -889,7 +933,9 @@ describe('FetchBasicDataService', () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 11,
-        teamIdAway: 39
+        teamIdAway: 39,
+        goalsAway: 1,
+        goalsHome: 2
       },
       {
         documentId: "last_match",
@@ -900,7 +946,9 @@ describe('FetchBasicDataService', () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 12,
-        teamIdAway: 50
+        teamIdAway: 50,
+        goalsAway: 1,
+        goalsHome: 2
       },
     ];
 
@@ -916,7 +964,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('matchdayIsFinished$, last match not finished, but postponed', (done: DoneFn) => {
+  it('matchdayIsFinished$, last match not finished, but postponed', (done) => {
     const matches: Match[] = [
       {
         documentId: "first_match",
@@ -927,7 +975,9 @@ describe('FetchBasicDataService', () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 10,
-        teamIdAway: 35
+        teamIdAway: 35,
+        goalsAway: 1,
+        goalsHome: 2
       },
       {
         documentId: "another_match",
@@ -938,7 +988,9 @@ describe('FetchBasicDataService', () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 11,
-        teamIdAway: 39
+        teamIdAway: 39,
+        goalsAway: 1,
+        goalsHome: 2
       },
       {
         documentId: "last_match",
@@ -949,7 +1001,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 12,
-        teamIdAway: 50
+        teamIdAway: 50,
+        goalsAway: 1,
+        goalsHome: 2
       },
     ];
 
@@ -969,7 +1023,7 @@ describe('FetchBasicDataService', () => {
   // matchdayHasBegun$
   // ---------------------------------------------------------------------------
 
-  it('matchdayHasBegun$, no tolerance, matchday has begun', (done: DoneFn) => {
+  it('matchdayHasBegun$, no tolerance, matchday has begun', (done) => {
     const match: Match = {
       documentId: "first_match",
       season: 2021,
@@ -979,7 +1033,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 10,
-      teamIdAway: 35
+      teamIdAway: 35,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     appDataSpy.getFirstMatchOfMatchday$.and.returnValue(of(match));
@@ -995,7 +1051,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('matchdayHasBegun$, no tolerance, matchday time equals current time, expect false', (done: DoneFn) => {
+  it('matchdayHasBegun$, no tolerance, matchday time equals current time, expect false', (done) => {
     const match: Match = {
       documentId: "first_match",
       season: 2021,
@@ -1005,7 +1061,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 10,
-      teamIdAway: 35
+      teamIdAway: 35,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     appDataSpy.getFirstMatchOfMatchday$.and.returnValue(of(match));
@@ -1021,7 +1079,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('matchdayHasBegun$, tolerance given and current time inside tolerance, expect true', (done: DoneFn) => {
+  it('matchdayHasBegun$, tolerance given and current time inside tolerance, expect true', (done) => {
     const tolerance: number = 1000;
 
     const match: Match = {
@@ -1033,7 +1091,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 10,
-      teamIdAway: 35
+      teamIdAway: 35,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     appDataSpy.getFirstMatchOfMatchday$.and.returnValue(of(match));
@@ -1049,7 +1109,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('matchdayHasBegun$, matchday time -1, expect false', (done: DoneFn) => {
+  it('matchdayHasBegun$, matchday time -1, expect false', (done) => {
     const match: Match = {
       documentId: "first_match",
       season: 2021,
@@ -1059,7 +1119,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 10,
-      teamIdAway: 35
+      teamIdAway: 35,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     appDataSpy.getFirstMatchOfMatchday$.and.returnValue(of(match));
@@ -1079,7 +1141,7 @@ describe('FetchBasicDataService', () => {
   // getCurrentMatchday$
   // ---------------------------------------------------------------------------
 
-  it('getCurrentMatchday$, normal operation', (done: DoneFn) => {
+  it('getCurrentMatchday$, normal operation', (done) => {
     // for testing the functionality it's not of importance if 10 or 3
     // matches are returned. Important: More than 1 match returned
 
@@ -1093,7 +1155,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 10,
-        teamIdAway: 20
+        teamIdAway: 20,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "dummy_match_1",
@@ -1104,7 +1168,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 11,
-        teamIdAway: 21
+        teamIdAway: 21,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "dummy_match_2",
@@ -1115,7 +1181,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 120,
-        teamIdAway: 22
+        teamIdAway: 22,
+        goalsAway: -1,
+        goalsHome: -1
       },
     ]
 
@@ -1131,7 +1199,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('getCurrentMatchday$, no last matches available (matchday == -1)', (done: DoneFn) => {
+  it('getCurrentMatchday$, no last matches available (matchday == -1)', (done) => {
     // for testing the functionality it's not of importance if 10 or 3
     // matches are returned. Important: More than 1 match returned
 
@@ -1145,7 +1213,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: -1,
-        teamIdAway: -1
+        teamIdAway: -1,
+        goalsAway: -1,
+        goalsHome: -1
       }
     ];
 
@@ -1165,7 +1235,7 @@ describe('FetchBasicDataService', () => {
   // getFinishedMatchday$
   // ---------------------------------------------------------------------------
 
-  it('getFinishedMatchday$, current matchday = finished matchday', (done: DoneFn) => {
+  it('getFinishedMatchday$, current matchday = finished matchday', (done) => {
     const currentMatchday: number = 26;
 
     spyOn<any>(service, "getCurrentMatchday$").and.returnValue(of(currentMatchday));
@@ -1181,7 +1251,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('getFinishedMatchday$, current matchday > finished matchday', (done: DoneFn) => {
+  it('getFinishedMatchday$, current matchday > finished matchday', (done) => {
     const currentMatchday: number = 26;
 
     spyOn<any>(service, "getCurrentMatchday$").and.returnValue(of(currentMatchday));
@@ -1197,7 +1267,7 @@ describe('FetchBasicDataService', () => {
     );
   });
 
-  it('getFinishedMatchday$, no matches played yet', (done: DoneFn) => {
+  it('getFinishedMatchday$, no matches played yet', (done) => {
     const currentMatchday: number = 1;
     const fallbackMatch: Match = {
       documentId: "match_doc_id",
@@ -1208,7 +1278,9 @@ describe('FetchBasicDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: 10,
-      teamIdAway: 35
+      teamIdAway: 35,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     spyOn<any>(service, "getCurrentMatchday$").and.returnValue(of(currentMatchday));
@@ -1228,7 +1300,7 @@ describe('FetchBasicDataService', () => {
   // getTeamStats$
   // ---------------------------------------------------------------------------
 
-  it('getTeamStats$', (done: DoneFn) => {
+  it('getTeamStats$', (done) => {
     const ranking: TeamRankingImportData[] = [
       {
         teamId: 10,
@@ -1281,7 +1353,7 @@ describe('FetchBasicDataService', () => {
   // getFirstMatchTimestamp$
   // ---------------------------------------------------------------------------
 
-  it('getFirstMatchTimestamp$, normal operation', (done: DoneFn) => {
+  it('getFirstMatchTimestamp$, normal operation', (done) => {
     // for testing the functionality it's not of importance if 9 or 3
     // matches are returned. Important: More than 1 match returned
 
@@ -1295,7 +1367,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 10,
-        teamIdAway: 20
+        teamIdAway: 20,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "dummy_match_1",
@@ -1306,7 +1380,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 11,
-        teamIdAway: 21
+        teamIdAway: 21,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "dummy_match_2",
@@ -1317,7 +1393,9 @@ describe('FetchBasicDataService', () => {
         isFinished: false,
         isTopMatch: false,
         teamIdHome: 120,
-        teamIdAway: 22
+        teamIdAway: 22,
+        goalsAway: -1,
+        goalsHome: -1
       },
     ]
 

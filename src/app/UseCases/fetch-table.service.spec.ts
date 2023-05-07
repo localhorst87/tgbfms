@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Observable, of, from } from 'rxjs';
+import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { FetchTableService } from './fetch-table.service';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
@@ -37,7 +37,7 @@ describe('FetchTableService', () => {
   // fetchSeasonScoreArray$
   // ---------------------------------------------------------------------------
 
-  it('fetchSeasonScoreArray$, all data available', (done: DoneFn) => {
+  it('fetchSeasonScoreArray$, all data available', (done) => {
     const argument: number = 2020;
 
     const seasonBets: SeasonBet[] = [
@@ -242,7 +242,7 @@ describe('FetchTableService', () => {
     );
   });
 
-  it('fetchSeasonScoreArray$, fetchSeasonBetArray returns empty array', (done: DoneFn) => {
+  it('fetchSeasonScoreArray$, fetchSeasonBetArray returns empty array', (done) => {
     const argument: number = 2020;
     const seasonResults: SeasonResult[] = [
       {
@@ -293,7 +293,7 @@ describe('FetchTableService', () => {
     );
   });
 
-  it('fetchSeasonScoreArray$, fetchSeasonResultArray returns empty array', (done: DoneFn) => {
+  it('fetchSeasonScoreArray$, fetchSeasonResultArray returns empty array', (done) => {
     const argument: number = 2020;
 
     const seasonBets: SeasonBet[] = [
@@ -439,7 +439,7 @@ describe('FetchTableService', () => {
   // fetchSeasonBetArray$
   // ---------------------------------------------------------------------------
 
-  it('fetchSeasonBetArray$, data available', (done: DoneFn) => {
+  it('fetchSeasonBetArray$, data available', (done) => {
     const argument: number = 2020;
 
     const seasonBetsUser0: SeasonBet[] = [
@@ -599,7 +599,7 @@ describe('FetchTableService', () => {
     );
   });
 
-  it('fetchSeasonBetArray$, getActiveUserIds$ returns empty Observable', (done: DoneFn) => {
+  it('fetchSeasonBetArray$, getActiveUserIds$ returns empty Observable', (done) => {
     const argument: number = 2020;
 
     const expectedValues: SeasonBet[] = [];
@@ -618,7 +618,7 @@ describe('FetchTableService', () => {
   // fetchSeasonResultArray$
   // ---------------------------------------------------------------------------#
 
-  it('fetchSeasonResultArray$, data available', (done: DoneFn) => {
+  it('fetchSeasonResultArray$, data available', (done) => {
     const argument: number = 2020;
 
     const seasonResults: SeasonResult[] = [
@@ -768,7 +768,7 @@ describe('FetchTableService', () => {
   // initScoreArray$
   // ---------------------------------------------------------------------------
 
-  it('initScoreArray$, data available', (done: DoneFn) => {
+  it('initScoreArray$, data available', (done) => {
 
     const userIds: string[] = ["test_user_id_0", "test_user_id_1", "test_user_id_2"];
     const expectedValues: Score[] = [
@@ -811,7 +811,7 @@ describe('FetchTableService', () => {
     );
   });
 
-  it('initScoreArray$, empty userId array available', (done: DoneFn) => {
+  it('initScoreArray$, empty userId array available', (done) => {
 
     const userIds: string[] = [];
     const expectedValues: Score[] = [];
@@ -830,7 +830,7 @@ describe('FetchTableService', () => {
   // makeTableData$
   // ---------------------------------------------------------------------------
 
-  it('makeTableData$, data available', (done: DoneFn) => {
+  it('makeTableData$, data available', (done) => {
 
     const argument: Score[] = [
       {
@@ -869,7 +869,12 @@ describe('FetchTableService', () => {
         email: "user.two@mail.com",
         displayName: "user_name_2",
         isAdmin: false,
-        isActive: true
+        isActive: true,
+        configs: {
+          theme: "light",
+          notificationLevel: 0,
+          notificationTime: 1
+        }
       },
       {
         documentId: "doc_00",
@@ -877,7 +882,12 @@ describe('FetchTableService', () => {
         email: "user.zero@mail.com",
         displayName: "user_name_0",
         isAdmin: false,
-        isActive: true
+        isActive: true,
+        configs: {
+          theme: "light",
+          notificationLevel: 0,
+          notificationTime: 1
+        }
       },
       {
         documentId: "doc_01",
@@ -885,7 +895,12 @@ describe('FetchTableService', () => {
         email: "user.one@mail.com",
         displayName: "user_name_1",
         isAdmin: false,
-        isActive: true
+        isActive: true,
+        configs: {
+          theme: "light",
+          notificationLevel: 0,
+          notificationTime: 1
+        }
       }
     ];
 
@@ -955,7 +970,7 @@ describe('FetchTableService', () => {
     );
   });
 
-  it('makeTableData$, Score array empty', (done: DoneFn) => {
+  it('makeTableData$, Score array empty', (done) => {
 
     const argument: Score[] = [];
 
@@ -1006,7 +1021,7 @@ describe('FetchTableService', () => {
   // fetchTableByMatchdays$
   // ---------------------------------------------------------------------------
 
-  it('fetchTableByMatchdays$, all data available, no including of seasonScore', (done: DoneFn) => {
+  it('fetchTableByMatchdays$, all data available, no including of seasonScore', (done) => {
     const argument1: number = 2020;
     const argument2: number[] = [1, 2, 3];
 
@@ -1383,7 +1398,7 @@ describe('FetchTableService', () => {
     );
   });
 
-  it('fetchTableByMatchdays$, all data available, includes seasonScore', (done: DoneFn) => {
+  it('fetchTableByMatchdays$, all data available, includes seasonScore', (done) => {
     const argument1: number = 2020;
     const argument2: number[] = [1, 2, 3];
     const argument3: boolean = true;
@@ -1761,7 +1776,7 @@ describe('FetchTableService', () => {
     );
   });
 
-  it('fetchTableByMatchdays$, scoreSnap is empty, includes seasonScore, one users bets not available in seasonScore', (done: DoneFn) => {
+  it('fetchTableByMatchdays$, scoreSnap is empty, includes seasonScore, one users bets not available in seasonScore', (done) => {
     const argument1: number = 2020;
     const argument2: number[] = [1, 2, 3];
     const argument3: boolean = true;
@@ -1949,7 +1964,7 @@ describe('FetchTableService', () => {
     );
   });
 
-  it('fetchTableByMatchdays$, no matchdays given, no including of seasonScore', (done: DoneFn) => {
+  it('fetchTableByMatchdays$, no matchdays given, no including of seasonScore', (done) => {
     const argument1: number = 2020;
     const argument2: number[] = [];
 
@@ -2050,7 +2065,7 @@ describe('FetchTableService', () => {
     );
   });
 
-  it('fetchTableByMatchdays$, no matchdays given, include seasonScore', (done: DoneFn) => {
+  it('fetchTableByMatchdays$, no matchdays given, include seasonScore', (done) => {
     const argument1: number = 2020;
     const argument2: number[] = [];
     const argument3: boolean = true;

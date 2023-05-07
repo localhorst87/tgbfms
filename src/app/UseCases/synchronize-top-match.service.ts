@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, combineLatest } from 'rxjs';
-import { tap, map, toArray, pluck, delay } from 'rxjs/operators';
+import { map, toArray, pluck } from 'rxjs/operators';
 import { Match, TopMatchVote } from '../Businessrules/basic_datastructures';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { UserInteractionService } from '../Businessrules/user-interaction.service';

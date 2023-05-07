@@ -1,11 +1,11 @@
 import { Component, OnInit, OnChanges, Input, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { MatTable } from '@angular/material/table';
-import { MatSort, Sort } from '@angular/material/sort';
+import { Sort } from '@angular/material/sort';
 import { FetchTableService } from '../UseCases/fetch-table.service';
 import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
 import { TableData } from '../UseCases/output_datastructures';
-import { SEASON, MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
+import { SEASON, MATCHDAYS_PER_SEASON } from '../Businessrules/rule_defined_values';
 
 @Component({
   selector: 'app-table',
@@ -25,7 +25,6 @@ export class TableComponent implements OnInit {
   matchdayEndForm: FormControl; // slider that indicates the end matchday of the calculation
   @ViewChild("allMatchdays") tableAllMatchdays!: MatTable<TableData>;
   @ViewChild("matchday") tableMatchday!: MatTable<TableData>;
-  // @ViewChild('allMatchdays', { read: MatSort, static: true }) sortAll!: MatSort;
   tableDataAllMatchdays: TableData[];
   tableDataMatchday: TableData[];
   propertiesDefault: string[];

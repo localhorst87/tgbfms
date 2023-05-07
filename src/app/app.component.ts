@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { SynchronizeDataService } from './UseCases/synchronize-data.service';
-import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +7,7 @@ import { interval } from 'rxjs';
 })
 export class AppComponent {
 
-  constructor(private syncService: SynchronizeDataService) { }
+  constructor() { }
 
   ngOnInit() { }
 }

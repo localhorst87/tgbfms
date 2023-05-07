@@ -1,11 +1,10 @@
 import { Component, OnInit, OnChanges, Input } from '@angular/core';
-import { Observable, from, interval } from 'rxjs';
-import { toArray, concatMap } from 'rxjs/operators';
+import { interval } from 'rxjs';
+import { toArray } from 'rxjs/operators';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { FetchBetOverviewService } from '../UseCases/fetch-bet-overview.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { BetOverviewFrameData, BetOverviewUserData, SeasonBetOverviewFrameData, SeasonBetOverviewUserData } from '../UseCases/output_datastructures';
-import { User } from '../Businessrules/basic_datastructures';
 import { SEASON, MATCHDAYS_PER_SEASON, NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
 
 const INTERVAL_TIME_REFRESH: number = 1 * 1000; // 1 sec

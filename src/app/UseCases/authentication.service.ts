@@ -35,6 +35,11 @@ export class AuthenticationService {
             displayName: displayName,
             isAdmin: false,
             isActive: false, // will be set to true after email verification
+            configs: {
+              theme: "light",
+              notificationLevel: 0,
+              notificationTime: 1
+            }
           };
           this.appData.setUser(newUser);
 

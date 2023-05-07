@@ -1,10 +1,9 @@
 import { Component, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { Observable, interval, range, of } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
-import { SwiperComponent } from "swiper/angular";
 import SwiperCore from "swiper";
 import { Pagination } from "swiper";
-import { SEASON, MATCHDAYS_PER_SEASON } from '../Businessrules/rule_defined_values';
+import { SEASON } from '../Businessrules/rule_defined_values';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { FetchStatisticsDataService } from '../UseCases/fetch-statistics-data.service';
 import { FetchTableService } from '../UseCases/fetch-table.service';

@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { AppdataAccessService } from './appdata-access.service';
 import { Observable, from, timer } from 'rxjs';
 import { map, switchMap, distinct, take, pluck, takeUntil } from 'rxjs/operators';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
-import firebase from 'firebase/compat/app';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { Bet, Match, Team, User, SeasonBet, SeasonResult, TopMatchVote } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
 import { NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
@@ -568,7 +567,12 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       email: "",
       displayName: "unknown user",
       isAdmin: false,
-      isActive: false
+      isActive: false,
+      configs: {
+        theme: "unknown",
+        notificationLevel: -1,
+        notificationTime: -1
+      }
     };
   }
 

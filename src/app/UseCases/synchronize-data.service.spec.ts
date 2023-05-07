@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { MatchImportData, TeamRankingImportData } from '../Dataaccess/import_datastructures';
-import { Bet, Match, Result, Team, SeasonResult } from '../Businessrules/basic_datastructures';
+import { Match, SeasonResult } from '../Businessrules/basic_datastructures';
 import { SynchronizeDataService } from './synchronize-data.service';
 import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
 import { of, from } from 'rxjs';
@@ -111,9 +111,6 @@ describe('SynchronizeDataService', () => {
     expect(service["syncMatch"]).toHaveBeenCalledWith(argument1, matchImportData[0]);
     expect(service["syncMatch"]).toHaveBeenCalledWith(argument1, matchImportData[1]);
     expect(service["syncMatch"]).toHaveBeenCalledWith(argument1, matchImportData[2]);
-    expect(service["syncResult"]).toHaveBeenCalledWith(argument1, matchImportData[0]);
-    expect(service["syncResult"]).toHaveBeenCalledWith(argument1, matchImportData[1]);
-    expect(service["syncResult"]).toHaveBeenCalledWith(argument1, matchImportData[2]);
     expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, argument2, rankingImportData);
   });
 
@@ -153,7 +150,6 @@ describe('SynchronizeDataService', () => {
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).not.toHaveBeenCalled();
-    expect(service["syncResult"]).not.toHaveBeenCalled();
     expect(service["syncSeasonResult"]).toHaveBeenCalledWith(argument1, argument2, rankingImportData);
   });
 
@@ -193,7 +189,6 @@ describe('SynchronizeDataService', () => {
 
     service.syncData(argument1, argument2);
     expect(service["syncMatch"]).not.toHaveBeenCalled();
-    expect(service["syncResult"]).not.toHaveBeenCalled();
     expect(service["syncSeasonResult"]).not.toHaveBeenCalled();
   });
 
@@ -201,7 +196,7 @@ describe('SynchronizeDataService', () => {
   // isSyncNeeded
   // ---------------------------------------------------------------------------
 
-  it('syncData, match import data is newer', (done: DoneFn) => {
+  it('syncData, match import data is newer', (done) => {
     const argument1: number = 2020;
     const argument2: number = 33;
 
@@ -217,7 +212,7 @@ describe('SynchronizeDataService', () => {
     );
   });
 
-  it('syncData, times equal', (done: DoneFn) => {
+  it('syncData, times equal', (done) => {
     const argument1: number = 2020;
     const argument2: number = 33;
 
@@ -252,7 +247,9 @@ describe('SynchronizeDataService', () => {
       isFinished: false,
       isTopMatch: false,
       teamIdHome: -1,
-      teamIdAway: -1
+      teamIdAway: -1,
+      goalsAway: -1,
+      goalsHome: -1
     };
 
     const transformedMatch: Match = {
@@ -264,7 +261,9 @@ describe('SynchronizeDataService', () => {
       isFinished: argument2.isFinished,
       isTopMatch: appDataMatch.isTopMatch,
       teamIdHome: argument2.teamIdHome,
-      teamIdAway: argument2.teamIdAway
+      teamIdAway: argument2.teamIdAway,
+      goalsAway: argument2.goalsAway,
+      goalsHome: argument2.goalsHome
     };
 
     appDataSpy.getMatch$.withArgs(argument2.matchId).and.returnValue(of(appDataMatch));
@@ -294,7 +293,9 @@ describe('SynchronizeDataService', () => {
       isFinished: argument2.isFinished,
       isTopMatch: true,
       teamIdHome: argument2.teamIdHome,
-      teamIdAway: argument2.teamIdAway
+      teamIdAway: argument2.teamIdAway,
+      goalsAway: argument2.goalsAway,
+      goalsHome: argument2.goalsHome
     };
 
     const transformedMatch: Match = {
@@ -306,7 +307,9 @@ describe('SynchronizeDataService', () => {
       isFinished: appDataMatch.isFinished,
       isTopMatch: appDataMatch.isTopMatch,
       teamIdHome: appDataMatch.teamIdHome,
-      teamIdAway: appDataMatch.teamIdAway
+      teamIdAway: appDataMatch.teamIdAway,
+      goalsAway: argument2.goalsAway,
+      goalsHome: argument2.goalsHome
     };
 
     appDataSpy.getMatch$.withArgs(argument2.matchId).and.returnValue(of(appDataMatch));
@@ -336,7 +339,9 @@ describe('SynchronizeDataService', () => {
       isFinished: argument2.isFinished,
       isTopMatch: true,
       teamIdHome: argument2.teamIdHome,
-      teamIdAway: argument2.teamIdAway
+      teamIdAway: argument2.teamIdAway,
+      goalsAway: argument2.goalsAway,
+      goalsHome: argument2.goalsHome
     };
 
     const transformedMatch: Match = {
@@ -348,7 +353,9 @@ describe('SynchronizeDataService', () => {
       isFinished: appDataMatch.isFinished,
       isTopMatch: appDataMatch.isTopMatch,
       teamIdHome: appDataMatch.teamIdHome,
-      teamIdAway: appDataMatch.teamIdAway
+      teamIdAway: appDataMatch.teamIdAway,
+      goalsAway: appDataMatch.goalsAway,
+      goalsHome: appDataMatch.goalsHome
     };
 
     appDataSpy.getMatch$.withArgs(argument2.matchId).and.returnValue(of(appDataMatch));
@@ -379,148 +386,6 @@ describe('SynchronizeDataService', () => {
     expect(service["convertToMatch"]).not.toHaveBeenCalled();
     expect(appDataSpy.updateMatch).not.toHaveBeenCalled();
     expect(appDataSpy.addMatch).not.toHaveBeenCalled();
-  });
-
-  // ---------------------------------------------------------------------------
-  // syncResult
-  // ---------------------------------------------------------------------------
-
-  it('syncResult, result available and new to app data', () => {
-    const argument1: number = 2021;
-    const argument2: MatchImportData = matchImportData[1];
-
-    const appdataResult: Result = {
-      documentId: "",
-      matchId: argument2.matchId,
-      goalsHome: -1,
-      goalsAway: -1
-    };
-
-    const transformedResult: Result = {
-      documentId: "",
-      matchId: argument2.matchId,
-      goalsHome: argument2.goalsHome,
-      goalsAway: argument2.goalsAway
-    };
-
-    appDataSpy.getResult$.withArgs(argument2.matchId).and.returnValue(of(appdataResult));
-    appDataSpy.addResult.and.stub();
-    appDataSpy.updateResult.and.stub();
-    spyOn<any>(service, "convertToResult").withArgs(argument2).and.returnValue(transformedResult);
-    spyOn<any>(service, "isResultEqual").withArgs(transformedResult, appdataResult).and.returnValue(false);
-    spyOn<any>(service, "checkCounters").and.stub();
-
-    service["syncResult"](argument1, argument2);
-    expect(appDataSpy.addResult).toHaveBeenCalledWith(transformedResult);
-    expect(appDataSpy.updateResult).not.toHaveBeenCalled();
-  });
-
-  it('syncResult, result available and different than in app data', () => {
-    const argument1: number = 2021;
-    const argument2: MatchImportData = matchImportData[1];
-
-    const appdataResult: Result = {
-      documentId: "test_doc_id",
-      matchId: argument2.matchId,
-      goalsHome: argument2.goalsHome,
-      goalsAway: argument2.goalsAway
-    };
-
-    const transformedResult: Result = {
-      documentId: "",
-      matchId: appdataResult.matchId,
-      goalsHome: appdataResult.goalsHome + 1,
-      goalsAway: appdataResult.goalsAway
-    };
-
-    appDataSpy.getResult$.withArgs(argument2.matchId).and.returnValue(of(appdataResult));
-    appDataSpy.addResult.and.stub();
-    appDataSpy.updateResult.and.stub();
-    spyOn<any>(service, "convertToResult").withArgs(argument2).and.returnValue(transformedResult);
-    spyOn<any>(service, "isResultEqual").withArgs(transformedResult, appdataResult).and.returnValue(false);
-    spyOn<any>(service, "checkCounters").and.stub();
-
-    service["syncResult"](argument1, argument2);
-    expect(appDataSpy.addResult).not.toHaveBeenCalled();
-    expect(appDataSpy.updateResult).toHaveBeenCalledWith(appdataResult.documentId, transformedResult);
-  });
-
-  it('syncResult, result available and equal to app data', () => {
-    const argument1: number = 2021;
-    const argument2: MatchImportData = matchImportData[1];
-
-    const appdataResult: Result = {
-      documentId: "test_doc_id",
-      matchId: argument2.matchId,
-      goalsHome: argument2.goalsHome,
-      goalsAway: argument2.goalsAway
-    };
-
-    const transformedResult: Result = {
-      documentId: "",
-      matchId: appdataResult.matchId,
-      goalsHome: appdataResult.goalsHome,
-      goalsAway: appdataResult.goalsAway
-    };
-
-    appDataSpy.getResult$.withArgs(argument2.matchId).and.returnValue(of(appdataResult));
-    appDataSpy.addResult.and.stub();
-    appDataSpy.updateResult.and.stub();
-    spyOn<any>(service, "convertToResult").withArgs(argument2).and.returnValue(transformedResult);
-    spyOn<any>(service, "isResultEqual").withArgs(transformedResult, appdataResult).and.returnValue(true);
-    spyOn<any>(service, "checkCounters").and.stub();
-
-    service["syncResult"](argument1, argument2);
-    expect(appDataSpy.addResult).not.toHaveBeenCalled();
-    expect(appDataSpy.updateResult).not.toHaveBeenCalled();
-  });
-
-  it('syncResult, result not available', () => {
-    const argument1: number = 2021;
-    const argument2: MatchImportData = matchImportData[2]; // goalsHome == goalsAway == -1
-
-    const appdataResult: Result = {
-      documentId: "test_doc_id",
-      matchId: argument2.matchId,
-      goalsHome: argument2.goalsHome,
-      goalsAway: argument2.goalsAway
-    };
-
-    const transformedResult: Result = {
-      documentId: "",
-      matchId: appdataResult.matchId,
-      goalsHome: appdataResult.goalsHome,
-      goalsAway: appdataResult.goalsAway
-    };
-
-    appDataSpy.getResult$.withArgs(argument2.matchId).and.returnValue(of(appdataResult));
-    appDataSpy.addResult.and.stub();
-    appDataSpy.updateResult.and.stub();
-    spyOn<any>(service, "convertToResult").withArgs(argument2).and.returnValue(transformedResult);
-    spyOn<any>(service, "isResultEqual").withArgs(transformedResult, appdataResult).and.returnValue(true);
-    spyOn<any>(service, "checkCounters").and.stub();
-
-    service["syncResult"](argument1, argument2);
-    expect(service["isResultEqual"]).not.toHaveBeenCalled();
-    expect(appDataSpy.addResult).not.toHaveBeenCalled();
-    expect(appDataSpy.updateResult).not.toHaveBeenCalled();
-  });
-
-  it('syncResult, getResult not emitting', () => {
-    const argument: MatchImportData = matchImportData[0];
-
-    appDataSpy.getResult$.withArgs(argument.matchId).and.returnValue(of());
-    appDataSpy.addResult.and.stub();
-    appDataSpy.updateResult.and.stub();
-    spyOn<any>(service, "convertToResult").and.callThrough();
-    spyOn<any>(service, "isResultEqual").and.callThrough();
-    spyOn<any>(service, "checkCounters").and.stub();
-
-    service["syncResult"](2021, argument);
-    expect(service["convertToResult"]).not.toHaveBeenCalled();
-    expect(service["isResultEqual"]).not.toHaveBeenCalled();
-    expect(appDataSpy.addResult).not.toHaveBeenCalled();
-    expect(appDataSpy.updateResult).not.toHaveBeenCalled();
   });
 
   // ---------------------------------------------------------------------------

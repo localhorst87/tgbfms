@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { AuthenticationService } from './authentication.service';
-import { NgZone } from '@angular/core';
 import { of } from 'rxjs';
 import { Router } from "@angular/router";
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -212,7 +211,12 @@ describe('AuthenticationService', () => {
       email: email,
       displayName: "test_user",
       isAdmin: false,
-      isActive: true
+      isActive: true,
+      configs: {
+        theme: "light",
+        notificationLevel: 0,
+        notificationTime: 1
+      }
     };
 
     appDataSpy.getUserDataById$.and.returnValue(of(userFromApp));
@@ -240,7 +244,12 @@ describe('AuthenticationService', () => {
       email: email,
       displayName: "test_user",
       isAdmin: false,
-      isActive: false
+      isActive: false,
+      configs: {
+        theme: "light",
+        notificationLevel: 0,
+        notificationTime: 1
+      }
     };
 
     appDataSpy.getUserDataById$.and.returnValue(of(userFromApp));

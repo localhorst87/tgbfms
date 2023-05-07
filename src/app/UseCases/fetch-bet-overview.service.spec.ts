@@ -4,7 +4,7 @@ import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { PointCalculatorService } from '../Businessrules/point-calculator.service';
 import { FetchBetOverviewService } from './fetch-bet-overview.service';
 import { BetOverviewFrameData, BetOverviewUserData, SeasonBetOverviewUserData, SeasonBetOverviewFrameData } from './output_datastructures';
-import { Bet, Match, Result, SeasonBet, SeasonResult, User, Team } from '../Businessrules/basic_datastructures';
+import { Bet, Match, SeasonBet, SeasonResult, User, Team } from '../Businessrules/basic_datastructures';
 import { POINTS_ADDED_OUTSIDER_TWO, POINTS_ADDED_OUTSIDER_ONE } from '../Businessrules/rule_defined_values';
 import { of, from } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
@@ -16,7 +16,6 @@ describe('FetchBetOverviewService', () => {
 
   let userData: User[];
   let bets: Bet[];
-  let results: Result[];
   let matches: Match[];
   let seasonBets: SeasonBet[];
   let seasonResults: SeasonResult[];
@@ -48,7 +47,12 @@ describe('FetchBetOverviewService', () => {
         email: "user1@email.com",
         displayName: "test_user_id_1",
         isAdmin: false,
-        isActive: true
+        isActive: true,
+        configs: {
+          theme: "light",
+          notificationLevel: 0,
+          notificationTime: 1
+        }
       },
       {
         documentId: "userdata_document_id_0",
@@ -56,7 +60,12 @@ describe('FetchBetOverviewService', () => {
         email: "user1@email.com",
         displayName: "test_user_id_1",
         isAdmin: false,
-        isActive: true
+        isActive: true,
+        configs: {
+          theme: "light",
+          notificationLevel: 0,
+          notificationTime: 1
+        }
       },
     ];
 
@@ -70,7 +79,9 @@ describe('FetchBetOverviewService', () => {
         isFinished: true,
         isTopMatch: false,
         teamIdHome: 211,
-        teamIdAway: 93
+        teamIdAway: 93,
+        goalsAway: 1,
+        goalsHome: 0
       },
       {
         documentId: "doc_id_1",
@@ -81,7 +92,9 @@ describe('FetchBetOverviewService', () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 13,
-        teamIdAway: 6
+        teamIdAway: 6,
+        goalsAway: 1,
+        goalsHome: 0
       }
     ];
 
@@ -290,21 +303,6 @@ describe('FetchBetOverviewService', () => {
       },
     ];
 
-    results = [
-      {
-        documentId: "result_document_id_0",
-        matchId: matches[0].matchId,
-        goalsHome: 2,
-        goalsAway: 0
-      },
-      {
-        documentId: "result_document_id_1",
-        matchId: matches[1].matchId,
-        goalsHome: 0,
-        goalsAway: 0
-      }
-    ];
-
     seasonResults = [
       {
         documentId: "result_document_id_0",
@@ -348,8 +346,8 @@ describe('FetchBetOverviewService', () => {
         teamNameAway: teams[11].nameLong,
         teamNameShortHome: teams[10].nameShort,
         teamNameShortAway: teams[11].nameShort,
-        resultGoalsHome: results[0].goalsHome,
-        resultGoalsAway: results[0].goalsAway,
+        resultGoalsHome: matches[0].goalsHome,
+        resultGoalsAway: matches[0].goalsAway,
         isMatchFinished: matches[0].isFinished,
         isBetFixed: false
       },
@@ -361,8 +359,8 @@ describe('FetchBetOverviewService', () => {
         teamNameAway: teams[13].nameLong,
         teamNameShortHome: teams[12].nameShort,
         teamNameShortAway: teams[13].nameShort,
-        resultGoalsHome: results[1].goalsHome,
-        resultGoalsAway: results[1].goalsAway,
+        resultGoalsHome: matches[1].goalsHome,
+        resultGoalsAway: matches[1].goalsAway,
         isMatchFinished: matches[1].isFinished,
         isBetFixed: true
       }
@@ -542,7 +540,7 @@ describe('FetchBetOverviewService', () => {
   // fetchFrameDataByMatchday$
   // ---------------------------------------------------------------------------
 
-  it('fetchFrameDataByMatchday$, matches available', (done: DoneFn) => {
+  it('fetchFrameDataByMatchday$, matches available', (done) => {
     const argument1: number = 2020;
     const argument2: number = 28;
     const argument3: string = "test_user_id";
@@ -561,7 +559,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('fetchFrameDataByMatchday$, emitting FrameData twice', (done: DoneFn) => {
+  it('fetchFrameDataByMatchday$, emitting FrameData twice', (done) => {
     const argument1: number = 2020;
     const argument2: number = 28;
     const argument3: string = "test_user_id";
@@ -580,7 +578,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('fetchFrameDataByMatchday$, no matches available', (done: DoneFn) => {
+  it('fetchFrameDataByMatchday$, no matches available', (done) => {
     const argument1: number = 2020;
     const argument2: number = 28;
     const argument3: string = "test_user_id";
@@ -600,7 +598,7 @@ describe('FetchBetOverviewService', () => {
   // fetchSeasonFrameData$
   // ---------------------------------------------------------------------------
 
-  it('fetchSeasonFrameData$, data available', (done: DoneFn) => {
+  it('fetchSeasonFrameData$, data available', (done) => {
     const argument1: number = 2021;
     const argument2: string = "test_user_id";
 
@@ -624,7 +622,7 @@ describe('FetchBetOverviewService', () => {
   // fetchUserSeasonBetData$
   // ---------------------------------------------------------------------------
 
-  it('fetchUserSeasonBetData$, bets available, no userId argument given', (done: DoneFn) => {
+  it('fetchUserSeasonBetData$, bets available, no userId argument given', (done) => {
     const argument1: number = 2021;
     const argument2: number = 1;
 
@@ -661,7 +659,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('fetchUserSeasonBetData$, bets available, dummy userId argument given', (done: DoneFn) => {
+  it('fetchUserSeasonBetData$, bets available, dummy userId argument given', (done) => {
     const argument1: number = 2021;
     const argument2: number = 1;
     const argument3: string = userData[0].id;
@@ -717,7 +715,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('fetchUserSeasonBetData$, no bets available', (done: DoneFn) => {
+  it('fetchUserSeasonBetData$, no bets available', (done) => {
     const argument1: number = 2021;
     const argument2: number = 3;
 
@@ -745,7 +743,7 @@ describe('FetchBetOverviewService', () => {
   // fetchUserBetDataByMatchday$
   // ---------------------------------------------------------------------------
 
-  it('fetchUserBetDataByMatchday$, bets available, argument2 not given', (done: DoneFn) => {
+  it('fetchUserBetDataByMatchday$, bets available, argument2 not given', (done) => {
     const argument1: number = matches[0].matchId;
 
     spyOn<any>(service, "getAllUserBets$").and.returnValues(from(bets));
@@ -762,7 +760,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('fetchUserBetDataByMatchday$, bets available, argument2 given', (done: DoneFn) => {
+  it('fetchUserBetDataByMatchday$, bets available, argument2 given', (done) => {
     const argument1: number = matches[0].matchId;
     const argument2: string = "test_user_id_1";
 
@@ -780,7 +778,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('fetchUserBetDataByMatchday$, emitting BetData twice', (done: DoneFn) => {
+  it('fetchUserBetDataByMatchday$, emitting BetData twice', (done) => {
     const argument: number = matches[0].matchId;
 
     spyOn<any>(service, "getAllUserBets$").and.returnValues(from(bets));
@@ -796,7 +794,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('fetchFrameDataByMatchday$, no bets available', (done: DoneFn) => {
+  it('fetchFrameDataByMatchday$, no bets available', (done) => {
     const argument: number = matches[0].matchId;
 
     spyOn<any>(service, "getAllUserBets$").and.returnValues(from([]));
@@ -814,7 +812,7 @@ describe('FetchBetOverviewService', () => {
   // makeFrameData$
   // ---------------------------------------------------------------------------
 
-  it('makeFrameData$, bets available', (done: DoneFn) => {
+  it('makeFrameData$, bets available', (done) => {
     const argument1: Match = matches[0]; // match 58815
     const argument2: string = bets[1].userId; // user 2
 
@@ -830,10 +828,6 @@ describe('FetchBetOverviewService', () => {
       .withArgs(bets[2].matchId, bets[2].userId).and.returnValue(of(bets[2]))
       .withArgs(bets[3].matchId, bets[3].userId).and.returnValue(of(bets[3]));
 
-    appDataSpy.getResult$
-      .withArgs(results[0].matchId).and.returnValue(of(results[0]))
-      .withArgs(results[1].matchId).and.returnValue(of(results[1]));
-
     service["makeFrameData$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedFrameValues[0]);
@@ -842,7 +836,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('makeFrameData$, observables emitting more than one value', (done: DoneFn) => {
+  it('makeFrameData$, observables emitting more than one value', (done) => {
     const argument1: Match = matches[0]; // match 58815
     const argument2: string = bets[1].userId; // user 2
 
@@ -858,10 +852,6 @@ describe('FetchBetOverviewService', () => {
       .withArgs(bets[2].matchId, bets[2].userId).and.returnValue(of(bets[0], bets[1], bets[2]))
       .withArgs(bets[3].matchId, bets[3].userId).and.returnValue(of(bets[3]));
 
-    appDataSpy.getResult$
-      .withArgs(results[0].matchId).and.returnValue(of(results[0], results[0]))
-      .withArgs(results[1].matchId).and.returnValue(of(results[0], results[1]));
-
     service["makeFrameData$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedFrameValues[0]);
@@ -870,7 +860,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('makeFrameData$, at least one observable not emitting', (done: DoneFn) => {
+  it('makeFrameData$, at least one observable not emitting', (done) => {
     const argument1: Match = matches[0]; // match 58815
     const argument2: string = bets[1].userId; // user 2
 
@@ -886,10 +876,6 @@ describe('FetchBetOverviewService', () => {
       .withArgs(bets[2].matchId, bets[2].userId).and.returnValue(of(bets[2]))
       .withArgs(bets[3].matchId, bets[3].userId).and.returnValue(of(bets[3]));
 
-    appDataSpy.getResult$
-      .withArgs(results[0].matchId).and.returnValue(of(results[0]))
-      .withArgs(results[1].matchId).and.returnValue(of(results[1]));
-
     service["makeFrameData$"](argument1, argument2).pipe(
       defaultIfEmpty(defaultFrameValue)).subscribe(
         val => {
@@ -903,7 +889,7 @@ describe('FetchBetOverviewService', () => {
   // makeSeasonFrameData$
   // ---------------------------------------------------------------------------
 
-  it('makeSeasonFrameData$, bets available', (done: DoneFn) => {
+  it('makeSeasonFrameData$, bets available', (done) => {
     const argument1: number = 2021;
     const argument2: number = 1;
     const argument3: string = userData[0].id;
@@ -932,7 +918,7 @@ describe('FetchBetOverviewService', () => {
   // getAllUserBets$
   // ---------------------------------------------------------------------------
 
-  it('getAllUserBets$, bets available, second argument not given', (done: DoneFn) => {
+  it('getAllUserBets$, bets available, second argument not given', (done) => {
     const argument1: number = matches[0].matchId;
 
     appDataSpy.getActiveUserIds$.and.returnValue(of(userData[0].id, userData[1].id));
@@ -953,7 +939,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('getAllUserBets$, bets available, second argument given', (done: DoneFn) => {
+  it('getAllUserBets$, bets available, second argument given', (done) => {
     const argument1: number = matches[0].matchId;
     const argument2: string = userData[0].id;
 
@@ -984,7 +970,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('getAllUserBets$, bets emitted twice', (done: DoneFn) => {
+  it('getAllUserBets$, bets emitted twice', (done) => {
     const argument: number = matches[0].matchId;
 
     appDataSpy.getActiveUserIds$.and.returnValue(of(userData[0].id, userData[1].id));
@@ -1005,7 +991,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('getAllUserBets$, no bets emitted', (done: DoneFn) => {
+  it('getAllUserBets$, no bets emitted', (done) => {
     const argument: number = matches[0].matchId;
 
     appDataSpy.getActiveUserIds$.and.returnValue(of(userData[0].id, userData[1].id));
@@ -1037,7 +1023,7 @@ describe('FetchBetOverviewService', () => {
   // getAllUserSeasonBets$
   // ---------------------------------------------------------------------------
 
-  it('getAllUserSeasonBets$, bets available, dummy userId argument not given', (done: DoneFn) => {
+  it('getAllUserSeasonBets$, bets available, dummy userId argument not given', (done) => {
     const argument1: number = 2021;
     const argument2: number = -3;
 
@@ -1066,7 +1052,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('getAllUserSeasonBets$, bets available, dummy userId argument given', (done: DoneFn) => {
+  it('getAllUserSeasonBets$, bets available, dummy userId argument given', (done) => {
     const argument1: number = 2021;
     const argument2: number = -3;
     const argument3: string = userData[0].id;
@@ -1104,7 +1090,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('getAllUserSeasonBets$, some bets emitted twice', (done: DoneFn) => {
+  it('getAllUserSeasonBets$, some bets emitted twice', (done) => {
     const argument1: number = 2021;
     const argument2: number = -3;
 
@@ -1132,7 +1118,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('getAllUserSeasonBets$, no bets emitted', (done: DoneFn) => {
+  it('getAllUserSeasonBets$, no bets emitted', (done) => {
     const argument1: number = 2021;
     const argument2: number = 3;
 
@@ -1161,7 +1147,7 @@ describe('FetchBetOverviewService', () => {
   // makeBetData$
   // ---------------------------------------------------------------------------
 
-  it('makeBetData$, data available', (done: DoneFn) => {
+  it('makeBetData$, data available', (done) => {
     const argument: Bet[] = bets;
 
     appDataSpy.getUserDataById$
@@ -1183,7 +1169,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('makeBetData$, data not available', (done: DoneFn) => {
+  it('makeBetData$, data not available', (done) => {
     const argument: Bet[] = bets;
 
     appDataSpy.getUserDataById$
@@ -1203,7 +1189,7 @@ describe('FetchBetOverviewService', () => {
   // makeSeasonBetData$
   // ---------------------------------------------------------------------------
 
-  it('makeSeasonBetData$, data available', (done: DoneFn) => {
+  it('makeSeasonBetData$, data available', (done) => {
     const argument: SeasonBet = seasonBets[0];
 
     appDataSpy.getUserDataById$
@@ -1221,7 +1207,7 @@ describe('FetchBetOverviewService', () => {
     );
   });
 
-  it('makeSeasonBetData$, user data not available', (done: DoneFn) => {
+  it('makeSeasonBetData$, user data not available', (done) => {
     const argument: SeasonBet = seasonBets[0];
 
     appDataSpy.getUserDataById$

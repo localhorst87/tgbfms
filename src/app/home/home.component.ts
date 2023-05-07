@@ -1,11 +1,10 @@
-import { Component, OnInit, EventEmitter, Renderer2 } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
-import { combineLatest, timer, of } from 'rxjs';
-import { switchMap, delay } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { AuthenticationService } from '../UseCases/authentication.service';
-import { Bet, SeasonBet, User } from '../Businessrules/basic_datastructures';
+import { User } from '../Businessrules/basic_datastructures';
 import { SEASON } from '../Businessrules/rule_defined_values';
 
 const BET_FIX_CYCLE: number = 1 * 60 * 1000; // cycle time in [ms] that is used to check if Bets needs to be fixed
@@ -41,7 +40,12 @@ export class HomeComponent implements OnInit {
       email: "",
       displayName: "",
       isAdmin: false,
-      isActive: false
+      isActive: false,
+      configs: {
+        theme: "light",
+        notificationLevel: 0,
+        notificationTime: 1
+      }
     };
 
     this.selectedPage = "dashboard";

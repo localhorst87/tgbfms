@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, from, iif, combineLatest, range, concat } from 'rxjs';
-import { map, tap, concatMap, toArray, reduce, scan, pluck, defaultIfEmpty } from 'rxjs/operators';
+import { map, concatMap, toArray, reduce, scan, pluck, defaultIfEmpty } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';
 import { Score, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';

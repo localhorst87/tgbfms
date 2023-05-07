@@ -1,12 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AppdataAccessFirestoreService } from './appdata-access-firestore.service';
-// import { AppdataAccessService } from './appdata-access.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { of } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
-import { COLLECTION_NAME_BETS, COLLECTION_NAME_MATCHES, COLLECTION_NAME_RESULTS, COLLECTION_NAME_TEAMS, COLLECTION_NAME_USERS } from './appdata-access-firestore.service';
-import { Bet, Result, Match, User, Team, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
+import { Bet, Match, User, Team, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
 
 describe('AppdataAccessFirestoreService', () => {
@@ -23,7 +21,7 @@ describe('AppdataAccessFirestoreService', () => {
   // getBet$
   // ---------------------------------------------------------------------------
 
-  it("getBet$, one dataset", (done: DoneFn) => {
+  it("getBet$, one dataset", (done) => {
     const argument1: number = 9999;
     const argument2: string = "test_user_id";
 
@@ -45,7 +43,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getBet$, more than one dataset", (done: DoneFn) => {
+  it("getBet$, more than one dataset", (done) => {
     const argument1: number = 9999;
     const argument2: string = "test_user_id";
 
@@ -68,7 +66,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getBet$, emitting twice", (done: DoneFn) => {
+  it("getBet$, emitting twice", (done) => {
     const argument1: number = 9999;
     const argument2: string = "test_user_id";
 
@@ -91,7 +89,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getBet$, no dataset available", (done: DoneFn) => {
+  it("getBet$, no dataset available", (done) => {
     const argument1: number = 9999;
     const argument2: string = "test_user_id";
 
@@ -117,7 +115,7 @@ describe('AppdataAccessFirestoreService', () => {
   // getSeasonBet$
   // ---------------------------------------------------------------------------
 
-  it("getSeasonBet$, data available", (done: DoneFn) => {
+  it("getSeasonBet$, data available", (done) => {
     const argument1: number = 2020;
     const argument2: number = 1;
     const argument3: string = "test_user_id";
@@ -148,7 +146,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonBet$, same dataset twice", (done: DoneFn) => {
+  it("getSeasonBet$, same dataset twice", (done) => {
     const argument1: number = 2020;
     const argument2: number = 1;
     const argument3: string = "test_user_id";
@@ -179,7 +177,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonBet$, emitting twice", (done: DoneFn) => {
+  it("getSeasonBet$, emitting twice", (done) => {
     const argument1: number = 2020;
     const argument2: number = 2;
     const argument3: string = "test_user_id";
@@ -210,7 +208,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonBet$, no dataset available", (done: DoneFn) => {
+  it("getSeasonBet$, no dataset available", (done) => {
     const argument1: number = 2020;
     const argument2: number = -2;
     const argument3: string = "test_user_id";
@@ -245,7 +243,7 @@ describe('AppdataAccessFirestoreService', () => {
   // getSeasonResults$
   // ---------------------------------------------------------------------------
 
-  it("getSeasonResult$, data available", (done: DoneFn) => {
+  it("getSeasonResult$, data available", (done) => {
     const argument1: number = 2020;
     const argument2: number = -1;
 
@@ -273,7 +271,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonResult$, same data twice available", (done: DoneFn) => {
+  it("getSeasonResult$, same data twice available", (done) => {
     const argument1: number = 2020;
     const argument2: number = -1;
 
@@ -301,7 +299,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonResult$, data emitted twice", (done: DoneFn) => {
+  it("getSeasonResult$, data emitted twice", (done) => {
     const argument1: number = 2020;
     const argument2: number = -1;
 
@@ -329,7 +327,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSeasonResult$, no data available", (done: DoneFn) => {
+  it("getSeasonResult$, no data available", (done) => {
     const argument1: number = 2020;
     const argument2: number = -1;
 
@@ -357,105 +355,18 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  // ---------------------------------------------------------------------------
-  // getResult$
-  // ---------------------------------------------------------------------------
-
-  it("getResult$, one dataset", (done: DoneFn) => {
-    const argument: number = 9999;
-
-    const targetResult: Result = { documentId: "test_id_123", matchId: argument, goalsHome: 2, goalsAway: 1 };
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetResult])) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValue: Result[] = [targetResult];
-
-    let i: number = 0;
-    service["getResult$"](argument).subscribe(
-      val => {
-        expect(val).toEqual(expectedValue[i++]);
-        done();
-      }
-    );
-  });
-
-  it("getResult$, more than one dataset", (done: DoneFn) => {
-    const argument: number = 9999;
-
-    const targetResult: Result = { documentId: "test_id_123", matchId: argument, goalsHome: 2, goalsAway: 1 };
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetResult, targetResult])) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValue: Result[] = [targetResult];
-
-    let i: number = 0;
-    service["getResult$"](argument).subscribe(
-      val => {
-        expect(val).toEqual(expectedValue[i++]);
-        done();
-      }
-    );
-  });
-
-  it("getResult$, emitting twice", (done: DoneFn) => {
-    const argument: number = 9999;
-
-    const targetResult: Result = { documentId: "test_id_123", matchId: argument, goalsHome: 2, goalsAway: 1 };
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetResult], [targetResult])) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValue: Result[] = [targetResult];
-
-    let i: number = 0;
-    service["getResult$"](argument).subscribe(
-      val => {
-        expect(val).toEqual(expectedValue[i++]);
-        done();
-      }
-    );
-  });
-
-  it("getResult$, no dataset available", (done: DoneFn) => {
-    const argument: number = 9999;
-
-    const unknownResult: Result = { documentId: "", matchId: argument, goalsHome: -1, goalsAway: -1 };
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValue: Result[] = [unknownResult];
-
-    let i: number = 0;
-    service["getResult$"](argument).subscribe(
-      val => {
-        expect(val).toEqual(expectedValue[i++]);
-        done();
-      }
-    );
-  });
 
   // ---------------------------------------------------------------------------
   // getMatchesByMatchday$
   // ---------------------------------------------------------------------------
 
-  it("getMatchesByMatchday$, datasets available", (done: DoneFn) => {
+  it("getMatchesByMatchday$, datasets available", (done) => {
     const argument1: number = 2021;
     const argument2: number = 34;
 
-    const match1: Match = { documentId: "test_id_1", season: argument1, matchday: argument2, matchId: 1, timestamp: 1617640000, isFinished: true, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
-    const match2: Match = { documentId: "test_id_2", season: argument1, matchday: argument2, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26 };
-    const match3: Match = { documentId: "test_id_3", season: argument1, matchday: argument2, matchId: 3, timestamp: 1617650000, isFinished: false, isTopMatch: false, teamIdHome: 5, teamIdAway: 2 };
+    const match1: Match = { documentId: "test_id_1", season: argument1, matchday: argument2, matchId: 1, timestamp: 1617640000, isFinished: true, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
+    const match2: Match = { documentId: "test_id_2", season: argument1, matchday: argument2, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26, goalsAway: 0, goalsHome: 0 };
+    const match3: Match = { documentId: "test_id_3", season: argument1, matchday: argument2, matchId: 3, timestamp: 1617650000, isFinished: false, isTopMatch: false, teamIdHome: 5, teamIdAway: 2, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([match1, match2, match3])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -473,13 +384,13 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getMatchesByMatchday$, double datasets available", (done: DoneFn) => {
+  it("getMatchesByMatchday$, double datasets available", (done) => {
     const argument1: number = 2021;
     const argument2: number = 34;
 
-    const match1: Match = { documentId: "test_id_1", season: argument1, matchday: argument2, matchId: 1, timestamp: 1617640000, isFinished: true, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
-    const match2: Match = { documentId: "test_id_2", season: argument1, matchday: argument2, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26 };
-    const match3: Match = { documentId: "test_id_3", season: argument1, matchday: argument2, matchId: 3, timestamp: 1617650000, isFinished: false, isTopMatch: false, teamIdHome: 5, teamIdAway: 2 };
+    const match1: Match = { documentId: "test_id_1", season: argument1, matchday: argument2, matchId: 1, timestamp: 1617640000, isFinished: true, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
+    const match2: Match = { documentId: "test_id_2", season: argument1, matchday: argument2, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26, goalsAway: 0, goalsHome: 0 };
+    const match3: Match = { documentId: "test_id_3", season: argument1, matchday: argument2, matchId: 3, timestamp: 1617650000, isFinished: false, isTopMatch: false, teamIdHome: 5, teamIdAway: 2, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([match1, match2, match2, match3, match3])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -497,13 +408,13 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getMatchesByMatchday$, emitting twice", (done: DoneFn) => {
+  it("getMatchesByMatchday$, emitting twice", (done) => {
     const argument1: number = 2021;
     const argument2: number = 34;
 
-    const match1: Match = { documentId: "test_id_1", season: argument1, matchday: argument2, matchId: 1, timestamp: 1617640000, isFinished: true, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
-    const match2: Match = { documentId: "test_id_2", season: argument1, matchday: argument2, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26 };
-    const match3: Match = { documentId: "test_id_3", season: argument1, matchday: argument2, matchId: 3, timestamp: 1617650000, isFinished: false, isTopMatch: false, teamIdHome: 5, teamIdAway: 2 };
+    const match1: Match = { documentId: "test_id_1", season: argument1, matchday: argument2, matchId: 1, timestamp: 1617640000, isFinished: true, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
+    const match2: Match = { documentId: "test_id_2", season: argument1, matchday: argument2, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26, goalsAway: 0, goalsHome: 0 };
+    const match3: Match = { documentId: "test_id_3", season: argument1, matchday: argument2, matchId: 3, timestamp: 1617650000, isFinished: false, isTopMatch: false, teamIdHome: 5, teamIdAway: 2, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([match1, match2, match3], [match1, match2, match3])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -521,11 +432,11 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getMatchesByMatchday$, no datasets available", (done: DoneFn) => {
+  it("getMatchesByMatchday$, no datasets available", (done) => {
     const argument1: number = 2021;
     const argument2: number = 34;
 
-    const defaultValue: Match = { documentId: "default", season: argument1, matchday: argument2, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1 };
+    const defaultValue: Match = { documentId: "default", season: argument1, matchday: argument2, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1, goalsAway: -1, goalsHome: -1 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -545,11 +456,11 @@ describe('AppdataAccessFirestoreService', () => {
   // getNextMatchesByTime$
   // ---------------------------------------------------------------------------
 
-  it("getNextMatchesByTime$, datasets available", (done: DoneFn) => {
+  it("getNextMatchesByTime$, datasets available", (done) => {
     const argument: number = 6;
 
-    const match1: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
-    const match2: Match = { documentId: "test_id_2", season: 2020, matchday: 28, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26 };
+    const match1: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
+    const match2: Match = { documentId: "test_id_2", season: 2020, matchday: 28, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([match1, match2])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -567,10 +478,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getNextMatchesByTime$, double datasets available", (done: DoneFn) => {
+  it("getNextMatchesByTime$, double datasets available", (done) => {
     const argument: number = 6;
 
-    const match1: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
+    const match1: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([match1, match1, match1])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -588,12 +499,12 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getNextMatchesByTime$, emitting twice", (done: DoneFn) => {
+  it("getNextMatchesByTime$, emitting twice", (done) => {
     const argument: number = 6;
 
-    const match1: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
-    const match2: Match = { documentId: "test_id_2", season: 2020, matchday: 28, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26 };
-    const match3: Match = { documentId: "test_id_3", season: 2020, matchday: 29, matchId: 3, timestamp: 1617650000, isFinished: false, isTopMatch: true, teamIdHome: 5, teamIdAway: 2 };
+    const match1: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
+    const match2: Match = { documentId: "test_id_2", season: 2020, matchday: 28, matchId: 2, timestamp: 1617645000, isFinished: false, isTopMatch: false, teamIdHome: 31, teamIdAway: 26, goalsAway: 0, goalsHome: 0 };
+    const match3: Match = { documentId: "test_id_3", season: 2020, matchday: 29, matchId: 3, timestamp: 1617650000, isFinished: false, isTopMatch: true, teamIdHome: 5, teamIdAway: 2, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([match1, match2, match3], [match1, match2, match3])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -611,10 +522,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getNextMatchesByTime$, no datasets available", (done: DoneFn) => {
+  it("getNextMatchesByTime$, no datasets available", (done) => {
     const argument: number = 1;
 
-    const defaultValue: Match = { documentId: "default", season: -1, matchday: -1, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1 };
+    const defaultValue: Match = { documentId: "default", season: -1, matchday: -1, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1, goalsAway: -1, goalsHome: -1 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -634,11 +545,11 @@ describe('AppdataAccessFirestoreService', () => {
   // getMatchdayByMatchId$
   // ---------------------------------------------------------------------------
 
-  it("getMatchdayByMatchId$, dataset available", (done: DoneFn) => {
+  it("getMatchdayByMatchId$, dataset available", (done) => {
     const argument: number = 9999;
     const expectedMatchday: number = 28;
 
-    const match: Match = { documentId: "test_id", season: 2020, matchday: expectedMatchday, matchId: argument, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
+    const match: Match = { documentId: "test_id", season: 2020, matchday: expectedMatchday, matchId: argument, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([match])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -656,11 +567,11 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getMatchdayByMatchId$, more than one dataset", (done: DoneFn) => {
+  it("getMatchdayByMatchId$, more than one dataset", (done) => {
     const argument: number = 9999;
     const expectedMatchday: number = 28;
 
-    const match: Match = { documentId: "test_id", season: 2020, matchday: expectedMatchday, matchId: argument, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
+    const match: Match = { documentId: "test_id", season: 2020, matchday: expectedMatchday, matchId: argument, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([match, match, match])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -678,11 +589,11 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getMatchdayByMatchId$, emitting twice", (done: DoneFn) => {
+  it("getMatchdayByMatchId$, emitting twice", (done) => {
     const argument: number = 9999;
     const expectedMatchday: number = 28;
 
-    const match: Match = { documentId: "test_id", season: 2020, matchday: expectedMatchday, matchId: argument, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
+    const match: Match = { documentId: "test_id", season: 2020, matchday: expectedMatchday, matchId: argument, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([match], [match])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -700,7 +611,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getMatchdayByMatchId$, no dataset available", (done: DoneFn) => {
+  it("getMatchdayByMatchId$, no dataset available", (done) => {
     const argument: number = 9999;
     const expectedMatchday: number = -1;
 
@@ -725,10 +636,10 @@ describe('AppdataAccessFirestoreService', () => {
   // getNextMatch$
   // ---------------------------------------------------------------------------
 
-  it("getNextMatch$, dataset available, no amount arugment given", (done: DoneFn) => {
+  it("getNextMatch$, dataset available, no amount arugment given", (done) => {
     const argument: number = 2020;
 
-    const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
+    const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetMatch])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -746,10 +657,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getNextMatch$, emitting twice", (done: DoneFn) => {
+  it("getNextMatch$, emitting twice", (done) => {
     const argument: number = 2020;
 
-    const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
+    const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: 0, goalsHome: 0 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetMatch], [targetMatch])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -767,7 +678,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getNextMatch$, dataset available, amount arugment given", (done: DoneFn) => {
+  it("getNextMatch$, dataset available, amount arugment given", (done) => {
     const argument1: number = 2020;
     const argument2: number = 3;
 
@@ -781,7 +692,9 @@ describe('AppdataAccessFirestoreService', () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 10,
-        teamIdAway: 20
+        teamIdAway: 20,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "test_id_2",
@@ -792,7 +705,9 @@ describe('AppdataAccessFirestoreService', () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 11,
-        teamIdAway: 21
+        teamIdAway: 21,
+        goalsAway: -1,
+        goalsHome: -1
       },
       {
         documentId: "test_id_3",
@@ -803,7 +718,9 @@ describe('AppdataAccessFirestoreService', () => {
         isFinished: false,
         isTopMatch: true,
         teamIdHome: 12,
-        teamIdAway: 22
+        teamIdAway: 22,
+        goalsAway: -1,
+        goalsHome: -1
       }
     ];
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of(targetMatches)) };
@@ -823,10 +740,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getNextMatch$, no dataset available", (done: DoneFn) => {
+  it("getNextMatch$, no dataset available", (done) => {
     const argument: number = 2020;
 
-    const unknownMatch: Match = { documentId: "", season: -1, matchday: -1, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1 };
+    const unknownMatch: Match = { documentId: "", season: -1, matchday: -1, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1, goalsAway: -1, goalsHome: -1 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -848,10 +765,10 @@ describe('AppdataAccessFirestoreService', () => {
   // getLastMatch$
   // ---------------------------------------------------------------------------
 
-  it("getLastMatch$, dataset available", (done: DoneFn) => {
+  it("getLastMatch$, dataset available", (done) => {
     const argument: number = 2020;
 
-    const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
+    const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: -1, goalsHome: -1 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetMatch])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -869,10 +786,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getLastMatch$, emitting twice", (done: DoneFn) => {
+  it("getLastMatch$, emitting twice", (done) => {
     const argument: number = 2020;
 
-    const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20 };
+    const targetMatch: Match = { documentId: "test_id_1", season: 2020, matchday: 28, matchId: 1, timestamp: 1617640000, isFinished: false, isTopMatch: true, teamIdHome: 10, teamIdAway: 20, goalsAway: -1, goalsHome: -1 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetMatch], [targetMatch])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -890,10 +807,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getLastMatch$, no dataset available", (done: DoneFn) => {
+  it("getLastMatch$, no dataset available", (done) => {
     const argument: number = 2020;
 
-    const unknownMatch: Match = { documentId: "", season: -1, matchday: -1, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1 };
+    const unknownMatch: Match = { documentId: "", season: -1, matchday: -1, matchId: -1, timestamp: -1, isFinished: false, isTopMatch: false, teamIdHome: -1, teamIdAway: -1, goalsAway: -1, goalsHome: -1 };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -915,7 +832,7 @@ describe('AppdataAccessFirestoreService', () => {
   // getTeamNameByTeamId$
   // ---------------------------------------------------------------------------
 
-  it("getTeamNameByTeamId$, dataset available, no short name argument", (done: DoneFn) => {
+  it("getTeamNameByTeamId$, dataset available, no short name argument", (done) => {
     const argument1: number = 10;
     const expectedTeamname: string = "TSV Handorf";
 
@@ -937,7 +854,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getTeamNameByTeamId$, dataset available, short name argument true", (done: DoneFn) => {
+  it("getTeamNameByTeamId$, dataset available, short name argument true", (done) => {
     const argument1: number = 10;
     const argument2: boolean = true;
     const expectedTeamname: string = "TSV";
@@ -960,7 +877,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getTeamNameByTeamId$, more than one dataset, short name argument, false", (done: DoneFn) => {
+  it("getTeamNameByTeamId$, more than one dataset, short name argument, false", (done) => {
     const argument1: number = 10;
     const argument2: boolean = false;
     const expectedTeamname: string = "TSV Handorf";
@@ -983,7 +900,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getTeamNameByTeamId$, emitting twice, short name argument true", (done: DoneFn) => {
+  it("getTeamNameByTeamId$, emitting twice, short name argument true", (done) => {
     const argument1: number = 10;
     const argument2: boolean = true;
     const expectedTeamname: string = "TSV";
@@ -1006,7 +923,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getTeamNameByTeamId$, emitting twice, no short name argument", (done: DoneFn) => {
+  it("getTeamNameByTeamId$, emitting twice, no short name argument", (done) => {
     const argument1: number = 10;
     const expectedTeamname: string = "unknown team";
 
@@ -1031,7 +948,7 @@ describe('AppdataAccessFirestoreService', () => {
   // getTeamByTeamId$
   // ---------------------------------------------------------------------------
 
-  it("getTeamByTeamId$, dataset available", (done: DoneFn) => {
+  it("getTeamByTeamId$, dataset available", (done) => {
     const argument: number = 10;
     const requestedTeam: Team = {
       documentId: "test_doc_id",
@@ -1060,11 +977,11 @@ describe('AppdataAccessFirestoreService', () => {
   // getActiveUserIds$
   // ---------------------------------------------------------------------------
 
-  it("getActiveUserIds$, users available", (done: DoneFn) => {
-    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", email: "test1@mail.com" };
-    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", email: "test2@mail.com" };
-    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", email: "test3@mail.com" };
-    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", email: "test4@mail.com" };
+  it("getActiveUserIds$, users available", (done) => {
+    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", email: "test1@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", email: "test2@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", email: "test3@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", email: "test4@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser1, targetUser2, targetUser3, targetUser4])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1082,11 +999,11 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getActiveUserIds$, users available, double datasets", (done: DoneFn) => {
-    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", email: "test1@mail.com" };
-    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", email: "test2@mail.com" };
-    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", email: "test3@mail.com" };
-    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", email: "test4@mail.com" };
+  it("getActiveUserIds$, users available, double datasets", (done) => {
+    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", email: "test1@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", email: "test2@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", email: "test3@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", email: "test4@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser1, targetUser1, targetUser2, targetUser2, targetUser3, targetUser4])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1104,11 +1021,11 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getActiveUserIds$, emitting twice", (done: DoneFn) => {
-    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", email: "test1@mail.com" };
-    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", email: "test2@mail.com" };
-    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", email: "test3@mail.com" };
-    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", email: "test4@mail.com" };
+  it("getActiveUserIds$, emitting twice", (done) => {
+    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", email: "test1@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", email: "test2@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", email: "test3@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", email: "test4@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser1, targetUser2, targetUser3, targetUser4], [targetUser1, targetUser2, targetUser3, targetUser4])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1126,10 +1043,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getActiveUserIds$, no datasets available", (done: DoneFn) => {
+  it("getActiveUserIds$, no datasets available", (done) => {
     const argument: number = 1;
 
-    const defaultUser: User = { documentId: "", isAdmin: false, isActive: false, id: "default_id", displayName: "", email: "" };
+    const defaultUser: User = { documentId: "", isAdmin: false, isActive: false, id: "default_id", displayName: "", email: "", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1149,10 +1066,10 @@ describe('AppdataAccessFirestoreService', () => {
   // getUserDataById$
   // ---------------------------------------------------------------------------
 
-  it("getUserDataById$, one dataset", (done: DoneFn) => {
+  it("getUserDataById$, one dataset", (done) => {
     const argument: string = "test_user_id";
 
-    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", email: "test@mail.com" };
+    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", email: "test@mail.com", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1170,10 +1087,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getUserDataById$, more than one dataset", (done: DoneFn) => {
+  it("getUserDataById$, more than one dataset", (done) => {
     const argument: string = "test_user_id";
 
-    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", email: "test@mail.com" };
+    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", email: "test@mail.com", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser, targetUser])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1192,10 +1109,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getUserDataById$, emitting twice", (done: DoneFn) => {
+  it("getUserDataById$, emitting twice", (done) => {
     const argument: string = "test_user_id";
 
-    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", email: "test@mail.com" };
+    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", email: "test@mail.com", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser], [targetUser])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1214,10 +1131,10 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getUserDataById$, no dataset available", (done: DoneFn) => {
+  it("getUserDataById$, no dataset available", (done) => {
     const argument: string = "test_user";
 
-    const unknownUser: User = { documentId: "", isAdmin: false, isActive: false, id: argument, displayName: "unknown user", email: "" };
+    const unknownUser: User = { documentId: "", isAdmin: false, isActive: false, id: argument, displayName: "unknown user", email: "", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1239,7 +1156,7 @@ describe('AppdataAccessFirestoreService', () => {
   // getMatchdayScoreSnapshot$
   // ---------------------------------------------------------------------------
 
-  it("getMatchdayScoreSnapshot$, one dataset", (done: DoneFn) => {
+  it("getMatchdayScoreSnapshot$, one dataset", (done) => {
     const argument1: number = 2020;
     const argument2: number = 17;
 
@@ -1272,7 +1189,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getMatchdayScoreSnapshot$, dataset available twice", (done: DoneFn) => {
+  it("getMatchdayScoreSnapshot$, dataset available twice", (done) => {
     const argument1: number = 2020;
     const argument2: number = 17;
 
@@ -1305,7 +1222,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getMatchdayScoreSnapshot$, dataset emitted twice", (done: DoneFn) => {
+  it("getMatchdayScoreSnapshot$, dataset emitted twice", (done) => {
     const argument1: number = 2020;
     const argument2: number = 17;
 
@@ -1338,7 +1255,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getMatchdayScoreSnapshot$, no dataset available", (done: DoneFn) => {
+  it("getMatchdayScoreSnapshot$, no dataset available", (done) => {
     const argument1: number = 2020;
     const argument2: number = 17;
 
@@ -1375,7 +1292,7 @@ describe('AppdataAccessFirestoreService', () => {
   // getSyncTime$
   // ---------------------------------------------------------------------------
 
-  it("getSyncTime$, one dataset", (done: DoneFn) => {
+  it("getSyncTime$, one dataset", (done) => {
     const argument1: number = 2020;
     const argument2: number = 23;
 
@@ -1403,7 +1320,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSyncTime$, more than one dataset", (done: DoneFn) => {
+  it("getSyncTime$, more than one dataset", (done) => {
     const argument1: number = 2020;
     const argument2: number = 23;
 
@@ -1430,7 +1347,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSyncTime$, emitting twice", (done: DoneFn) => {
+  it("getSyncTime$, emitting twice", (done) => {
     const argument1: number = 2020;
     const argument2: number = 23;
 
@@ -1457,7 +1374,7 @@ describe('AppdataAccessFirestoreService', () => {
     );
   });
 
-  it("getSyncTime$, no dataset available", (done: DoneFn) => {
+  it("getSyncTime$, no dataset available", (done) => {
     const argument: string = "test_user";
 
     const argument1: number = 2020;

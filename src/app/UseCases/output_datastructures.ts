@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-
 export interface MatchInfo {
   matchDate: Date;
   matchday: number;

@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Observable, combineLatest, range, concat, from, throwError } from 'rxjs';
-import { tap, map, take, toArray, concatMap, distinct, retry } from 'rxjs/operators';
+import { map, toArray, concatMap, distinct, retry } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
 import { StatisticsCalculatorService } from '../Businessrules/statistics-calculator.service';

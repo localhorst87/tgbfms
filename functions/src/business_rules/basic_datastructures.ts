@@ -51,6 +51,13 @@ export interface User {
   displayName: string;
   isAdmin: boolean;
   isActive: boolean;
+  configs: UserConfigs;
+}
+
+export interface UserConfigs {
+  notificationLevel: number;
+  notificationTime: number;
+  theme: string;
 }
 
 export interface Score {

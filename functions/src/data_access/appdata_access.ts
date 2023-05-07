@@ -8,7 +8,8 @@ import {Match,
   TopMatchVote} from "../business_rules/basic_datastructures";
 import {UpdateTime, 
   SyncPhase, 
-  MatchdayScoreSnapshot} from "./import_datastructures";
+  MatchdayScoreSnapshot,
+  Email} from "./import_datastructures";
 import * as helper from "./appdata_helpers";
 
 const COLLECTION_NAME_MATCHES: string = "matches";
@@ -20,6 +21,7 @@ const COLLECTION_NAME_SEASON_RESULTS: string = "season_results";
 const COLLECTION_NAME_USERS: string = "users";
 const COLLECTION_NAME_SCORE_SNAPSHOT: string = "matchday_score_snapshots";
 const COLLECTION_NAME_TOPMATCH_VOTES: string = "topmatch_votes";
+const COLLECTION_NAME_EMAIL: string = "mail";
 
 // for testing with online Firebase services: 
 // GOOGLE_APPLICATION_CREDENTIALS must be set as env variable and point to
@@ -486,6 +488,13 @@ export async function setMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot):
     });
 }
 
+/**
+ * Requests all TopMatchVotes for the given matchday
+ * 
+ * @param season the selected season
+ * @param matchday the selected matchday
+ * @returns {Promise<TopMatchVote[]>}
+ */
 export async function getTopMatchVotes(season: number, matchday: number): Promise<TopMatchVote[]> {
   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_TOPMATCH_VOTES)
     .where("season", "==", season)
@@ -496,4 +505,51 @@ export async function getTopMatchVotes(season: number, matchday: number): Promis
       return helper.processSnapshot<TopMatchVote>(querySnapshot);
     }
   );
+}
+
+/**
+ * Gets all emails that has been sent out since the given startDate to the given
+ * recipient 
+ * 
+ * @param to email adress of the recipient
+ * @param startDate only emails later than this Date will be considered
+ * @returns {Promise<any[]>} all emails that hold true
+ */
+export async function getMail(to: string, startDate: Date): Promise<Email[]> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_EMAIL)
+    .where("to", "==", to)
+    .where("delivery.endTime", ">=", startDate);
+
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      return helper.processSnapshot<any>(querySnapshot);
+    }
+  );  
+}
+
+/**
+ * 
+ * @param email the email, as defined with all necessary fields
+ * @returns 
+ */
+export async function setMail(email: Email): Promise<boolean> {
+  let documentReference: admin.firestore.DocumentReference;
+  if (email.documentId == "") {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_EMAIL).doc()
+  }
+  else {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_EMAIL).doc(email.documentId);
+  }
+
+  // documentId should not be a property in the dataset itself, as it is meta-data
+  let emailToSet: any = { ...email };
+  delete emailToSet.documentId;
+
+  return documentReference.set(emailToSet)
+    .then(() => {
+      return true;
+    })
+    .catch((err: any) => {
+      return false;
+    });
 }

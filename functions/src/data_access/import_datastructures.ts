@@ -46,3 +46,26 @@ export interface SyncPhase {
   start: number;
   matchIds: number[];
 }
+
+export interface Email {
+  documentId: "";
+  to: string;
+  message: EmailMessage;
+  delivery?: EmailDeliveryInfo;
+}
+
+export interface EmailMessage {
+  subject: string;
+  html: string;
+  text?: string;
+}
+
+export interface EmailDeliveryInfo {
+  state: string;
+  attempts: number;
+  startTime: Date;
+  endTime: Date;
+  leaseExpireTime: Date | null;
+  error: string | null;
+  info: any;
+}

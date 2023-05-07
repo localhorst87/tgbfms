@@ -57,3 +57,9 @@ export function getFutureEndDate(nextDays: number): number {
     dateFuture.getDate(), 23, 59, 59); // ceil to end of day
   return Math.floor(dateFuture.getTime() / 1000);
 }
+
+export function getBeginningOfDayDate(): Date {
+  const timestampEndOfDay: number = getFutureEndDate(0);
+  const timestampBeginningOfDay: number = timestampEndOfDay - 86399; // 23:59:59 minus 1 day + 1 second
+  return new Date(1000*timestampBeginningOfDay); 
+}

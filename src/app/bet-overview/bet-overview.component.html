@@ -37,7 +37,6 @@
     <!-- selection with slider when choosing matchdays as method -->
     <div *ngIf="displayMethodForm.value=='matchday'">
       <mat-slider
-          class="matchday-slider"
           [formControl]="matchdayForm"
           min = "1"
           max = {{nMatchdays}}

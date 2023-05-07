@@ -8,15 +8,11 @@
         <mat-icon>insights</mat-icon>
         <span>Statistiken</span>
       </button>
-      <!-- <button mat-menu-item disabled>
-        <mat-icon>history_edu</mat-icon>
-        <span>History</span>
-      </button> -->
       <button mat-menu-item disabled>
         <mat-icon>manage_accounts</mat-icon>
         <span>Profil</span>
       </button>
-      <button mat-menu-item disabled>
+      <button mat-menu-item (click)="selectedPage='config'">
         <mat-icon>settings</mat-icon>
         <span>Einstellungen</span>
       </button>
@@ -72,6 +68,12 @@
   [matchdayCurrent] = "matchdayCurrent"
   [matchdayCompleted] = "matchdayCompleted">
 </app-dashboard>
+
+<app-config
+  *ngIf = "selectedPage == 'config'"
+  [user] = "loggedUser"
+  (userConfigChange) = "updateUser($event)">
+</app-config>
 
 <app-rules
   *ngIf = "selectedPage == 'rules'">

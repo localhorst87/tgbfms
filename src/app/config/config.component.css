@@ -1,0 +1,39 @@
+.notification {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;    
+}
+
+.notification-toggle {
+    display: flex;
+    justify-content: left;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.theme-toggle {
+    display: flex;
+    justify-content: left;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.default-theme {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    padding: 10px;
+}
+
+.labeler {
+    margin: 5px;
+}
+
+mat-slider {
+    width: 80%;
+}
+
+mat-icon {
+    margin-left: 5px;
+    margin-right: 5px;
+}

@@ -442,7 +442,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
   }
 
   setBet(bet: Bet): Promise<void> {
-    let betToUpdate: any = bet;
+    let betToUpdate: any = {...bet};
     let documentId: string = bet.documentId;
     delete betToUpdate.documentId;
 
@@ -451,7 +451,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
   }
 
   setSeasonBet(bet: SeasonBet): void {
-    let betToUpdate: any = bet;
+    let betToUpdate: any = {...bet};
     let documentId: string = bet.documentId;
     delete betToUpdate.documentId;
 
@@ -460,7 +460,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
   }
 
   setUser(user: User): void {
-    let userToUpdate: any = user;
+    let userToUpdate: any = {...user};
     let documentId: string = user.documentId;
     delete userToUpdate.documentId;
 
@@ -469,19 +469,19 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
   }
 
   addMatch(match: Match): void {
-    let matchToWrite: any = match;
+    let matchToWrite: any = {...match};
     delete matchToWrite.documentId;
     this.firestore.collection(COLLECTION_NAME_MATCHES).add(matchToWrite);
   }
 
   addSeasonResult(result: SeasonResult): void {
-    let resultToWrite: any = result;
+    let resultToWrite: any = {...result};
     delete resultToWrite.documentId;
     this.firestore.collection(COLLECTION_NAME_SEASON_RESULTS).add(resultToWrite);
   }
 
   updateMatch(documentId: string, match: Match): void {
-    let matchToUpdate: any = match;
+    let matchToUpdate: any = {...match};
     delete matchToUpdate.documentId;
 
     let matchDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_MATCHES + "/" + documentId);
@@ -489,7 +489,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
   }
 
   updateSeasonResult(documentId: string, result: SeasonResult): void {
-    let resultToUpdate: any = result;
+    let resultToUpdate: any = {...result};
     delete resultToUpdate.documentId;
 
     let resultDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_SEASON_RESULTS + "/" + documentId);
@@ -497,7 +497,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
   }
 
   setMatchdayScoreSnapshot(snapshot: MatchdayScoreSnapshot): void {
-    let snapshotToUpdate: any = snapshot;
+    let snapshotToUpdate: any = {...snapshot};
     let documentId: string = snapshot.documentId;
     delete snapshotToUpdate.documentId;
 
@@ -506,7 +506,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
   }
 
   setSyncTime(syncTime: SyncTime): void {
-    let syncTimeToUpdate: any = syncTime;
+    let syncTimeToUpdate: any = {...syncTime};
     let documentId: string = syncTime.documentId;
     delete syncTimeToUpdate.documentId;
 
@@ -515,7 +515,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
   }
 
   setTopMatchVote(vote: TopMatchVote): Promise<void> {
-    let voteToSet: any = vote;
+    let voteToSet: any = {...vote};
     let documentId: string = vote.documentId;
     delete voteToSet.documentId;
 

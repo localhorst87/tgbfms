@@ -76,6 +76,10 @@ export class HomeComponent implements OnInit {
     this.matchdayUserSelection = matchday;
   }
 
+  updateUser(user: User): void {
+    this.loggedUser = user;
+  }
+
   logout(): void {
     this.authenticator.logout();
   }
@@ -132,6 +136,9 @@ export class HomeComponent implements OnInit {
             (userProfile: User) => {
               this.loggedUser = userProfile;
               this.loggedUser.isActive = user.emailVerified;
+              // switch to default theme from user config
+              this.applyDarkTheme.setValue(this.loggedUser.configs.theme == "dark");
+              this.switchTheme();
             }
           );
         }

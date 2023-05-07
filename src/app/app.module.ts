@@ -9,7 +9,7 @@ import '@angular/common/locales/global/de';
 
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
-import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFirestoreModule, SETTINGS } from '@angular/fire/compat/firestore';
 import { environment } from '../environments/environment';
 
 import { AppdataAccessService } from './Dataaccess/appdata-access.service';
@@ -57,10 +57,12 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 // Other UI components
 import { SwiperModule } from 'swiper/angular';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { ConfigComponent } from './config/config.component';
 
 @NgModule({
   declarations: [
@@ -73,7 +75,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     RegisterComponent,
     DashboardComponent,
     PasswordResetComponent,
-    RulesComponent
+    RulesComponent,
+    ConfigComponent
   ],
   imports: [
     BrowserModule,
@@ -108,6 +111,7 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     MatSlideToggleModule,
     MatSortModule,
     MatMenuModule,
+    MatCheckboxModule,
     SwiperModule,
     NgxChartsModule
   ],
@@ -117,7 +121,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     { provide: MatchdataAccessService, useClass: MatchdataAccessOpenligaService },
     { provide: PointCalculatorService, useClass: PointCalculatorTrendbasedService },
     { provide: StatisticsCalculatorService, useClass: StatisticsCalculatorTrendbasedService },
-    { provide: UserInteractionService, useClass: UserInteractionVoteBasedService }
+    { provide: UserInteractionService, useClass: UserInteractionVoteBasedService },
+    {
+      provide: SETTINGS,
+      useValue: environment.emulator === true ? {
+        host: 'localhost:8080',
+        ssl: false
+      } : undefined
+    }
   ],
   bootstrap: [AppComponent]
 })

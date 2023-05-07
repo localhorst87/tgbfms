@@ -1,0 +1,46 @@
+<!-- notification -->
+<div class="notification" *ngIf="user.id.length > 0">
+    <div class="mat-h0">E-Mail Notifications senden</div>
+    <div class="notification-toggle">
+        <mat-icon>notifications_off</mat-icon>
+        <mat-slide-toggle
+            color="accent"
+            [checked]="notificationsSet.value"
+            [formControl]="notificationsSet">
+        </mat-slide-toggle>
+        <mat-icon>notifications_active</mat-icon>
+    </div>
+    <div *ngIf="notificationsSet.value === true">
+        <label class="labeler">{{notificationsTime.value}} h vor Spielbeginn</label>
+        <mat-slider
+            [formControl]="notificationsTime"
+            [disabled]="notificationsSet.value === false"
+            invert="true"
+            [max]="sliderTimeMax"
+            [min]="sliderTimeMin"
+            [step]="sliderTimeStep"
+            thumbLabel="true"
+            tickInterval="sliderTimeStep">
+        </mat-slider>        
+    </div>
+    <div *ngIf="notificationsSet.value === true">
+        <mat-checkbox
+            [formControl]="notificationsSingleDay">
+            Max. 1 Notification pro Tag bekommen
+        </mat-checkbox>
+    </div>
+</div>
+
+<!-- default theme  -->
+<div class="default-theme">
+    <div class="mat-h0">Start-Theme</div>
+    <div class="theme-toggle">
+        <mat-icon>light_mode</mat-icon>
+        <mat-slide-toggle
+            color="accent"
+            [checked]="darkDefaultTheme.value"
+            [formControl]="darkDefaultTheme">
+        </mat-slide-toggle>
+        <mat-icon>dark_mode</mat-icon>
+    </div>
+</div>

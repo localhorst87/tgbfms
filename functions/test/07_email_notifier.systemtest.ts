@@ -31,7 +31,7 @@ function setUser(user: User): Promise<boolean> {
     });
 }
 
-describe.only('email_notifier', () => {
+describe('email_notifier', () => {
 
   describe("email_notifier_helpers", () => {
 
@@ -450,43 +450,3 @@ describe.only('email_notifier', () => {
   });
   
 });
-
-// describe('email test', () => {
-
-    // async function setUser(user: User): Promise<boolean> {
-    //     let documentReference: admin.firestore.DocumentReference;
-    //     if (user.documentId == "") {
-    //       documentReference = admin.firestore().collection('users').doc()
-    //     }
-    //     else {
-    //       documentReference = admin.firestore().collection('users').doc(user.documentId);
-    //     }
-      
-    //     // documentId should not be a property in the dataset itself, as it is meta-data
-    //     let userToSet: any = { ...user };
-    //     delete userToSet.documentId;
-      
-    //     return documentReference.set(userToSet)
-    //       .then(() => {
-    //         return true;
-    //       })
-    //       .catch((err: any) => {
-    //         return false;
-    //       });
-    // }
-
-    // it('update', async () => {
-    //     let users: User[] = await appdata.getActiveUsers();
-    //     for (let user of users) {
-    //         user.configs = {
-    //             notificationLevel: 1,
-    //             notificationTime: 1.5,
-    //             theme: "light"
-    //         };
-
-    //         await setUser(user);
-    //     }
-    // });
-    
-// });
-

@@ -122,13 +122,13 @@ import { ConfigComponent } from './config/config.component';
     { provide: PointCalculatorService, useClass: PointCalculatorTrendbasedService },
     { provide: StatisticsCalculatorService, useClass: StatisticsCalculatorTrendbasedService },
     { provide: UserInteractionService, useClass: UserInteractionVoteBasedService },
-    {
-      provide: SETTINGS,
-      useValue: environment.emulator === true ? {
-        host: 'localhost:8080',
-        ssl: false
-      } : undefined
-    }
+    // {
+    //   provide: SETTINGS,
+    //   useValue: environment.emulator === true ? {
+    //     host: 'localhost:8080',
+    //     ssl: false
+    //   } : undefined
+    // }
   ],
   bootstrap: [AppComponent]
 })

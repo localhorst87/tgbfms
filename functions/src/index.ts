@@ -84,13 +84,13 @@ export const syncMatchPlan = functions
  * notifies users if they forgot to set bets
  * 
  * At minute 0 and 30
- * past every hour from 8 through 19
+ * past every hour from 9 through 20
  * in January, February, March, April, May, August, September, October, November, and December.
  */
 export const notifyUsers = functions
   .region('europe-west3')
   .pubsub
-  .schedule('0,30 8-19 * 1,2,3,4,5,8,9,10,11,12 *')
+  .schedule('0,30 9-20 * 1,2,3,4,5,8,9,10,11,12 *')
   .timeZone('Europe/Berlin')
   .onRun(async (context: functions.EventContext) => {
     await email_notifier.notifyMissingBets();

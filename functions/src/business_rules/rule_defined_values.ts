@@ -19,4 +19,4 @@ export const POINTS_SEASON_LOSER_CORRECT: number = 1; // points if the relegator
 
 export const TOP_MATCH_VOTES_CLOSING_TIME_MINUTES: number = 60;
 
-export const SEASON: number = 2022; // current season (year of beginning of the season)
+export const SEASON: number = 2023; // current season (year of beginning of the season)

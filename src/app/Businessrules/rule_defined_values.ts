@@ -17,4 +17,4 @@ export const POINTS_SEASON_SECOND_EXACT: number = 2; // points if the 2nd place 
 export const POINTS_SEASON_LOSER_EXACT: number = 2; // points if a relegator bet is exactly correct
 export const POINTS_SEASON_LOSER_CORRECT: number = 1; // points if the relegator bet is among results, but not exactly
 
-export const SEASON: number = 2022; // current season (year of beginning of the season)
+export const SEASON: number = 2023; // current season (year of beginning of the season)

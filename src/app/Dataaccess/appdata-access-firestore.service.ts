@@ -5,6 +5,7 @@ import { map, switchMap, distinct, take, pluck, takeUntil } from 'rxjs/operators
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { Bet, Match, Team, User, SeasonBet, SeasonResult, TopMatchVote } from '../Businessrules/basic_datastructures';
 import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
+import { Table } from '../UseCases/output_datastructures';
 import { NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
 
 export const COLLECTION_NAME_BETS: string = 'bets';
@@ -17,6 +18,7 @@ export const COLLECTION_NAME_SEASON_BETS: string = 'season_bets';
 export const COLLECTION_NAME_SEASON_RESULTS: string = 'season_results';
 export const COLLECTION_NAME_UPDATE_TIMES: string = 'sync_times';
 export const COLLECTION_NAME_TOPMATCH_VOTE: string = 'topmatch_votes';
+export const COLLECTION_NAME_TABLE_VIEW: string = 'view_tables';
 
 const SECONDS_PER_DAY: number = 86400;
 const MATCHES_PER_MATCHDAY: number = Math.floor(NUMBER_OF_TEAMS / 2);
@@ -441,6 +443,28 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
+  getTableView$(id: string, season: number, matchday: number): Observable<Table> {
+    let tableQuery$: Observable<Table[]> = this.firestore.collection<Table>(COLLECTION_NAME_TABLE_VIEW, ref =>
+      ref
+        .where("season", "==", season)
+        .where("matchday", "==", matchday)
+        .where("id", "==", id))
+      .valueChanges({ idField: 'documentId' });
+
+    return tableQuery$.pipe(
+      map((tableArray: Table[]) => {
+        if (tableArray.length == 0) {
+          return this.makeUnknownTable(season, matchday, id);
+        }
+        else {
+          return tableArray[0];
+        }
+      }),
+      take(1),
+      distinct()
+    );
+  }
+
   setBet(bet: Bet): Promise<void> {
     let betToUpdate: any = {...bet};
     let documentId: string = bet.documentId;
@@ -636,6 +660,16 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       season: season,
       matchday: matchday,
       timestamp: -1
+    };
+  }
+
+  private makeUnknownTable(season: number, matchday: number, id: string): Table {
+    return {
+      documentId: "",
+      season: season,
+      matchday: matchday,
+      id: id,
+      tableData: []
     };
   }
 

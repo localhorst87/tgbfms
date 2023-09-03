@@ -4,6 +4,7 @@ import * as admin from "firebase-admin";
 import { Match, Bet, SeasonBet, SeasonResult, User, TopMatchVote } from "../../src/app/Businessrules/basic_datastructures";
 import { UpdateTime, SyncPhase, MatchdayScoreSnapshot } from "../src/data_access/import_datastructures";
 import * as appdata_access from "../src/data_access/appdata_access";
+import { Table } from "../src/data_access/export_datastructures";
 
 describe("getAllMatches, end-to-end-test", () => {
 
@@ -541,13 +542,35 @@ describe('getMatchdayScoreSnapshot, end-to-end-test', () => {
       documentId: "QmfKZDzUVD9rgxDDisV4",
       season: 2030,
       matchday: 10,
-      userId: ["test_user_0", "test_user_1", "test_user_2"],
-      points: [5, 14, 6],
-      matches: [4, 8, 4],
-      results: [1, 3, 1],
-      extraOutsider: [0, 3, 1],
-      extraTop: [0, 0, 0],
-      extraSeason: [0, 0, 0]
+      scores: [
+        {
+          userId: "test_user_0",
+          points: 5,
+          matches: 4,
+          results: 1,
+          extraOutsider: 0,
+          extraTop: 0,
+          extraSeason: 0,
+        },
+        {
+          userId: "test_user_1",
+          points: 14,
+          matches: 8,
+          results: 3,
+          extraOutsider: 3,
+          extraTop: 0,
+          extraSeason: 0
+        },
+        {
+          userId: "test_user_2",
+          points: 6,
+          matches: 4,
+          results: 1,
+          extraOutsider: 1,
+          extraTop: 0,
+          extraSeason: 0
+        }
+      ]
     };
 
     const snapshot: MatchdayScoreSnapshot = await appdata_access.getMatchdayScoreSnapshot(2030, 10);
@@ -560,13 +583,7 @@ describe('getMatchdayScoreSnapshot, end-to-end-test', () => {
       documentId: "",
       season: 2030,
       matchday: 34,
-      userId: [],
-      points: [],
-      matches: [],
-      results: [],
-      extraOutsider: [],
-      extraTop: [],
-      extraSeason: []
+      scores: []
     };
 
     const snapshot: MatchdayScoreSnapshot = await appdata_access.getMatchdayScoreSnapshot(2030, 34);
@@ -583,21 +600,43 @@ describe('setMatchdayScoreSnapshot, end-to-end-test', () => {
       documentId: "",
       season: 2030,
       matchday: 11,
-      userId: ["test_user_0", "test_user_1", "test_user_2"],
-      points: [4, 2, 5],
-      matches: [4, 1, 3],
-      results: [0, 1, 0],
-      extraOutsider: [0, 0, 1],
-      extraTop: [0, 0, 1],
-      extraSeason: [0, 0, 0]
+      scores: [
+        {
+          userId: "test_user_0",
+          points: 4,
+          matches: 4,
+          results: 0,
+          extraOutsider: 0,
+          extraTop: 0,
+          extraSeason: 0,
+        },
+        {
+          userId: "test_user_1",
+          points: 2,
+          matches: 1,
+          results: 1,
+          extraOutsider: 0,
+          extraTop: 0,
+          extraSeason: 0
+        },
+        {
+          userId: "test_user_2",
+          points: 5,
+          matches: 3,
+          results: 0,
+          extraOutsider: 1,
+          extraTop: 1,
+          extraSeason: 0
+        }
+      ]
     };
 
     let snapshotBefore: MatchdayScoreSnapshot = await appdata_access.getMatchdayScoreSnapshot(2030, 11);
     await appdata_access.setMatchdayScoreSnapshot(snapshot);
     let snapshotAfter: MatchdayScoreSnapshot = await appdata_access.getMatchdayScoreSnapshot(2030, 11);
 
-    expect(snapshotBefore.points).to.deep.equal([]);
-    expect(snapshotAfter.points).to.deep.equal([4, 2, 5]);   
+    expect(snapshotBefore.scores).to.deep.equal([]);
+    expect(snapshotAfter.scores[2].userId).to.deep.equal("test_user_2");
   });
 
   it('snapshot already existing => expect to update snapshot', async () => {
@@ -605,21 +644,43 @@ describe('setMatchdayScoreSnapshot, end-to-end-test', () => {
       documentId: "QmfKZDzUVD9rgxDDisV4",
       season: 2030,
       matchday: 10,
-      userId: ["test_user_0", "test_user_1", "test_user_2"],
-      points: [7, 14, 9],
-      matches: [5, 8, 5],
-      results: [1, 3, 2],
-      extraOutsider: [0, 3, 2],
-      extraTop: [1, 0, 0],
-      extraSeason: [0, 0, 0]
+      scores: [
+        {
+          userId: "test_user_0",
+          points: 7,
+          matches: 5,
+          results: 1,
+          extraOutsider: 0,
+          extraTop: 1,
+          extraSeason: 0,
+        },
+        {
+          userId: "test_user_1",
+          points: 14,
+          matches: 8,
+          results: 3,
+          extraOutsider: 3,
+          extraTop: 0,
+          extraSeason: 0
+        },
+        {
+          userId: "test_user_2",
+          points: 9,
+          matches: 5,
+          results: 2,
+          extraOutsider: 2,
+          extraTop: 0,
+          extraSeason: 0
+        }
+      ]
     };
 
     let snapshotBefore: MatchdayScoreSnapshot = await appdata_access.getMatchdayScoreSnapshot(2030, 10);
     await appdata_access.setMatchdayScoreSnapshot(snapshotUpdate);
     let snapshotAfter: MatchdayScoreSnapshot = await appdata_access.getMatchdayScoreSnapshot(2030, 10);
 
-    expect(snapshotBefore.points).to.deep.equal([5, 14, 6]);
-    expect(snapshotAfter.points).to.deep.equal([7, 14, 9]);   
+    expect(snapshotBefore.scores[0].points).to.equal(5);
+    expect(snapshotAfter.scores[0].points).to.equal(7);   
   });
   
 });
@@ -661,4 +722,71 @@ describe('getTopMatchVotes, end-to-end-test', () => {
     const votes: TopMatchVote[] = await appdata_access.getTopMatchVotes(2099, 2);
     expect(votes).to.deep.equal([]);
   });
+});
+
+describe('getTableView', () => {
+
+  it('table available => expect to return the table', async () => {
+    const table: Table = await appdata_access.getTableView("total", 2023, 1);
+    expect(table.tableData[0].userName).to.deep.equal("user_0");
+    expect(table.tableData[1].points).to.equal(7);
+  });
+
+  it('table not available => expect to return dummy table', async () => {
+    const table: Table = await appdata_access.getTableView("historic", 2023, 1);
+    expect(table.tableData).to.be.empty;
+  });
+  
+});
+
+describe('setTableView', () => {
+  let table: Table = {
+    documentId: "36H5NeKzLJAXdfDFPzJj",
+    id: "matchday",
+    season: 2023,
+    matchday: 1,
+    tableData: [
+      {
+        position: 1,
+        userName: "user_0",
+        points: 9,
+        matches: 5,
+        results: 1,
+        extraTop: 1,
+        extraOutsider: 2,
+        extraSeason: 0
+      },
+      {
+        position: 2,
+        userName: "user_1",
+        points: 7,
+        matches: 5,
+        results: 1,
+        extraTop: 1,
+        extraOutsider: 0,
+        extraSeason: 0
+      }      
+    ]
+  };
+  
+  it('table is already existing => expect to change dataset', async () => {
+    const tableBefore: any = (await (admin.firestore().collection("view_tables").doc("36H5NeKzLJAXdfDFPzJj").get())).data();
+    await appdata_access.setTableView(table);
+    const tableAfter: any = (await (admin.firestore().collection("view_tables").doc("36H5NeKzLJAXdfDFPzJj").get())).data();
+
+    expect(tableBefore.id).to.deep.equal("total");
+    expect(tableAfter.id).to.deep.equal("matchday");
+  });
+
+  it('table not yet existing => expect to add new dataset', async () => {
+    table.documentId = "";
+    
+    const snapshotBefore: admin.firestore.QueryDocumentSnapshot[] = (await admin.firestore().collection("view_tables").get()).docs;
+    await appdata_access.setTableView(table);
+    const snapshotAfter: admin.firestore.QueryDocumentSnapshot[] = (await admin.firestore().collection("view_tables").get()).docs;
+    
+    expect(snapshotBefore.length).to.equal(1);
+    expect(snapshotAfter.length).to.equal(2);
+  });
+
 });

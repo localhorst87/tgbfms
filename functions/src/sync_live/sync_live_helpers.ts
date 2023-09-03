@@ -1,9 +1,12 @@
-import { Match, Bet, User, Score } from "../business_rules/basic_datastructures";
+import { Match, Bet, User, SeasonBet, SeasonResult, Score } from "../business_rules/basic_datastructures";
 import { MatchImportData, SyncPhase, UpdateTime, MatchdayScoreSnapshot } from "../data_access/import_datastructures";
 import * as appdata from "../data_access/appdata_access";
 import * as matchdata from "../data_access/matchdata_access";
 import { getCurrentTimestamp } from "../util";
-
+import { Table, TableData } from "../data_access/export_datastructures";
+import { ScoreAdderTrendbased } from "../business_rules/score_adder_trendbased";
+import { TableExporterTrendbased } from "../view_preparation/export_table_trendbased";
+import { MATCHDAYS_PER_SEASON } from "../business_rules/rule_defined_values";
 
 declare global {
     interface Array<T> {
@@ -43,6 +46,23 @@ export async function getAllBetsOfMatches(matches: Match[], users: User[]): Prom
     }
   
     return allBets;
+}
+
+/**
+ * Returns the season bets of the given users for the given season. Results will not be ordered.
+ * 
+ * @param season the season for requesting the bets
+ * @param users the users for requesting the bets
+ * @returns the corresponding season bets
+ */
+export async function getAllSeasonBets(season: number, users: User[]): Promise<SeasonBet[]> {
+    let allSeasonBets: SeasonBet[] = [];
+
+    for (let user of users) {
+        allSeasonBets.push(...(await appdata.getSeasonBets(season, user.id)));
+    }
+
+    return allSeasonBets;
 }
 
 /**
@@ -141,6 +161,184 @@ export async function setNewUpdateTimes(season: number, matchdays: number[]): Pr
     return matchdayTimeSet;
 }
 
+export async function getMatchdayScoreSnapshots(season: number, matchdays: number[]): Promise<MatchdayScoreSnapshot[]> {
+    let scoreSnapshots: MatchdayScoreSnapshot[] = [];
+
+    for (let matchday of matchdays) {
+        scoreSnapshots.push(await appdata.getMatchdayScoreSnapshot(season, matchday));
+    }
+
+    return scoreSnapshots;
+}
+
+export async function getSeasonScoreSnapshot(season: number, matchday: number, users: User[]): Promise<MatchdayScoreSnapshot> {
+    let scoreAdder = new ScoreAdderTrendbased();
+
+    const bets: SeasonBet[] = await getAllSeasonBets(season, users);
+    const results: SeasonResult[] = await appdata.getSeasonResults(season);
+
+    scoreAdder.calcSeasonScores(bets, results);
+    const scores: Score[] = scoreAdder.getScores(true);
+
+    return {
+        documentId: "",
+        season: season,
+        matchday: matchday,
+        scores: scores
+    }
+}
+
+/**
+ * Calculates the matchday table of the given matchday of the season as Table
+ * data structure, ready for the view in the frontend
+ * 
+ * @param season the corresponding season
+ * @param matchday the matchday
+ * @param users all users
+ * @returns the matchday table 
+ */
+export function makeMatchdayTable(season: number, matchday: number, users: User[], allSnapshots: MatchdayScoreSnapshot[]): Table {
+    const tableData: TableData[] = makeTable(matchday, matchday, users, allSnapshots);
+
+    return {
+        documentId: "",
+        id: "matchday",
+        season: season,
+        matchday: matchday,
+        tableData: tableData
+    }; 
+}
+
+/**
+ * Calculates the total table of the given matchday of the season as Table data
+ * structure, ready for the view in the frontend
+ * 
+ * @param season the corresponding season
+ * @param matchday the matchday of the total table
+ * @param users all users
+ * @returns the total table 
+ */
+export function makeTotalTable(season: number, matchday: number, users: User[], allSnapshots: MatchdayScoreSnapshot[]): Table {
+    const tableData: TableData[] = makeTable(1, matchday, users, allSnapshots);
+
+    return {
+        documentId: "",
+        id: "total",
+        season: season,
+        matchday: matchday,
+        tableData: tableData
+    };
+}
+
+/**
+ * Returns the ...
+ * 
+ * @param season the corresponding season
+ * @param matchday the matchday of the table
+ * @param users all users
+ * @param matchdaySnapshots all MatchdayScoreSnapshots from (at least) the relevant matchdays
+ * @param seasonScoreSnapshot the MatchdayScoreSnapshot from the season bets only
+ * @returns the total table including the season bet points
+ */
+export function makeFinalTable(season: number, matchday: number, users: User[], matchdaySnapshots: MatchdayScoreSnapshot[], seasonScoreSnapshot: MatchdayScoreSnapshot): Table {
+    const allSnapshots: MatchdayScoreSnapshot[] = [...matchdaySnapshots, seasonScoreSnapshot];
+    const tableData: TableData[] = makeTable(1, matchday, users, allSnapshots, true);    
+
+    return {
+        documentId: "",
+        id: "final",
+        season: season,
+        matchday: matchday,
+        tableData: tableData
+    };
+}
+
+/**
+ * Calculates the second season half table of the given matchday of the season
+ * as Table data structure, ready for the view in the frontend
+ * 
+ * @param season the corresponding season
+ * @param matchday the matchday of the total table
+ * @param users all users
+ * @param allSnapshots all MatchdayScoreSnapshots from (at least) the relevant matchdays
+ * @returns the total table 
+ */
+export function makeSecondHalfTable(season: number, matchday: number, users: User[], allSnapshots: MatchdayScoreSnapshot[]): Table {
+    const matchdayStart: number = MATCHDAYS_PER_SEASON / 2 + 1;
+    const matchdayEnd: number = Math.max(MATCHDAYS_PER_SEASON/2 + 1, matchday);
+
+    const tableData: TableData[] = makeTable(matchdayStart, matchdayEnd, users, allSnapshots);
+
+    return {
+        documentId: "",
+        id: "second_half",
+        season: season,
+        matchday: matchday,
+        tableData: tableData
+    };
+}
+
+/**
+ * Calculates the table of the last 5 matchdays for the given matchday of the 
+ * season as Table data structure, ready for the view in the frontend
+ * 
+ * @param season the corresponding season
+ * @param matchday the matchday of the total table
+ * @param users all users
+ * @returns the total table 
+ */
+export function makeLast5Table(season: number, matchday: number, users: User[], allSnapshots: MatchdayScoreSnapshot[]): Table {
+    const matchdayStart: number = Math.max(1, matchday - 4);
+    const tableData: TableData[] = makeTable(matchdayStart, matchday, users, allSnapshots);
+
+    return {
+        documentId: "",
+        id: "last_5",
+        season: season,
+        matchday: matchday,
+        tableData: tableData
+    };
+}
+
+/**
+ * Calculates the table of the last 10 matchdays for the given matchday of the 
+ * season as Table data structure, ready for the view in the frontend
+ * 
+ * @param season the corresponding season
+ * @param matchday the matchday of the total table
+ * @param users all users
+ * @returns the total table
+ */
+export function makeLast10Table(season: number, matchday: number, users: User[], allSnapshots: MatchdayScoreSnapshot[]): Table {
+    const matchdayStart: number = Math.max(1, matchday - 9);
+    const tableData: TableData[] = makeTable(matchdayStart, matchday, users, allSnapshots);
+
+    return {
+        documentId: "",
+        id: "last_10",
+        season: season,
+        matchday: matchday,
+        tableData: tableData
+    };
+}
+
+export function makeTable(matchdayStart: number, matchdayEnd: number, users: User[], allSnapshots: MatchdayScoreSnapshot[], ingestSeasonScore: boolean = false): TableData[] {
+    let scoreAdder: ScoreAdderTrendbased = new ScoreAdderTrendbased();
+    
+    for (let i = matchdayStart; i <= matchdayEnd; i++) {
+        let scoreSnapshotsRelevant: MatchdayScoreSnapshot[] = allSnapshots.filter(snapshot => snapshot.matchday == i);
+        if (scoreSnapshotsRelevant.length > 0) {
+            // for a single matchday, two snapshots may exist if season bet snapshot is ingested
+            for (let snapshot of scoreSnapshotsRelevant) {
+                scoreAdder.addScores(snapshot.scores);
+            }
+        }
+    }
+
+    let tableExporter: TableExporterTrendbased = new TableExporterTrendbased(users, scoreAdder);
+    return tableExporter.exportTable(ingestSeasonScore);
+}
+
 /**
  * Enriches the given Match with live data from the MatchImportData
  * 
@@ -155,39 +353,3 @@ export function addLiveData(match: Match, imported: MatchImportData): Match {
   
     return match;
 }
-
-/**
- * Converts a ScoreArray to a MatchdayScoreSnapshot
- * 
- * @param season the current season
- * @param matchday the matchday of the current season
- * @param scoreArray the ScoreArray to convert
- * @returns the snapshot for the DB
- */
-export function convertToScoreSnapshot(season: number, matchday: number, scoreArray: Score[]): MatchdayScoreSnapshot {
-    let scoreSnapshot: MatchdayScoreSnapshot = {
-        documentId: "",
-        season: season,
-        matchday: matchday,
-        userId: [],
-        points: [],
-        matches: [],
-        results: [],
-        extraTop: [],
-        extraOutsider: [],
-        extraSeason: []
-    };
-  
-    for (let score of scoreArray) {
-        scoreSnapshot.userId.push(score.userId);
-        scoreSnapshot.points.push(score.points);
-        scoreSnapshot.matches.push(score.matches);
-        scoreSnapshot.results.push(score.results);
-        scoreSnapshot.extraTop.push(score.extraTop);
-        scoreSnapshot.extraOutsider.push(score.extraOutsider);
-        scoreSnapshot.extraSeason.push(score.extraSeason);
-    }
-  
-    return scoreSnapshot;
-}
-

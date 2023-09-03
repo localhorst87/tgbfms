@@ -11,7 +11,8 @@
     "test": "npm run test_mocked; npm run test_emulated",
     "test_mocked": "mocha -r ts-node/register 'test/*.mocked.ts' --reporter spec",
     "test_emulated": "export FIRESTORE_EMULATOR_HOST='localhost:8080' && mocha -r ts-node/register 'test/*.emulated.ts' --reporter spec; unset FIRESTORE_EMULATOR_HOST",
-    "test_system": "export FIRESTORE_EMULATOR_HOST='localhost:8080' && mocha -r ts-node/register 'test/*.systemtest.ts' --reporter spec; unset FIRESTORE_EMULATOR_HOST"
+    "test_system": "export FIRESTORE_EMULATOR_HOST='localhost:8080' && mocha -r ts-node/register 'test/*.systemtest.ts' --reporter spec; unset FIRESTORE_EMULATOR_HOST",
+    "convert": "mocha -r ts-node/register 'test/*.convert.ts' --reporter spec;"
   },
   "engines": {
     "node": "16"

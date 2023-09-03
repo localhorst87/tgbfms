@@ -5,16 +5,11 @@ import * as sync_topmatch from "./sync_topmatch/sync_topmatch";
 import * as fix_bets from "./fix_bets/fix_bets";
 import * as email_notifier from "./email_notifier/email_notifier";
 
-// notifier
-
-// At minute 0 and 30 past every hour from 8 through 19 in January, February, March, April, May, August, September, October, November, and December.
-// --> '0,30 8-19 * 1,2,3,4,5,8,9,10,11,12 *'
-
 /**
  * Synchronizes results, ranking and scores
  * 
  * At minute 0, 15, 30, and 45
- * past every hour from 15 through 22 
+ * past every hour from 15 till 22 included
  * on Friday, Saturday, and Sunday
  * in January, February, March, April, May, August, September, October, November, and December.
  */

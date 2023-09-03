@@ -5,7 +5,7 @@ import * as sync_topmatch from "../src/sync_topmatch/sync_topmatch";
 import * as appdata from "../src/data_access/appdata_access";
 import * as util from "../src/util";
 import {Match, TopMatchVote} from "../src/business_rules/basic_datastructures";
-import {TOP_MATCH_VOTES_CLOSING_TIME_MINUTES} from "../src/business_rules/rule_defined_values";
+import * as rule_defined_values from "../src/business_rules/rule_defined_values";
 import * as admin from "firebase-admin";
 
 describe('syncTopMatch system test', () => {
@@ -37,8 +37,8 @@ describe('syncTopMatch system test', () => {
     const startTime31: number = 1683311400;
 
     // voting open/closed times
-    const votingOpen: number = startTime31 - TOP_MATCH_VOTES_CLOSING_TIME_MINUTES*60 - 1;
-    const votingClosed: number = startTime31 - TOP_MATCH_VOTES_CLOSING_TIME_MINUTES*60 + 1;
+    const votingOpen: number = startTime31 - rule_defined_values.TOP_MATCH_VOTES_CLOSING_TIME_MINUTES*60 - 1;
+    const votingClosed: number = startTime31 - rule_defined_values.TOP_MATCH_VOTES_CLOSING_TIME_MINUTES*60 + 1;
 
     // prepare data
     before(async () => {
@@ -81,6 +81,7 @@ describe('syncTopMatch system test', () => {
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
+        sandbox.stub(rule_defined_values, "SEASON").value(2022);
     });
 
     afterEach(() => {

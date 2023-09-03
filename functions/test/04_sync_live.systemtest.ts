@@ -8,6 +8,107 @@ import * as sync_live_helper from "../src/sync_live/sync_live_helpers";
 import * as util from "../src/util";
 import { Match, SeasonResult} from "../../src/app/Businessrules/basic_datastructures";
 import { MatchdayScoreSnapshot, SyncPhase, UpdateTime } from "../src/data_access/import_datastructures";
+import * as rule_defined_values from "../src/business_rules/rule_defined_values";
+import { SeasonBet } from "../src/business_rules/basic_datastructures";
+import { Table } from "../src/data_access/export_datastructures";
+
+describe('sync_live_helpers', () => {
+    
+    describe('getAllSeasonBets', () => {
+        
+        it('request one user => expect correct documents', async () => {
+            const seasonBets: SeasonBet[] = await sync_live_helper.getAllSeasonBets(2022, [{
+                documentId: "",
+                id: "gLwLn9HxwkMwHf28drJGVhRbC1y1",
+                isActive: true,
+                isAdmin: true,
+                email: "bla@gmx.de",
+                displayName: "Avlov",
+                configs: {
+                    notificationLevel: 0,
+                    notificationTime: 0.5,
+                    theme: "light"
+                }
+            }]);
+
+            expect(seasonBets.length).to.equal(5);
+            expect(seasonBets.map(bet => bet.documentId).includes("4zNJZz402DfgMO9cRVNh")).to.be.true; // test one sample
+        });
+
+    });
+
+    describe('getMatchdayScoreSnapshots', () => {
+        
+        it('snapshots available => expect to return correct score snapshots', async () => {
+            const snapshots: MatchdayScoreSnapshot[] = await sync_live_helper.getMatchdayScoreSnapshots(2022, [9, 10, 11]);
+
+            expect(snapshots.map(snapshot => snapshot.documentId)).to.deep.equal([
+                "BrgD0YlcGCPm5nWzuUZ4",
+                "nHJmzltvhHKWb5BXIy7H",
+                "EfunylT4yphNVNII7o6G"
+            ]);            
+        });
+
+        it('snapshots not available => expect dummy score snapshots', async () => {
+            const snapshots: MatchdayScoreSnapshot[] = await sync_live_helper.getMatchdayScoreSnapshots(2050, [1, 2]);
+
+            expect(snapshots).to.deep.equal([
+                {
+                    documentId: "",
+                    season: 2050,
+                    matchday: 1,
+                    scores: []
+                },
+                {
+                    documentId: "",
+                    season: 2050,
+                    matchday: 2,
+                    scores: []
+                },
+            ]);
+        });
+
+    });
+
+    describe('getSeasonScoreSnapshot', () => {
+
+        it('basic function test', async () => {
+            const scoreSnap: MatchdayScoreSnapshot = await sync_live_helper.getSeasonScoreSnapshot(2022, 5, [
+                {
+                    documentId: "",
+                    id: "gLwLn9HxwkMwHf28drJGVhRbC1y1",
+                    isActive: true,
+                    isAdmin: true,
+                    email: "bla@gmx.de",
+                    displayName: "Avlov",
+                    configs: {
+                        notificationLevel: 0,
+                        notificationTime: 0.5,
+                        theme: "light"
+                    }
+                },
+                {
+                    documentId: "",
+                    id: "QeJBkfpnDha5h28jxZvRnSJcr322",
+                    isActive: true,
+                    isAdmin: false,
+                    email: "bla@gmx.de",
+                    displayName: "Avlov",
+                    configs: {
+                        notificationLevel: 0,
+                        notificationTime: 0.5,
+                        theme: "light"
+                    }
+                }
+            ]);
+    
+            expect(scoreSnap.scores.length).to.equal(2);
+            expect(scoreSnap.scores[0].points == scoreSnap.scores[0].extraSeason).to.be.true; 
+        });
+             
+    });
+
+});
 
 describe('syncMatches', () => {
     var sandbox: any;
@@ -31,6 +132,8 @@ describe('syncMatches', () => {
     // first reset the data so that will not be the same as in the reference DB
     beforeEach(async () => {
         sandbox = sinon.createSandbox();
+
+        sandbox.stub(rule_defined_values, "SEASON").value(2022);
 
         matchesToSync = [];        
         for (let id of relevantMatchIds) {
@@ -243,8 +346,10 @@ describe('updateScoreSnapshot', () => {
         sandbox = sinon.createSandbox();
 
         let scoreSnapshot: MatchdayScoreSnapshot = await appdata.getMatchdayScoreSnapshot(2022, 29);
-        scoreSnapshot.points = [0, 0, 0, 0, 0, 0, 0, 0];
-        scoreSnapshot.matches = [0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < 8; i++) {
+            scoreSnapshot.scores[i].points = 0;
+            scoreSnapshot.scores[i].matches = 0;
+        }
         await appdata.setMatchdayScoreSnapshot(scoreSnapshot);
     });
 
@@ -262,8 +367,8 @@ describe('updateScoreSnapshot', () => {
         await sync_live.updateScoreSnapshot(2022, 29);
         const scoreSnapshot: MatchdayScoreSnapshot = await appdata.getMatchdayScoreSnapshot(2022, 29);
 
-        expect(scoreSnapshot.points.reduce((sum, val) => sum + val, 0)).to.be.greaterThan(0);
-        expect(scoreSnapshot.matches.reduce((sum, val) => sum + val, 0)).to.be.greaterThan(0);
+        expect(scoreSnapshot.scores.map(score => score.points).reduce((sum, val) => sum + val, 0)).to.be.greaterThan(0);
+        expect(scoreSnapshot.scores.map(score => score.matches).reduce((sum, val) => sum + val, 0)).to.be.greaterThan(0);
     });
 
     it('active users empty => expect return value to be false', async () => {
@@ -289,11 +394,65 @@ describe('updateScoreSnapshot', () => {
 
 });
 
+describe.only('updateTablesView', () => {
+
+    var sandbox: any;
+
+    beforeEach(() => {
+        sandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+        sandbox.restore();
+    });
+
+    it('no active users => expect to not update', async () => {
+        sandbox.stub(appdata, "getActiveUsers").resolves([]);
+        const isSuccessful: boolean = await sync_live.updateTablesView(2021, 17);
+        
+        expect(isSuccessful).to.be.false;
+    });
+
+    it('all preconditions given, matchday = 17 => expect to set all Tables except second half', async () => {
+        const isSuccessful: boolean = await sync_live.updateTablesView(2021, 17);
+
+        const totalTable: Table = await appdata.getTableView("total", 2021, 17);
+        const secondHalfTable: Table = await appdata.getTableView("second_half", 2021, 17);
+        
+        expect(isSuccessful).to.be.true;
+        expect(totalTable.tableData[0].userName).to.deep.equal("Fede");
+        expect(totalTable.tableData[0].points).to.equal(113);
+        expect(secondHalfTable.tableData).to.deep.equal([]);
+    }).timeout(5*60*1000);
+
+    it('all preconditions given, matchday = 34 => expect to set all Tables correctly', async () => {
+        const isSuccessful: boolean = await sync_live.updateTablesView(2021, 34);
+
+        const totalTable: Table = await appdata.getTableView("total", 2021, 34);
+        const finalTable: Table = await appdata.getTableView("final", 2021, 34);
+        const secondHalfTable: Table = await appdata.getTableView("second_half", 2021, 34);
+        const last5Table: Table = await appdata.getTableView("last_5", 2021, 34);
+
+        expect(isSuccessful).to.be.true;
+        expect(totalTable.tableData[0].userName).to.deep.equal("Fede");
+        expect(totalTable.tableData[0].points).to.equal(214);
+        expect(totalTable.tableData[7].userName).to.deep.equal("Christian");   
+        expect(finalTable.tableData[0].points).to.equal(223);
+        expect(secondHalfTable.tableData[0].userName).to.deep.equal("Marcel");
+        expect(secondHalfTable.tableData[0].points).to.equal(109);
+        expect(last5Table.tableData[0].userName).to.deep.equal("Mauri");
+        expect(last5Table.tableData[0].points).to.equal(33);
+    }).timeout(5*60*1000);
+    
+});
+
 describe('syncLive', () => {
     var sandbox: any;
 
     beforeEach(async () => {
         sandbox = sinon.createSandbox();
+
+        sandbox.stub(rule_defined_values, "SEASON").value(2022);
 
         // reset match results
         const matches29: Match[] = await appdata.getMatchesByMatchday(2022, 29);
@@ -314,13 +473,7 @@ describe('syncLive', () => {
 
         // reset score snapshot 
         let scoreSnapshot: MatchdayScoreSnapshot = await appdata.getMatchdayScoreSnapshot(2022, 29);
-        scoreSnapshot.userId = [];
-        scoreSnapshot.points = [];
-        scoreSnapshot.matches = [];
-        scoreSnapshot.results = [];
-        scoreSnapshot.extraOutsider = [];
-        scoreSnapshot.extraSeason = [];
-        scoreSnapshot.extraTop = [];
+        scoreSnapshot.scores = [];
         await appdata.setMatchdayScoreSnapshot(scoreSnapshot);
 
         // set sync phases
@@ -396,7 +549,7 @@ describe('syncLive', () => {
             .reduce((isMinus1, val) => isMinus1 && val == -1, true))
         .to.be.true; // all values -1
 
-        expect(snapshotData.points).to.deep.equal([]);
+        expect(snapshotData.scores).to.deep.equal([]);
 
         expect(updateData.timestamp).to.not.equal(1682101799);
     });
@@ -436,8 +589,7 @@ describe('syncLive', () => {
         .to.be.false; // no value must be -1
 
         // score must be refreshed
-        expect(snapshotData.userId).to.not.deep.equal([]);
-        expect(snapshotData.points).to.not.deep.equal([]);
+        expect(snapshotData.scores).to.not.deep.equal([]);
 
         // update time must be refreshed
         expect(updateData.timestamp).to.equal(1682108700);
@@ -497,8 +649,7 @@ describe('syncLive', () => {
         expect(rankingData.map(ranking => ranking.teamId).includes(-1)).to.be.false;
 
         // score must be refreshed
-        expect(snapshotData.userId).to.not.deep.equal([]);
-        expect(snapshotData.points).to.not.deep.equal([]);
+        expect(snapshotData.scores).to.not.deep.equal([]);
 
         // update time must be refreshed
         expect(updateData.timestamp).to.equal(1682177100);

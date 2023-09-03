@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import { Match, Bet, SeasonBet, SeasonResult } from "../business_rules/basic_datastructures";
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from "../business_rules/rule_defined_values"
 import { UpdateTime, MatchdayScoreSnapshot } from "./import_datastructures";
+import { Table } from "./export_datastructures";
 
 /**
  * Is processing the QuerySnapshot into the desired data type
@@ -136,13 +137,25 @@ export function makeUnknownScoreSnapshot(season: number, matchday: number): Matc
     documentId: "",
     season: season,
     matchday: matchday,
-    userId: [],
-    points: [],
-    matches: [],
-    results: [],
-    extraTop: [],
-    extraOutsider: [],
-    extraSeason: []
+    scores: []
+  };
+}
+
+/**
+ * Creates a dummy Table
+ * 
+ * @param id the identifier of the table (e.g. "total")
+ * @param season the season of the corresponding matchday
+ * @param matchday the matchay of the table
+ * @returns an empty dummy table
+ */
+export function makeUnknownTableView(id: string, season: number, matchday: number): Table {
+  return {
+    documentId: "",
+    id: id,
+    season: season,
+    matchday: matchday,
+    tableData: []
   };
 }
 

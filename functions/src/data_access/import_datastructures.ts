@@ -1,3 +1,5 @@
+import { Score } from "../business_rules/basic_datastructures";
+
 export interface MatchImportData {
   season: number;
   matchday: number;
@@ -14,13 +16,7 @@ export interface MatchdayScoreSnapshot {
   documentId: string;
   season: number;
   matchday: number;
-  userId: string[];
-  points: number[];
-  matches: number[];
-  results: number[];
-  extraTop: number[];
-  extraOutsider: number[];
-  extraSeason: number[];
+  scores: Score[];
 }
 
 export interface TeamRankingImportData {

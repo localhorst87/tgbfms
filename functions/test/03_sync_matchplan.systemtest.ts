@@ -7,10 +7,11 @@ import * as matchdata from "../src/data_access/matchdata_access";
 import * as util from "../src/util";
 import { Match } from "../../src/app/Businessrules/basic_datastructures";
 import { SyncPhase } from "../src/data_access/import_datastructures";
+import * as rule_defined_values from "../src/business_rules/rule_defined_values";
 
 describe('syncMatchplan system test', () => {
     var sandbox: any;
-
+    
     const expectedMatches31: Match[] = [
           {
             documentId: '2Ha42QdoDxrjLfDeiZ6D',
@@ -18,12 +19,12 @@ describe('syncMatchplan system test', () => {
             matchday: 31,
             matchId: 64136,
             timestamp: 1683311400,
-            isFinished: false,
+            isFinished: true,
             isTopMatch: false,
             teamIdHome: 6,
             teamIdAway: 65,
-            goalsHome: -1,
-            goalsAway: -1
+            goalsHome: 1,
+            goalsAway: 2
           },
           {
             documentId: '7fDVLDY6jEjnH5uYIHEp',
@@ -31,12 +32,12 @@ describe('syncMatchplan system test', () => {
             matchday: 31,
             matchId: 64137,
             timestamp: 1683473400,
-            isFinished: false,
+            isFinished: true,
             isTopMatch: false,
             teamIdHome: 7,
             teamIdAway: 131,
-            goalsHome: -1,
-            goalsAway: -1
+            goalsHome: 6,
+            goalsAway: 0
           },
           {
             documentId: 'R7PLj5VSxV2yUcEPPUWJ',
@@ -44,12 +45,12 @@ describe('syncMatchplan system test', () => {
             matchday: 31,
             matchId: 64139,
             timestamp: 1683379800,
-            isFinished: false,
+            isFinished: true,
             isTopMatch: false,
             teamIdHome: 112,
             teamIdAway: 1635,
-            goalsHome: -1,
-            goalsAway: -1
+            goalsHome: 0,
+            goalsAway: 1
           },
           {
             documentId: 'Y30inOL4y3WT5oyFIrlo',
@@ -57,12 +58,12 @@ describe('syncMatchplan system test', () => {
             matchday: 31,
             matchId: 64142,
             timestamp: 1683311400,
-            isFinished: false,
+            isFinished: true,
             isTopMatch: false,
             teamIdHome: 81,
             teamIdAway: 9,
-            goalsHome: -1,
-            goalsAway: -1
+            goalsHome: 2,
+            goalsAway: 3
           },
           {
             documentId: 'andEfdAAsxSc3TzqCQqA',
@@ -70,12 +71,12 @@ describe('syncMatchplan system test', () => {
             matchday: 31,
             matchId: 64138,
             timestamp: 1683379800,
-            isFinished: false,
+            isFinished: true,
             isTopMatch: false,
             teamIdHome: 87,
             teamIdAway: 129,
-            goalsHome: -1,
-            goalsAway: -1
+            goalsHome: 2,
+            goalsAway: 0
           },
           {
             documentId: 'bSiADabSxH7KruLnlFVI',
@@ -83,12 +84,12 @@ describe('syncMatchplan system test', () => {
             matchday: 31,
             matchId: 64140,
             timestamp: 1683379800,
-            isFinished: false,
-            isTopMatch: false,
+            isFinished: true,
+            isTopMatch: true,
             teamIdHome: 54,
             teamIdAway: 16,
-            goalsHome: -1,
-            goalsAway: -1
+            goalsHome: 2,
+            goalsAway: 1
           },
           {
             documentId: 'hYLjVu7PmSGiS8dEKkdu',
@@ -96,12 +97,12 @@ describe('syncMatchplan system test', () => {
             matchday: 31,
             matchId: 64135,
             timestamp: 1683379800,
-            isFinished: false,
+            isFinished: true,
             isTopMatch: false,
             teamIdHome: 95,
             teamIdAway: 80,
-            goalsHome: -1,
-            goalsAway: -1
+            goalsHome: 1,
+            goalsAway: 0
           },
           {
             documentId: 'j65A8b3gXxmFHeNMR4oB',
@@ -109,12 +110,12 @@ describe('syncMatchplan system test', () => {
             matchday: 31,
             matchId: 64143,
             timestamp: 1683390600,
-            isFinished: false,
+            isFinished: true,
             isTopMatch: false,
             teamIdHome: 134,
             teamIdAway: 40,
-            goalsHome: -1,
-            goalsAway: -1
+            goalsHome: 1,
+            goalsAway: 2
           },
           {
             documentId: 'kCfJnpEPUfrLGGkxyWks',
@@ -122,17 +123,18 @@ describe('syncMatchplan system test', () => {
             matchday: 31,
             matchId: 64141,
             timestamp: 1683379800,
-            isFinished: false,
+            isFinished: true,
             isTopMatch: false,
             teamIdHome: 175,
             teamIdAway: 91,
-            goalsHome: -1,
-            goalsAway: -1
+            goalsHome: 3,
+            goalsAway: 1
           }
         ];
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
+        sandbox.stub(rule_defined_values, "SEASON").value(2022);
     });
 
     afterEach(() => {
@@ -149,8 +151,8 @@ describe('syncMatchplan system test', () => {
         // enforce only updates for matchday 31
         sandbox.stub(matchdata, "getLastUpdateTime")
           .withArgs(2022, 29).resolves(-1) // no new data
-          .withArgs(2022, 30).resolves(-1) // new data
-          .withArgs(2022, 31).resolves(9999999999) // no new data
+          .withArgs(2022, 30).resolves(-1) // no new data
+          .withArgs(2022, 31).resolves(9999999999) // new data
           .withArgs(2022, 32).resolves(-1) // no new data
           .withArgs(2022, 33).resolves(-1) // no new data
           .withArgs(2022, 34).resolves(-1); // no new data
@@ -167,5 +169,5 @@ describe('syncMatchplan system test', () => {
 
         // expect 4 sync phases to be added
         expect(syncPhases.length).to.equal(4);
-    });
+    }).timeout(20000);
 });

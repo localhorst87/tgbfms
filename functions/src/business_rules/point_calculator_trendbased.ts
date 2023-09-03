@@ -1,11 +1,23 @@
 import { PointCalculator } from "./point_calculator";
-import { Match, Bet, Score } from "./basic_datastructures";
-import { POINTS_TENDENCY, POINTS_ADDED_RESULT, FACTOR_TOP_MATCH, POINTS_ADDED_OUTSIDER_ONE, POINTS_ADDED_OUTSIDER_TWO } from "./rule_defined_values";
+import { Match, Bet, Score, SeasonBet, SeasonResult } from "./basic_datastructures";
+import { 
+    POINTS_TENDENCY,
+    POINTS_ADDED_RESULT,
+    FACTOR_TOP_MATCH,
+    POINTS_ADDED_OUTSIDER_ONE,
+    POINTS_ADDED_OUTSIDER_TWO,
+    POINTS_SEASON_FIRST_EXACT,
+    POINTS_SEASON_SECOND_EXACT,
+    POINTS_SEASON_LOSER_CORRECT,
+    POINTS_SEASON_LOSER_EXACT } from "./rule_defined_values";
 
 export class PointCalculatorTrendbased implements PointCalculator {
-    score: Score;
+    userId: string;
+    private score: Score;
+    private seasonScore: Score;
 
     constructor(userId: string) {
+        this.userId = userId;
         this.score = {
             userId: userId,
             points: 0,
@@ -15,59 +27,154 @@ export class PointCalculatorTrendbased implements PointCalculator {
             extraOutsider: 0,
             extraSeason: 0
         };
+        this.seasonScore = {
+            userId: userId,
+            points: 0,
+            matches: 0,
+            results: 0,
+            extraTop: 0,
+            extraOutsider: 0,
+            extraSeason: 0
+        }
     }
 
     /**
-     * Adds the points of a single match to the users Score structure
+     * Returns the Score of the user
+     * 
+     * @param ingestSeasonScore if set to true, the season Score will be added
+     * @returns the user Score
+     */
+    public getScore(ingestSeasonScore: boolean = false): Score {
+        if (ingestSeasonScore) 
+            return this.addTwoScores({...this.score}, {...this.seasonScore});
+        else
+            return {...this.score};
+    }
+
+    /**
+     * Calculates and adds the points of a single match to the users Score
      * 
      * @param betsAllUsers the Bets of all users of a single match
      * @param match the match to compare
-     * @returns 
      */
     public addSingleMatchScore(betsAllUsers: Bet[], match: Match): void {
         
         let betUser: Bet = { documentId: "", matchId: -1, userId: "", isFixed: false, goalsHome: -1, goalsAway: -1 };
         for (let bet of betsAllUsers) {
-          if (this.score.userId == bet.userId) {
-            betUser = bet;
-            break;
-          }
+            if (this.score.userId == bet.userId) {
+                betUser = bet;
+                break;
+            }
         }
 
         let singleScore = {
-          userId: this.score.userId,
-          points: 0,
-          matches: 0,
-          results: 0,
-          extraTop: 0,
-          extraOutsider: 0,
-          extraSeason: 0
+            userId: this.score.userId,
+            points: 0,
+            matches: 0,
+            results: 0,
+            extraTop: 0,
+            extraOutsider: 0,
+            extraSeason: 0
         };
-    
+
         if (betUser.matchId != match.matchId)
-          return;
-    
+            return;
+
         if (this.isTendencyCorrect(betUser, match)) {
-          singleScore.matches += 1;
-          singleScore.points += POINTS_TENDENCY;
+            singleScore.matches += 1;
+            singleScore.points += POINTS_TENDENCY;
         }
         if (this.isResultCorrect(betUser, match)) {
-          singleScore.results += 1;
-          singleScore.points += POINTS_ADDED_RESULT;
+            singleScore.results += 1;
+            singleScore.points += POINTS_ADDED_RESULT;
         }
         if (match.isTopMatch) {
-          singleScore.extraTop += singleScore.points * (FACTOR_TOP_MATCH - 1);
-          singleScore.points *= FACTOR_TOP_MATCH;
+            singleScore.extraTop += singleScore.points * (FACTOR_TOP_MATCH - 1);
+            singleScore.points *= FACTOR_TOP_MATCH;
         }
         if (singleScore.points > 0) {
-          const extraOutsider: number = this.getPotentialOutsiderPoints(betsAllUsers, betUser);
-          singleScore.extraOutsider += extraOutsider;
-          singleScore.points += extraOutsider;
+            const extraOutsider: number = this.getPotentialOutsiderPoints(betsAllUsers, betUser);
+            singleScore.extraOutsider += extraOutsider;
+            singleScore.points += extraOutsider;
         }
-        
+      
         this.addScore(singleScore);
-        
-        return;
+    }
+
+    /**
+     * Calculates and adds season score of the specific user to the Score.
+     * Given bets user ID must correspond with the userID assigned on
+     * instantiation
+     * 
+     * @param bets season bets of the user (all or some)
+     * @param results season results (all or some)
+     */
+    public addSeasonScore(bets: SeasonBet[], results: SeasonResult[]): void {  
+        let points: number = 0;
+
+        const relegatorResults: SeasonResult[] = results.filter(res => res.place < 0);
+
+        for (let bet of bets) {
+            // if bet not available or wrong user => next bet
+            if (bet.teamId == -1 || bet.userId !== this.score.userId)
+                continue;
+    
+            // if result not available, make an unknown result
+            let result: SeasonResult | undefined = results.find(res => res.place == bet.place);
+            if (result === undefined) {
+                result = this.makeUnknownSeasonResult(bet.season, bet.place);
+            }
+
+            // check for exact matching of bet and result
+            if (bet.teamId == result.teamId) {
+                if (bet.place == 1)
+                    points += POINTS_SEASON_FIRST_EXACT;
+                else if (bet.place == 2)
+                    points += POINTS_SEASON_SECOND_EXACT;
+                else
+                    points += POINTS_SEASON_LOSER_EXACT;
+            }
+            else {    
+                // for relegator bets, points can also be collected for not
+                // exact correctness team of bet is among the relegator places
+                if (bet.place < 0) {
+                    for (let relegatorRes of relegatorResults) {
+                        if (bet.teamId == relegatorRes.teamId)
+                            points += POINTS_SEASON_LOSER_CORRECT;
+                    }
+                }
+            }
+        }
+      
+      this.seasonScore.points += points;
+      this.seasonScore.extraSeason = points; 
+    }
+
+    /**
+     * Adds any arbitrary Score to the overall score of this user
+     * 
+     * @param score the single score
+     */
+    public addScore(score: Score): void {
+        this.score = this.addTwoScores({...this.score}, score);
+    }
+
+    /**
+     * Return the addition of two Scores
+     * 
+     * @param score1 
+     * @param score2 
+     * @returns score1 + score2
+     */
+    private addTwoScores(score1: Score, score2: Score): Score {
+        score1.points += score2.points;
+        score1.matches += score2.matches;
+        score1.results += score2.results;
+        score1.extraTop += score2.extraTop;
+        score1.extraOutsider += score2.extraOutsider;
+        score1.extraSeason += score2.extraSeason; 
+
+        return score1;
     }
 
     /**
@@ -83,14 +190,14 @@ export class PointCalculatorTrendbased implements PointCalculator {
         let tendencyUser = this.getTendency(betUser);
     
         if (tendencyUser == -1)
-          return 0; // no bet available
+            return 0; // no bet available
     
         if (nTendency[tendencyUser] == 2)
-          return POINTS_ADDED_OUTSIDER_TWO; // only 1 other user has set this bet
+            return POINTS_ADDED_OUTSIDER_TWO; // only 1 other user has set this bet
         else if (nTendency[tendencyUser] == 1)
-          return POINTS_ADDED_OUTSIDER_ONE; // users bet is unique
+            return POINTS_ADDED_OUTSIDER_ONE; // users bet is unique
         else
-          return 0;
+            return 0;
     }
 
     /**
@@ -181,16 +288,18 @@ export class PointCalculatorTrendbased implements PointCalculator {
     }
 
     /**
-     * Adds a single score to the overall score of this user
+     * Create dummy SeasonResult with teamId = -1
      * 
-     * @param score the single score
+     * @param season 
+     * @param place 
+     * @returns 
      */
-    private addScore(score: Score): void {
-      this.score.points += score.points;
-      this.score.matches += score.matches;
-      this.score.results += score.results;
-      this.score.extraTop += score.extraTop;
-      this.score.extraOutsider += score.extraOutsider;
-      this.score.extraSeason += score.extraSeason;
+    private makeUnknownSeasonResult(season: number, place: number): SeasonResult {
+        return {
+            documentId: "",
+            season: season,
+            place: place,
+            teamId: -1
+        };
     }
 }

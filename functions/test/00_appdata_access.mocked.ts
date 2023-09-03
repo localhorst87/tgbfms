@@ -12,7 +12,6 @@ import { describe, it } from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
 import { Bet, Match } from "../../src/app/Businessrules/basic_datastructures";
-// import * as appdata_access from "../src/data_access/appdata_access";
 import * as appdata_helpers from "../src/data_access/appdata_helpers";
 import * as admin from "firebase-admin";
 

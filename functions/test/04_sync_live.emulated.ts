@@ -3,9 +3,10 @@ import { expect } from "chai";
 import * as sinon from "sinon";
 import * as sync_live_helpers from "../src/sync_live/sync_live_helpers";
 import * as appdata from "../src/data_access/appdata_access";
-import { Match, Bet, User, Score } from "../../src/app/Businessrules/basic_datastructures";
+import { Match, Bet, User } from "../../src/app/Businessrules/basic_datastructures";
 import { UpdateTime, SyncPhase, MatchImportData, MatchdayScoreSnapshot } from "../src/data_access/import_datastructures";
 import * as util from "../src/util";
+import { Table } from "../src/data_access/export_datastructures";
 
 describe('sync_live_helpers', () => {
 
@@ -59,7 +60,12 @@ describe('sync_live_helpers', () => {
                 email: "",
                 displayName: "",
                 isAdmin: false,
-                isActive: true
+                isActive: true,
+                configs: {
+                    notificationLevel: 0,
+                    notificationTime: 2,
+                    theme: "dark"
+                }
             },
             {
                 id: "user_id_1",
@@ -67,7 +73,12 @@ describe('sync_live_helpers', () => {
                 email: "",
                 displayName: "",
                 isAdmin: false,
-                isActive: true
+                isActive: true,
+                configs: {
+                    notificationLevel: 0,
+                    notificationTime: 2,
+                    theme: "dark"
+                }
             },    
             {
                 id: "user_id_2",
@@ -75,7 +86,12 @@ describe('sync_live_helpers', () => {
                 email: "",
                 displayName: "",
                 isAdmin: false,
-                isActive: true
+                isActive: true,
+                configs: {
+                    notificationLevel: 0,
+                    notificationTime: 2,
+                    theme: "dark"
+                }
             }     
         ];
 
@@ -565,75 +581,6 @@ describe('sync_live_helpers', () => {
             });            
         });
     
-    });
-
-    describe('convertToScoreSnapshot', () => {
-
-        it('ScoreArray is empty => expect MatchdayScoreSnapshot with empty arrays', () => {
-            const scoreSnapshot: MatchdayScoreSnapshot = sync_live_helpers.convertToScoreSnapshot(2030, 12, []);
-            
-            expect(scoreSnapshot).to.deep.equal({
-                documentId: "",
-                season: 2030,
-                matchday: 12,
-                userId: [],
-                points: [],
-                matches: [],
-                results: [],
-                extraTop: [],
-                extraOutsider: [],
-                extraSeason: []
-            });
-            
-        });
-
-        it('ScoreArray not empty => expect transformed data', () => {
-            const scores: Score[] = [
-                {
-                    userId: "user_0",
-                    points: 10,
-                    matches: 6,
-                    results: 2,
-                    extraTop: 1,
-                    extraOutsider: 1,
-                    extraSeason: 0
-                },
-                {
-                    userId: "user_1",
-                    points: 5,
-                    matches: 4,
-                    results: 0,
-                    extraTop: 1,
-                    extraOutsider: 0,
-                    extraSeason: 0
-                },   
-                {
-                    userId: "user_2",
-                    points: 7,
-                    matches: 4,
-                    results: 1,
-                    extraTop: 1,
-                    extraOutsider: 1,
-                    extraSeason: 0
-                }             
-            ];
-
-            const scoreSnapshot: MatchdayScoreSnapshot = sync_live_helpers.convertToScoreSnapshot(2030, 12, scores);
-            
-            expect(scoreSnapshot).to.deep.equal({
-                documentId: "",
-                season: 2030,
-                matchday: 12,
-                userId: ["user_0", "user_1", "user_2"],
-                points: [10, 5, 7],
-                matches: [6, 4, 4],
-                results: [2, 0, 1],
-                extraTop: [1, 1, 1],
-                extraOutsider: [1, 0, 1],
-                extraSeason: [0, 0, 0]
-            });
-        });
-        
     });
     
 });

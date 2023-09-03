@@ -11,6 +11,7 @@ import {UpdateTime,
   MatchdayScoreSnapshot,
   Email} from "./import_datastructures";
 import * as helper from "./appdata_helpers";
+import { Table } from "./export_datastructures";
 
 const COLLECTION_NAME_MATCHES: string = "matches";
 const COLLECTION_NAME_BETS: string = "bets";
@@ -22,6 +23,7 @@ const COLLECTION_NAME_USERS: string = "users";
 const COLLECTION_NAME_SCORE_SNAPSHOT: string = "matchday_score_snapshots";
 const COLLECTION_NAME_TOPMATCH_VOTES: string = "topmatch_votes";
 const COLLECTION_NAME_EMAIL: string = "mail";
+const COLLECTION_NAME_VIEW_TABLES: string = "view_tables";
 
 // for testing with online Firebase services: 
 // GOOGLE_APPLICATION_CREDENTIALS must be set as env variable and point to
@@ -528,6 +530,8 @@ export async function getMail(to: string, startDate: Date): Promise<Email[]> {
 }
 
 /**
+ * Sets an Email object in the app database (which triggers to send an email
+ * to the given recipient)
  * 
  * @param email the email, as defined with all necessary fields
  * @returns 
@@ -546,6 +550,64 @@ export async function setMail(email: Email): Promise<boolean> {
   delete emailToSet.documentId;
 
   return documentReference.set(emailToSet)
+    .then(() => {
+      return true;
+    })
+    .catch((err: any) => {
+      return false;
+    });
+}
+
+/**
+ * Get a specific Table for the view in the frontend. A specific Table object
+ * is uniquely identified by the id, the season and the matchday.
+ * 
+ * If the requested Table does not exist in the app database, an empty dummy
+ * Table object will be created.
+ * 
+ * @param id the id of the table to request. Must be one of the following:
+ *            "total", "matchday", "second_half", "last_5", "last_10"
+ * @param season the season of the corresp. matchday for unique identification 
+ * @param matchday the matchday of the table
+ * @returns the requested table or a dummy Table object
+ */
+export async function getTableView(id: string, season: number, matchday: number): Promise<Table> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_VIEW_TABLES)
+    .where("id", "==", id)
+    .where("season", "==", season)
+    .where("matchday", "==", matchday);
+
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      let table: Table[] = helper.processSnapshot<Table>(querySnapshot);
+      if (table.length > 0)
+        return table[0];
+      else
+        return helper.makeUnknownTableView(id, season, matchday);
+    }
+  );
+}
+
+/**
+ * Sets the given Table in the app database
+ * 
+ * @param table the Table object to set
+ * @returns 
+ */
+export async function setTableView(table: Table): Promise<boolean> {
+  let documentReference: admin.firestore.DocumentReference;
+  if (table.documentId == "") {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_VIEW_TABLES).doc()
+  }
+  else {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_VIEW_TABLES).doc(table.documentId);
+  }
+
+  // documentId should not be a property in the dataset itself, as it is meta-data
+  let tableToSet: any = { ...table };
+  delete tableToSet.documentId;
+
+  return documentReference.set(tableToSet)
     .then(() => {
       return true;
     })

@@ -74,7 +74,7 @@
             switch_left
           </mat-icon>
         </button>
-        <button mat-mini-fab color="primary" class="preset-button" [disabled]="currentMatchday <= 5" (click)="showTable('total')">
+        <button mat-mini-fab color="primary" class="preset-button" [disabled]="currentMatchday <= 5" (click)="showTable('last_5')">
           <mat-icon
             matTooltip="letzte 5 Spieltage"
             matTooltipPosition="above"
@@ -82,7 +82,7 @@
             replay_5
           </mat-icon>
         </button>
-        <button mat-mini-fab color="primary" class="preset-button" [disabled]="currentMatchday <= 10" (click)="showTable('total')">
+        <button mat-mini-fab color="primary" class="preset-button" [disabled]="currentMatchday <= 10" (click)="showTable('last_10')">
           <mat-icon
             matTooltip="letzte 10 Spieltage"
             matTooltipPosition="above"

@@ -1,13 +1,13 @@
 import { Component, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { Observable, interval, range, of } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import SwiperCore from "swiper";
 import { Pagination } from "swiper";
 import { SEASON } from '../Businessrules/rule_defined_values';
 import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
-import { FetchStatisticsDataService } from '../UseCases/fetch-statistics-data.service';
-import { FetchTableService } from '../UseCases/fetch-table.service';
-import { MatchInfo, TableData } from '../UseCases/output_datastructures';
+import { MatchInfo, Table, TableData } from '../UseCases/output_datastructures';
+import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
+import { UserStats } from '../Dataaccess/import_datastructures';
 SwiperCore.use([Pagination]);
 
 interface DataPoint {
@@ -60,8 +60,7 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   constructor(
     private fetchBasicService: FetchBasicDataService,
-    private fetchStatsService: FetchStatisticsDataService,
-    private fetchTableService: FetchTableService) {
+    private appdata: AppdataAccessService) {
 
     this.userId = "";
     this.matchdayNextMatch = -1;
@@ -186,7 +185,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         (matchInfo: MatchInfo) => {
           this.nextMatchesInfo.push(matchInfo);
         },
-        (err) => { },
+        (err) => { console.log(err); },
         () => { this.elementsLoaded++; }
 
       );
@@ -196,67 +195,64 @@ export class DashboardComponent implements OnInit, OnChanges {
       this.tableData = []; // clear tableData
       let startMatchday: number;
       let matchdayCount: number;
-      let endMatchday: number;
+      // let endMatchday: number;
       let currentMatchday: number;
-      let matchdaysToFetch$: Observable<number>;
+      let matchdaysToFetch: number[];
 
       if (this.matchdayCompleted > 0) {
         startMatchday = Math.max(1, this.matchdayCompleted - HISTORY_MATCHES + 1);
         matchdayCount = Math.min(this.matchdayCompleted, HISTORY_MATCHES);
-        endMatchday = this.matchdayCompleted;
+        // endMatchday = this.matchdayCompleted;
         currentMatchday = this.matchdayCurrent;
-        matchdaysToFetch$ = range(startMatchday, matchdayCount);
+        matchdaysToFetch = Array.from({length: matchdayCount}, (_, i) => startMatchday + i);
       }
       else {
         startMatchday = 0;
         matchdayCount = 0;
-        endMatchday = 0;
+        // endMatchday = 0;
         currentMatchday = 0;
-        matchdaysToFetch$ = of(0);
+        matchdaysToFetch = [];
       }
 
       // update Form History Data
-      matchdaysToFetch$.pipe(
-        concatMap((matchday: number) => this.fetchStatsService.fetchFormByUserId$(SEASON, matchday, this.userId).pipe(
-          map((form: number) => { return { "name": String(matchday), "value": form }; })
-        ))
-      ).subscribe(
-        (dataPoint: DataPoint) => {
-          this.formHistoryData[0].series.push(dataPoint);
+      this.appdata.getUserStats$(SEASON, currentMatchday, this.userId).subscribe(
+        (userStats: UserStats) => {
+          for (let matchday of matchdaysToFetch) {
+            // add current form
+            if (userStats.currentForm !== undefined)
+              this.currentForm = userStats.currentForm;
+            else
+              this.currentForm = 0;
+
+            // add form history
+            let formDataPoint: DataPoint;
+            if (userStats.formHistory !== undefined)
+              formDataPoint = { "name": String(matchday), "value": userStats.formHistory[matchday - 1] };
+            else
+              formDataPoint = { "name": String(matchday), "value": 0 };
+            this.formHistoryData[0].series.push(formDataPoint);
+
+            // add position history
+            let tableDataPoint: DataPoint;
+            if (userStats.positionHistory !== undefined)
+              tableDataPoint = { "name": String(matchday), "value": userStats.positionHistory[matchday - 1] };
+            else
+              tableDataPoint = { "name": String(matchday), "value": 0 };
+            this.tableHistoryData[0].series.push(tableDataPoint);
+          }
         },
-        (err) => { },
+        (err) => { console.log(err); },
         () => {
           this.formHistoryData = [...this.formHistoryData];
-          this.elementsLoaded++;
-        }
-      );
-
-      // update Table History Data
-      let j = 0;
-      this.fetchTableService.fetchUserPlaceForMatchdays$(SEASON, startMatchday, endMatchday, this.userId).pipe(
-        map((place: number) => { return { "name": String(startMatchday + j++), "value": place }; })
-      ).subscribe(
-        (dataPoint: DataPoint) => {
-          this.tableHistoryData[0].series.push(dataPoint);
-        },
-        (err) => { },
-        () => {
           this.tableHistoryData = [...this.tableHistoryData];
           this.elementsLoaded++;
-        }
-      );
-
-      // update current user Form
-      this.fetchStatsService.fetchFormByUserId$(SEASON, endMatchday, this.userId).subscribe(
-        val => { this.currentForm = val },
-        (err) => { },
-        () => {
+          this.elementsLoaded++;
           this.elementsLoaded++;
         }
-      );
+      )
 
-      // update Table History Data
-      this.fetchTableService.fetchTotalTableForMatchdays$(SEASON, currentMatchday).subscribe(
+      // update Table Data
+      this.appdata.getTableView$("total", SEASON, currentMatchday).pipe(map((table: Table) => table.tableData)).subscribe(
         (tableDataArray: TableData[]) => {
           this.tableLeader = tableDataArray[0].userName;
           let leaderPoints: number = tableDataArray[0].points;

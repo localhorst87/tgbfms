@@ -3,7 +3,6 @@ import { Observable, of, from, range, concat, iif, combineLatest } from 'rxjs';
 import { map, switchMap, mergeMap, concatMap, pluck, distinct, filter, first, last, toArray, reduce } from 'rxjs/operators';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { MatchdataAccessService } from '../Dataaccess/matchdata-access.service';
-import { PointCalculatorService } from '../Businessrules/point-calculator.service';
 import { Bet, Match, Team, SeasonBet } from '../Businessrules/basic_datastructures';
 import { MatchInfo, TeamStats } from './output_datastructures';
 import { TeamRankingImportData } from '../Dataaccess/import_datastructures';
@@ -20,8 +19,7 @@ export class FetchBasicDataService {
 
   constructor(
     private appData: AppdataAccessService,
-    private matchData: MatchdataAccessService,
-    private pointCalc: PointCalculatorService) {
+    private matchData: MatchdataAccessService) {
     this.relevantPlaces$ = concat(
       range(1, RELEVANT_FIRST_PLACES_COUNT),
       range(-RELEVANT_LAST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT)
@@ -212,7 +210,25 @@ export class FetchBasicDataService {
       goalsAway: resultGoalsAway
     }
 
-    return this.pointCalc.isTendencyCorrect(bet, result);
+    return this.isTendencyCorrect(bet, result);
+  }
+
+  private isTendencyCorrect(subject1: any, subject2: any) {
+    return this.getTendency(subject1) == this.getTendency(subject2);
+  }
+
+  private getTendency(subject: any) {
+    const diff: number = subject.goalsHome - subject.goalsAway;
+
+    if (diff > 0) {
+      return 1;
+    }
+    else if (diff < 0) {
+      return 2;
+    }
+    else {
+      return 0;
+    }
   }
 
   private makeMatchInfo$(match: Match, userId: string): Observable<MatchInfo> {

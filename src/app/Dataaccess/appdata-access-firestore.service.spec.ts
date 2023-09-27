@@ -5,7 +5,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { of } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 import { Bet, Match, User, Team, SeasonBet, SeasonResult } from '../Businessrules/basic_datastructures';
-import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
+import { MatchdayScoreSnapshot } from './import_datastructures';
 
 describe('AppdataAccessFirestoreService', () => {
   let service: AppdataAccessFirestoreService;
@@ -1283,115 +1283,6 @@ describe('AppdataAccessFirestoreService', () => {
     service["getMatchdayScoreSnapshot$"](argument1, argument2).subscribe(
       val => {
         expect(val).toEqual(expectedValues[i++]);
-        done();
-      }
-    );
-  });
-
-  // ---------------------------------------------------------------------------
-  // getSyncTime$
-  // ---------------------------------------------------------------------------
-
-  it("getSyncTime$, one dataset", (done) => {
-    const argument1: number = 2020;
-    const argument2: number = 23;
-
-    const targetSyncTime: SyncTime = {
-      documentId: "doc_id_0",
-      season: argument1,
-      matchday: argument2,
-      timestamp: 1619980993
-    };
-
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetSyncTime])) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValue: SyncTime[] = [targetSyncTime];
-
-    let i: number = 0;
-    service["getSyncTime$"](argument1, argument2).subscribe(
-      val => {
-        expect(val).toEqual(expectedValue[i++]);
-        done();
-      }
-    );
-  });
-
-  it("getSyncTime$, more than one dataset", (done) => {
-    const argument1: number = 2020;
-    const argument2: number = 23;
-
-    const targetSyncTime: SyncTime = {
-      documentId: "doc_id_0",
-      season: argument1,
-      matchday: argument2,
-      timestamp: 1619980993
-    };
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetSyncTime, targetSyncTime])) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValue: SyncTime[] = [targetSyncTime];
-
-    let i: number = 0;
-    service["getSyncTime$"](argument1, argument2).subscribe(
-      val => {
-        expect(val).toEqual(expectedValue[i++]);
-        done();
-      }
-    );
-  });
-
-  it("getSyncTime$, emitting twice", (done) => {
-    const argument1: number = 2020;
-    const argument2: number = 23;
-
-    const targetSyncTime: SyncTime = {
-      documentId: "doc_id_0",
-      season: argument1,
-      matchday: argument2,
-      timestamp: 1619980993
-    };
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetSyncTime], [targetSyncTime])) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValue: SyncTime[] = [targetSyncTime];
-
-    let i: number = 0;
-    service["getSyncTime$"](argument1, argument2).subscribe(
-      val => {
-        expect(val).toEqual(expectedValue[i++]);
-        done();
-      }
-    );
-  });
-
-  it("getSyncTime$, no dataset available", (done) => {
-    const argument: string = "test_user";
-
-    const argument1: number = 2020;
-    const argument2: number = 23;
-
-    const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
-    const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
-
-    TestBed.configureTestingModule({ providers: [AppdataAccessFirestoreService, { provide: AngularFirestore, useValue: firestoreStub }] });
-    service = TestBed.inject(AppdataAccessFirestoreService);
-
-    const expectedValue: SyncTime[] = [{ documentId: "", season: argument1, matchday: argument2, timestamp: -1 }];
-
-    let i: number = 0;
-    service["getSyncTime$"](argument1, argument2).subscribe(
-      val => {
-        expect(val).toEqual(expectedValue[i++]);
         done();
       }
     );

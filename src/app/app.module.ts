@@ -20,8 +20,6 @@ import { PointCalculatorService } from './Businessrules/point-calculator.service
 import { PointCalculatorTrendbasedService } from './Businessrules/point-calculator-trendbased.service';
 import { StatisticsCalculatorService } from './Businessrules/statistics-calculator.service';
 import { StatisticsCalculatorTrendbasedService } from './Businessrules/statistics-calculator-trendbased.service';
-import { UserInteractionService } from './Businessrules/user-interaction.service';
-import { UserInteractionVoteBasedService } from './Businessrules/user-interaction-vote-based.service';
 import { BetWriteComponent } from './bet-write/bet-write.component';
 import { BetOverviewComponent } from './bet-overview/bet-overview.component';
 import { HomeComponent } from './home/home.component';
@@ -121,7 +119,6 @@ import { ConfigComponent } from './config/config.component';
     { provide: MatchdataAccessService, useClass: MatchdataAccessOpenligaService },
     { provide: PointCalculatorService, useClass: PointCalculatorTrendbasedService },
     { provide: StatisticsCalculatorService, useClass: StatisticsCalculatorTrendbasedService },
-    { provide: UserInteractionService, useClass: UserInteractionVoteBasedService },
     // {
     //   provide: SETTINGS,
     //   useValue: environment.emulator === true ? {

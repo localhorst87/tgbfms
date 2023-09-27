@@ -4,7 +4,7 @@ import { Observable, from, timer } from 'rxjs';
 import { map, switchMap, distinct, take, pluck, takeUntil } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { Bet, Match, Team, User, SeasonBet, SeasonResult, TopMatchVote } from '../Businessrules/basic_datastructures';
-import { MatchdayScoreSnapshot, SyncTime } from './import_datastructures';
+import { MatchdayScoreSnapshot, UserStats } from './import_datastructures';
 import { Table } from '../UseCases/output_datastructures';
 import { NUMBER_OF_TEAMS } from '../Businessrules/rule_defined_values';
 
@@ -19,6 +19,7 @@ export const COLLECTION_NAME_SEASON_RESULTS: string = 'season_results';
 export const COLLECTION_NAME_UPDATE_TIMES: string = 'sync_times';
 export const COLLECTION_NAME_TOPMATCH_VOTE: string = 'topmatch_votes';
 export const COLLECTION_NAME_TABLE_VIEW: string = 'view_tables';
+export const COLLECTION_NAME_USER_STATS: string = 'user_stats';
 
 const SECONDS_PER_DAY: number = 86400;
 const MATCHES_PER_MATCHDAY: number = Math.floor(NUMBER_OF_TEAMS / 2);
@@ -382,29 +383,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
-  getSyncTime$(season: number, matchday: number): Observable<SyncTime> {
-    // returns the last time as unix timestamp (wrapped as SyncTime object)
-    // of when the last change in the app database was made with respect to
-    // the given season and matchday
-
-    let timeQuery$: Observable<SyncTime[]> = this.firestore.collection<SyncTime>(COLLECTION_NAME_UPDATE_TIMES, ref =>
-      ref.where("season", "==", season).where("matchday", "==", matchday))
-      .valueChanges({ idField: 'documentId' });
-
-    return timeQuery$.pipe(
-      map((syncTimeArray: SyncTime[]) => {
-        if (syncTimeArray.length == 0) {
-          return this.makeUnknownSyncTime(season, matchday);
-        }
-        else {
-          return syncTimeArray[0];
-        }
-      }),
-      take(1),
-      distinct()
-    );
-  }
-
   getOpenBets$(matchId: number): Observable<Bet> {
     // returns all the Bets with the given match ID that are not fixed
 
@@ -463,6 +441,28 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       take(1),
       distinct()
     );
+  }
+
+  getUserStats$(season: number, matchday: number, userId: string): Observable<UserStats> {
+    let query$: Observable<UserStats[]> = this.firestore.collection<UserStats>(COLLECTION_NAME_USER_STATS, ref =>
+      ref
+        .where("season", "==", season)
+        .where("matchday", "==", matchday)
+        .where("userId", "==", userId))
+      .valueChanges({ idField: 'documentId' });
+
+      return query$.pipe(
+        map((statsArray: UserStats[]) => {
+          if (statsArray.length > 0) {
+            return statsArray[0];
+          }
+          else {
+            return this.makeUnknownUserStats(season, matchday, userId);
+          }
+        }),
+        take(1),
+        distinct()
+      );    
   }
 
   setBet(bet: Bet): Promise<void> {
@@ -527,15 +527,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     let snapshotDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_MATCHDAY_SCORE_SNAPSHOT + "/" + documentId);
     snapshotDocument.set(snapshotToUpdate);
-  }
-
-  setSyncTime(syncTime: SyncTime): void {
-    let syncTimeToUpdate: any = {...syncTime};
-    let documentId: string = syncTime.documentId;
-    delete syncTimeToUpdate.documentId;
-
-    let syncTimeDocument: AngularFirestoreDocument = this.firestore.doc(COLLECTION_NAME_UPDATE_TIMES + "/" + documentId);
-    syncTimeDocument.set(syncTimeToUpdate);
   }
 
   setTopMatchVote(vote: TopMatchVote): Promise<void> {
@@ -607,13 +598,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       documentId: "",
       season: season,
       matchday: matchday,
-      userId: [],
-      points: [],
-      matches: [],
-      results: [],
-      extraTop: [],
-      extraOutsider: [],
-      extraSeason: []
+      scores: []
     };
   }
 
@@ -652,17 +637,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     };
   }
 
-  private makeUnknownSyncTime(season: number, matchday: number): SyncTime {
-    // returns an unknown SyncTime struct
-
-    return {
-      documentId: "",
-      season: season,
-      matchday: matchday,
-      timestamp: -1
-    };
-  }
-
   private makeUnknownTable(season: number, matchday: number, id: string): Table {
     return {
       documentId: "",
@@ -670,6 +644,15 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       matchday: matchday,
       id: id,
       tableData: []
+    };
+  }
+
+  private makeUnknownUserStats(season: number, matchday: number, userId: string): UserStats {
+    return {
+      documentId: "",
+      season: season,
+      matchday: matchday,
+      userId: userId
     };
   }
 

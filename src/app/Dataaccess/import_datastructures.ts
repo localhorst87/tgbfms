@@ -1,3 +1,5 @@
+import { Score } from "../Businessrules/basic_datastructures";
+
 export interface MatchImportData {
   matchday: number;
   matchId: number;
@@ -13,13 +15,7 @@ export interface MatchdayScoreSnapshot {
   documentId: string;
   season: number;
   matchday: number;
-  userId: string[];
-  points: number[];
-  matches: number[];
-  results: number[];
-  extraTop: number[];
-  extraOutsider: number[];
-  extraSeason: number[];
+  scores: Score[];
 }
 
 export interface TeamRankingImportData {
@@ -33,9 +29,30 @@ export interface TeamRankingImportData {
   goalsAgainst: number;
 }
 
-export interface SyncTime {
+export interface UserStats {
   documentId: string;
   season: number;
   matchday: number;
-  timestamp: number;
+  userId: string;
+  currentForm?: number;
+  formHistory?: number[];
+  meanPoints?: number;
+  stddev?: number;
+  stddevRel?: number;
+  positionHistory?: number[];
+  mostFrequentBets?: ResultFrequency[];
+  boxPlot?: BoxPlot;
+}
+
+export interface ResultFrequency {
+  result: string;
+  fraction: number;
+}
+
+export interface BoxPlot {
+  minimum: number;
+  lowerQuartile: number;
+  median: number;
+  upperQuartile: number;
+  maximum: number;
 }

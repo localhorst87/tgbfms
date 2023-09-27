@@ -12,7 +12,7 @@
     "test_mocked": "mocha -r ts-node/register 'test/*.mocked.ts' --reporter spec",
     "test_emulated": "export FIRESTORE_EMULATOR_HOST='localhost:8080' && mocha -r ts-node/register 'test/*.emulated.ts' --reporter spec; unset FIRESTORE_EMULATOR_HOST",
     "test_system": "export FIRESTORE_EMULATOR_HOST='localhost:8080' && mocha -r ts-node/register 'test/*.systemtest.ts' --reporter spec; unset FIRESTORE_EMULATOR_HOST",
-    "convert": "mocha -r ts-node/register 'test/*.convert.ts' --reporter spec;"
+    "test_fly": "mocha -r ts-node/register 'test/*.fly.ts' --reporter spec;"
   },
   "engines": {
     "node": "16"
@@ -21,7 +21,7 @@
   "dependencies": {
     "@firebase/firestore-types": "^2.5.1",
     "axios": "^0.26.1",
-    "firebase-admin": "^10.0.2",
+    "firebase-admin": "^11.10.1",
     "firebase-functions": "^4.3.1"
   },
   "devDependencies": {

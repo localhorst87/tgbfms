@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import { Match, Bet, SeasonBet, SeasonResult } from "../business_rules/basic_datastructures";
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from "../business_rules/rule_defined_values"
-import { UpdateTime, MatchdayScoreSnapshot } from "./import_datastructures";
+import { UpdateTime, MatchdayScoreSnapshot, UserStats } from "./import_datastructures";
 import { Table } from "./export_datastructures";
 
 /**
@@ -120,7 +120,8 @@ export function makeUnknownUpdateTime(season: number, matchday: number): UpdateT
     documentId: "",
     season: season,
     matchday: matchday,
-    timestamp: -1
+    timestampMatches: -1,
+    timestampStats: -1
   }
 }
 
@@ -156,6 +157,25 @@ export function makeUnknownTableView(id: string, season: number, matchday: numbe
     season: season,
     matchday: matchday,
     tableData: []
+  };
+}
+
+/**
+ * Creates a dummy UserStats object.
+ * To allow easy extendability, all stats are optional properties, so no need to return
+ * any further values here
+ * 
+ * @param season the season of the corresponding matchday
+ * @param matchday the matchay of the stats
+ * @param userId the according user ID
+ * @returns 
+ */
+export function makeUnknownUserStats(season: number, matchday: number, userId: string): UserStats {
+  return {
+    documentId: "",
+    season: season,
+    matchday: matchday,
+    userId: userId
   };
 }
 

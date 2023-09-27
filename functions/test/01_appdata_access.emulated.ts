@@ -1,9 +1,11 @@
 import { describe, it } from "mocha";
+import * as sinon from "sinon";
 import { expect } from "chai";
 import * as admin from "firebase-admin";
 import { Match, Bet, SeasonBet, SeasonResult, User, TopMatchVote } from "../../src/app/Businessrules/basic_datastructures";
 import { UpdateTime, SyncPhase, MatchdayScoreSnapshot } from "../src/data_access/import_datastructures";
 import * as appdata_access from "../src/data_access/appdata_access";
+import * as util from "../src/util";
 import { Table } from "../src/data_access/export_datastructures";
 
 describe("getAllMatches, end-to-end-test", () => {
@@ -195,14 +197,16 @@ describe("getLastUpdateTime, end-to-end test", () => {
     documentId: "AXf0qFILTjRoUPccRMv0",
     season: 2022,
     matchday: 1,
-    timestamp: 1234567890
+    timestampMatches: 1234567890,
+    timestampStats: -1
   };
 
   var unknownUpdateTime: UpdateTime = {
     documentId: "",
     season: 2019,
     matchday: 1,
-    timestamp: -1
+    timestampMatches: -1,
+    timestampStats: -1
   };
 
   it("UpdateTime is available => expect correct UpdateTime to be returned", async () => {
@@ -226,7 +230,8 @@ describe("setUpdateTime, end-to-end-test", () => {
       documentId: "",
       season: 2023,
       matchday: 1,
-      timestamp: 1234567890
+      timestampMatches: 1234567890,
+      timestampStats: -1
     };
 
     await appdata_access.setUpdateTime(newUpdateTime);
@@ -240,7 +245,8 @@ describe("setUpdateTime, end-to-end-test", () => {
       documentId: "AXf0qFILTjRoUPccRMv0",
       season: 2022,
       matchday: 1,
-      timestamp: 2234567890
+      timestampMatches: 2234567890,
+      timestampStats: -1
     };
 
     await appdata_access.setUpdateTime(updatetimeToUpdate);
@@ -789,4 +795,149 @@ describe('setTableView', () => {
     expect(snapshotAfter.length).to.equal(2);
   });
 
+});
+
+describe('getNumberOfBets', () => {
+
+  describe('one match', () => {
+
+      it('all 4 users have set the bet => expect 4', async () => {
+          let nBets: number = await appdata_access.getNumberOfBets([990]);
+          expect(nBets).to.equal(4);
+      });
+
+      it('all 4 users have set the bet, exclude one user => expect 3', async () => {
+          let nBets: number = await appdata_access.getNumberOfBets([990], "user_3");
+          expect(nBets).to.equal(3);
+      });
+
+      it('user_3 has not set bet => expect 3', async () => {
+          let nBets: number = await appdata_access.getNumberOfBets([991]);
+          expect(nBets).to.equal(3);
+      });
+
+      it('user_3 has not set bet, exclude user_3 => expect 3', async () => {
+        let nBets: number = await appdata_access.getNumberOfBets([991], "user_3");
+        expect(nBets).to.equal(3);
+      });
+
+      it('user_3 has not set bet, exclude different user => expect 2', async () => {
+        let nBets: number = await appdata_access.getNumberOfBets([991], "user_0");
+        expect(nBets).to.equal(2);
+      });
+
+  });
+
+  describe('more than one match', () => {
+
+    it('number of bets for the matches are 4, 3, 2 => expect 9', async () => {
+      let nBets: number = await appdata_access.getNumberOfBets([990, 991, 992]);
+      expect(nBets).to.equal(9);
+    });
+
+    it('user_0 has set all bets, exclude user_0 => expect 6', async () => {
+      let nBets: number = await appdata_access.getNumberOfBets([990, 991, 992], "user_0");
+      expect(nBets).to.equal(6);
+    });
+
+    it('user_3 has set bet only for match 990 => expect 8', async () => {
+        let nBets: number = await appdata_access.getNumberOfBets([990, 991, 992], "user_3");
+        expect(nBets).to.equal(8);
+    });
+
+  });
+
+});
+
+describe('getLastMatch', () => {
+
+  let sandbox: any;
+
+  beforeEach(() => {
+      sandbox = sinon.createSandbox();
+  });
+  
+  afterEach(() => {
+      sandbox.restore();
+  });
+
+  it('mustBeFinished not given, match 60870 finished => expect to return match 60870', async () => {
+      const timestamp: number = 1630243800 + 1; // timestamp of 60870 + 1 sec
+      sandbox.stub(util, "getCurrentTimestamp").returns(timestamp);
+
+      const lastMatch: Match = await appdata_access.getLastMatch(2021);
+
+      expect(lastMatch.matchId).to.equal(60870);
+  });
+
+  it('mustBeFinished not given, match 60870 not finished => expect to return match 60870', async () => {
+      let match: Match = await appdata_access.getMatch(60870);
+      match.isFinished = false;
+      await appdata_access.setMatch(match);
+
+      const timestamp: number = 1630243800 + 1; // timestamp of 60870 + 1 sec
+      sandbox.stub(util, "getCurrentTimestamp").returns(timestamp);
+
+      const lastMatch: Match = await appdata_access.getLastMatch(2021);
+
+      expect(lastMatch.matchId).to.equal(60870);
+  });
+
+  it('mustBeFinished given, match 60870 not finished => expect to NOT return match 60870', async () => {
+    let match: Match = await appdata_access.getMatch(60870);
+    match.isFinished = false;
+    await appdata_access.setMatch(match);
+
+    const timestamp: number = 1630243800 + 1; // timestamp of 60870 + 1 sec
+    sandbox.stub(util, "getCurrentTimestamp").returns(timestamp);
+
+    const lastMatch: Match = await appdata_access.getLastMatch(2021, true);
+
+    expect(lastMatch.matchId).to.not.equal(60870);
+  });
+
+  it('mustBeFinished given, match 60870 finished => expect to return match 60870', async () => {
+    let match: Match = await appdata_access.getMatch(60870);
+    match.isFinished = true;
+    await appdata_access.setMatch(match);
+
+    const timestamp: number = 1630243800 + 1; // timestamp of 60870 + 1 sec
+    sandbox.stub(util, "getCurrentTimestamp").returns(timestamp);
+
+    const lastMatch: Match = await appdata_access.getLastMatch(2021, true);
+
+    expect(lastMatch.matchId).to.equal(60870);
+  });
+});
+
+describe.only('getNextMatch', () => {
+
+  let sandbox: any;
+
+  beforeEach(() => {
+      sandbox = sinon.createSandbox();
+  });
+  
+  afterEach(() => {
+      sandbox.restore();
+  });
+
+  it('timestamp smaller than match 60870 => expect to return match 60870', async () => {
+    const timestamp: number = 1630243800 - 1; // timestamp of 60870 - 1 sec
+    sandbox.stub(util, "getCurrentTimestamp").returns(timestamp);
+
+    const nextMatch: Match = await appdata_access.getNextMatch(2021);
+
+    expect(nextMatch.matchId).to.equal(60870);
+  });
+
+  it('no next match available => expect to return dummy match', async () => {
+    const timestamp: number = 9999999999;
+    sandbox.stub(util, "getCurrentTimestamp").returns(timestamp);
+
+    const nextMatch: Match = await appdata_access.getNextMatch(2021);
+
+    expect(nextMatch.matchId).to.equal(-1);
+  });    
+  
 });

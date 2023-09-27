@@ -34,7 +34,8 @@ export interface UpdateTime {
   documentId: string;
   season: number;
   matchday: number;
-  timestamp: number;
+  timestampMatches: number;
+  timestampStats: number;
 }
 
 export interface SyncPhase {
@@ -44,7 +45,7 @@ export interface SyncPhase {
 }
 
 export interface Email {
-  documentId: "";
+  documentId: string;
   to: string;
   message: EmailMessage;
   delivery?: EmailDeliveryInfo;
@@ -64,4 +65,32 @@ export interface EmailDeliveryInfo {
   leaseExpireTime: Date | null;
   error: string | null;
   info: any;
+}
+
+export interface ResultFrequency {
+  result: string;
+  fraction: number;
+}
+
+export interface UserStats {
+  documentId: string;
+  season: number;
+  matchday: number;
+  userId: string;
+  currentForm?: number;
+  formHistory?: number[];
+  meanPoints?: number;
+  stddev?: number;
+  stddevRel?: number;
+  positionHistory?: number[];
+  mostFrequentBets?: ResultFrequency[];
+  boxPlot?: BoxPlot;
+}
+
+export interface BoxPlot {
+  minimum: number;
+  lowerQuartile: number;
+  median: number;
+  upperQuartile: number;
+  maximum: number;
 }

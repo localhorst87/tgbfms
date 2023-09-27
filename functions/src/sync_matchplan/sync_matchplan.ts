@@ -64,7 +64,7 @@ export async function updateMatchdays(season: number, matchdays: number[]): Prom
     // update time in the app DB, as it will be used to check if an update is required
     if (updateRequired && updateSuccessful) {
       let updateTime: UpdateTime = await appdata.getLastUpdateTime(season, matchday);
-      updateTime.timestamp = util.getCurrentTimestamp();
+      updateTime.timestampMatches = util.getCurrentTimestamp();
       await appdata.setUpdateTime(updateTime);
     }
   }
@@ -98,7 +98,7 @@ export async function getMatchdaysToUpdate(matchList: MatchList): Promise<number
     appUpdateTime = await appdata.getLastUpdateTime(matchList.season, matchday); // -1 on not available
     matchUpdateTimestamp = await matchdata.getLastUpdateTime(matchList.season, matchday); // -1 on no data
 
-    if (matchUpdateTimestamp > appUpdateTime.timestamp)
+    if (matchUpdateTimestamp > appUpdateTime.timestampMatches)
       matchdaysToUpdate.push(matchday);
   }
 

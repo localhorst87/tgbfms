@@ -161,7 +161,7 @@ describe('syncMatches', () => {
     it('sync successful => expect sync timestamp to be updated', async () => {
         const timestampNow: number = util.getCurrentTimestamp();
         await sync_live.syncMatches(matchesToSync);
-        const updateTime: number = (await appdata.getLastUpdateTime(2022, 29)).timestamp;
+        const updateTime: number = (await appdata.getLastUpdateTime(2022, 29)).timestampMatches;
 
         expect(updateTime).to.be.greaterThanOrEqual(timestampNow);
     });
@@ -236,7 +236,7 @@ describe('syncMatches', () => {
         const timestampFcnCall: number = util.getCurrentTimestamp();
         const syncedMatches: Match[] = await sync_live.syncMatches(matchesToSync);
 
-        const updateTime: number = (await appdata.getLastUpdateTime(2022, 29)).timestamp;
+        const updateTime: number = (await appdata.getLastUpdateTime(2022, 29)).timestampMatches;
 
         expect(syncedMatches).to.deep.equal([]);
         expect(updateTime).to.be.lessThan(timestampFcnCall);
@@ -394,7 +394,7 @@ describe('updateScoreSnapshot', () => {
 
 });
 
-describe.only('updateTablesView', () => {
+describe('updateTablesView', () => {
 
     var sandbox: any;
 
@@ -551,7 +551,7 @@ describe('syncLive', () => {
 
         expect(snapshotData.scores).to.deep.equal([]);
 
-        expect(updateData.timestamp).to.not.equal(1682101799);
+        expect(updateData.timestampMatches).to.not.equal(1682101799);
     });
 
     it('first sync phase has begun => expect to sync match of first sync phase', async () => {
@@ -592,7 +592,7 @@ describe('syncLive', () => {
         expect(snapshotData.scores).to.not.deep.equal([]);
 
         // update time must be refreshed
-        expect(updateData.timestamp).to.equal(1682108700);
+        expect(updateData.timestampMatches).to.equal(1682108700);
 
         // sync phase must still exist (must be removed on next call)
         expect(syncPhasesFirstCall.length).to.equal(1);
@@ -652,7 +652,7 @@ describe('syncLive', () => {
         expect(snapshotData.scores).to.not.deep.equal([]);
 
         // update time must be refreshed
-        expect(updateData.timestamp).to.equal(1682177100);
+        expect(updateData.timestampMatches).to.equal(1682177100);
 
         // sync phase must still exist (must be removed on next call)
         expect(syncPhasesSecondCall.length).to.equal(1);

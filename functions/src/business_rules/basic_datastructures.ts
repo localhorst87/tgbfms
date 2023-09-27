@@ -84,3 +84,10 @@ export interface VoteCount {
   nVotes: number;
   lastVoteTime: number;
 }
+
+export interface Form {
+  userId: string;
+  season: number;
+  matchday: number;
+  form: number;
+}

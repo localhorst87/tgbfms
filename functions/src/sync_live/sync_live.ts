@@ -1,11 +1,12 @@
 import { SEASON, NUMBER_OF_TEAMS, MATCHDAYS_PER_SEASON } from "../business_rules/rule_defined_values";
 import { Match, Bet, User, SeasonResult } from "../business_rules/basic_datastructures";
-import { MatchImportData, TeamRankingImportData, MatchdayScoreSnapshot } from "../data_access/import_datastructures";
+import { MatchImportData, TeamRankingImportData, MatchdayScoreSnapshot, ResultFrequency, BoxPlot, UserStats, UpdateTime } from "../data_access/import_datastructures";
 import { Table } from "../data_access/export_datastructures";
 import * as appdata from "../data_access/appdata_access";
 import * as matchdata from "../data_access/matchdata_access";
 import { ScoreAdderTrendbased } from "../business_rules/score_adder_trendbased";
 import * as helper from "./sync_live_helpers";
+import { StatisticsCalculatorTrendbased } from "../stats/statistics_calculator_trendbased";
 
 declare global {
   interface Array<T> {
@@ -36,14 +37,11 @@ declare global {
 export async function syncLive(): Promise<void> {
   let matchesToSync: Match[] = await helper.getRelevantMatchesToSync();
 
-  if (matchesToSync.length == 0) {
-    console.log("no need to synchronize");
+  if (matchesToSync.length == 0)
     return;
-  }
 
   // sync matches
   const matchesSynced: Match[] = await syncMatches(matchesToSync);
-  console.log("matches synchronized: \n" + JSON.stringify(matchesSynced));
 
   // sync team ranking 
   await syncTeamRanking(SEASON);
@@ -58,6 +56,13 @@ export async function syncLive(): Promise<void> {
   // refresh tables
   for (let matchday of matchdaysSynced)
     await updateTablesView(SEASON, matchday);
+
+  // refresh stats if needed
+  // for the unusual case that a postponed match is set at the same time as other matches
+  // multiple matches can be returned
+  const matchdaysStatsUpdate: number[] = await helper.getMatchdaysForStatsUpdate(SEASON);
+  for (let matchday of matchdaysStatsUpdate)
+    await updateStats(SEASON, matchday);
 
   return;
 }
@@ -212,4 +217,56 @@ export async function updateTablesView(season: number, matchday: number): Promis
   }
 
   return isSuccessful;
+}
+
+/**
+ * Updated the statistics of each user in the app database
+ * 
+ * @param season the corresponding season of the matchday
+ * @param matchday the matchday to update user stats for
+ * @param statisticsCalculator pre-filled statistics calculator to avoid multiple data request
+ * @returns true/false if all updates have been successful or not
+ */
+export async function updateStats(season: number, matchday: number): Promise<boolean> {
+  let statisticsCalculator = new StatisticsCalculatorTrendbased(season, matchday);
+  await statisticsCalculator.setScoreSnapshots();
+  await statisticsCalculator.setMatches();
+  await statisticsCalculator.setBets();
+
+  const users: User[] = await appdata.getActiveUsers();
+
+  let updateSuccessful: boolean = true;
+
+  for (let user of users) {
+    const form: number = statisticsCalculator.getSingleForm(user.id, matchday);
+    const formHistory: number[] = statisticsCalculator.getFormHistory(user.id, 1, matchday);
+    const positionHistory: number[] = statisticsCalculator.getPositionHistory(user.id, matchday);
+    const boxPlot: BoxPlot = statisticsCalculator.getBoxPlot(user.id, matchday);
+    const meanPoints: number = statisticsCalculator.getMeanPoints(user.id, matchday);
+    const stddev: number = statisticsCalculator.getStdDev(user.id, matchday);
+    const mostFrequentBets: ResultFrequency[] = statisticsCalculator.getMostFrequentBets(user.id, matchday);
+    
+    let userStats: UserStats = await appdata.getUserStats(season, matchday, user.id);
+    userStats = {
+      documentId: userStats.documentId,
+      season: SEASON,
+      matchday: matchday,
+      userId: user.id,
+      currentForm: form,
+      formHistory: formHistory,
+      meanPoints: meanPoints,
+      stddev: stddev,
+      boxPlot: boxPlot,
+      stddevRel: stddev/meanPoints,
+      positionHistory: positionHistory,
+      mostFrequentBets: mostFrequentBets
+    };
+
+    updateSuccessful = updateSuccessful &&  await appdata.setUserStats(userStats);
+  }
+
+  if (updateSuccessful)
+    await helper.setNewStatsUpdateTime(season, matchday);
+
+  return updateSuccessful;
 }

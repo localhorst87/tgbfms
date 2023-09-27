@@ -9,9 +9,11 @@ import {Match,
 import {UpdateTime, 
   SyncPhase, 
   MatchdayScoreSnapshot,
-  Email} from "./import_datastructures";
+  Email,
+  UserStats} from "./import_datastructures";
 import * as helper from "./appdata_helpers";
 import { Table } from "./export_datastructures";
+import * as util from "../util";
 
 const COLLECTION_NAME_MATCHES: string = "matches";
 const COLLECTION_NAME_BETS: string = "bets";
@@ -24,6 +26,7 @@ const COLLECTION_NAME_SCORE_SNAPSHOT: string = "matchday_score_snapshots";
 const COLLECTION_NAME_TOPMATCH_VOTES: string = "topmatch_votes";
 const COLLECTION_NAME_EMAIL: string = "mail";
 const COLLECTION_NAME_VIEW_TABLES: string = "view_tables";
+const COLLECTION_NAME_USER_STATS: string = "user_stats";
 
 // for testing with online Firebase services: 
 // GOOGLE_APPLICATION_CREDENTIALS must be set as env variable and point to
@@ -117,6 +120,79 @@ export function getTopMatch(season: number, matchday: number): Promise<Match> {
 }
 
 /**
+ * Requests the latest matches that have started and returns the list of matches that started 
+ * at the same time
+ * 
+ * @param season 
+ * @param mustBeFinished if set to true, the last finished match will be returned, else the last
+ *                       started match, independent if finished or not
+ * @returns 
+ */
+export function getLastMatch(season: number, mustBeFinished: boolean = false): Promise<Match> {
+  const timestampNow: number = util.getCurrentTimestamp();
+
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
+    .where("season", "==", season)
+    .where("timestamp", "<", timestampNow)
+    .orderBy("timestamp", "desc");
+
+  if (mustBeFinished) {
+    query = query.where("isFinished", "==", true);
+  }
+
+  return query.limit(1).get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      let matchList: Match[] = helper.processSnapshot<Match>(querySnapshot);
+      if (matchList.length > 0) {
+        return matchList[0];
+      }
+      else {
+        return helper.makeUnknownMatch(-1);
+      }
+    }
+  );
+}
+
+export function getMatchesByTimestamp(timestamp: number): Promise<Match[]> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
+    .where("timestamp", "==", timestamp);
+    
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      return helper.processSnapshot<Match>(querySnapshot);
+    }
+  );
+}
+
+/**
+ * Reqeusts the next match
+ * 
+ * @param season 
+ * @returns 
+ */
+export function getNextMatch(season: number): Promise<Match> {
+  const timestampNow: number = util.getCurrentTimestamp();
+
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
+    .where("season", "==", season)
+    .where("timestamp", ">", timestampNow)
+    .orderBy("timestamp")
+    .limit(1);
+
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      let matchList: Match[] = helper.processSnapshot<Match>(querySnapshot);
+      if (matchList.length > 0) {
+        return matchList[0];
+      }
+      else {
+        return helper.makeUnknownMatch(-1);
+      }
+    }
+  );
+}
+
+/**
  * Adds or updates a Match. If documentId of the Match equals an empty string,
  * the Match will be added, if the documentId is already available, the Match
  * will be updated. Returns a true/false Promise if the operation has been
@@ -186,6 +262,28 @@ export function getAllBets(matchId: number): Promise<Bet[]> {
   return query.get().then(
     (querySnapshot: admin.firestore.QuerySnapshot) => {
       return helper.processSnapshot<Bet>(querySnapshot);
+    }
+  );
+}
+
+/**
+ * Request the number of given bets of all users for the given match IDs
+ * 
+ * @param matchIds the match IDs of the matches where the number of given bets
+ *                 is requested
+ * @returns the total number of bets for the given match IDs
+ */
+export function getNumberOfBets(matchIds: number[], excludeUser?: string): Promise<number> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_BETS)
+    .where("matchId", "in", matchIds);
+  
+  if (excludeUser !== undefined) {
+    query = query.where("userId", "!=", excludeUser);
+  }
+
+  return query.count().get().then(
+    (aggregateSnapshot: FirebaseFirestore.AggregateQuerySnapshot<{count: FirebaseFirestore.AggregateField<number>;}>) => {
+      return aggregateSnapshot.data().count;
     }
   );
 }
@@ -608,6 +706,57 @@ export async function setTableView(table: Table): Promise<boolean> {
   delete tableToSet.documentId;
 
   return documentReference.set(tableToSet)
+    .then(() => {
+      return true;
+    })
+    .catch((err: any) => {
+      return false;
+    });
+}
+
+/**
+ * Get the user statistics of a specific matchday
+ * 
+ * @param season 
+ * @param matchday 
+ * @param userId 
+ * @returns 
+ */
+export async function getUserStats(season: number, matchday: number, userId: string): Promise<UserStats> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_USER_STATS)
+    .where("season", "==", season)
+    .where("matchday", "==", matchday)
+    .where("userId", "==", userId);
+
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      let stats: UserStats[] = helper.processSnapshot<UserStats>(querySnapshot);
+      if (stats.length > 0)
+        return stats[0];
+      else
+        return helper.makeUnknownUserStats(season, matchday, userId);
+    }
+  );
+}
+
+/**
+ * 
+ * @param userStats 
+ */
+export async function setUserStats(userStats: UserStats): Promise<boolean> {
+  let documentReference: admin.firestore.DocumentReference;
+  if (userStats.documentId == "") {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_USER_STATS).doc()
+  }
+  else {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_USER_STATS).doc(userStats.documentId);
+  }
+
+  // documentId should not be a property in the dataset itself, as it is meta-data
+  let userStatsToSet: any = { ...userStats };
+  delete userStatsToSet.documentId;
+
+  return documentReference.set(userStatsToSet)
     .then(() => {
       return true;
     })

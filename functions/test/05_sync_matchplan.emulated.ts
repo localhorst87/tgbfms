@@ -103,7 +103,8 @@ describe('sync_matchplan', () => {
         documentId: "7AUFFurUslTErUacAd0U",
         season: 2021,
         matchday: 1,
-        timestamp: 1629391220 // matchdata update time is 1629391221
+        timestampMatches: 1629391220, // matchdata update time is 1629391221,
+        timestampStats: -1
       });
   
       let matchList = new sync_matches_helpers.MatchList(2021);
@@ -120,7 +121,8 @@ describe('sync_matchplan', () => {
         documentId: "7AUFFurUslTErUacAd0U",
         season: 2021,
         matchday: 1,
-        timestamp: 1629391222 // matchdata update time is 1629391221
+        timestampMatches: 1629391222, // matchdata update time is 1629391221
+        timestampStats: -1
       });
   
       let matchList = new sync_matches_helpers.MatchList(2021);
@@ -172,8 +174,8 @@ describe('sync_matchplan', () => {
   
       expect(updatedMatchesReturn.length).to.equal(1);
       expect(updatedMatch.isFinished).to.be.true;
-      expect(updateTime1.timestamp > testStartTime).to.be.true;
-      expect(updateTime2.timestamp < testStartTime).to.be.true;
+      expect(updateTime1.timestampMatches > testStartTime).to.be.true;
+      expect(updateTime2.timestampMatches < testStartTime).to.be.true;
     });
   
     it("one matchday not complete => expect to update the according matchday", async () => {
@@ -201,8 +203,8 @@ describe('sync_matchplan', () => {
   
       expect(updatedMatches[0].matchId).to.equal(60851);
       expect(updatedMatch.teamIdHome).to.not.equal(-1);
-      expect(updateTime1.timestamp > testStartTime).to.be.true;
-      expect(updateTime2.timestamp < testStartTime).to.be.true;
+      expect(updateTime1.timestampMatches > testStartTime).to.be.true;
+      expect(updateTime2.timestampMatches < testStartTime).to.be.true;
     });
   
   });

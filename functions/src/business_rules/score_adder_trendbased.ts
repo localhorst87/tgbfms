@@ -31,6 +31,13 @@ export class ScoreAdderTrendbased implements ScoreAdder {
     }
 
     /**
+     * resets all point calculators
+     */
+    public reset(): void {
+        this.pointCalculators = [];
+    }
+
+    /**
      * Returns the Scores of all given users as a sorted Score array
      * 
      * @param ingestSeasonScore 

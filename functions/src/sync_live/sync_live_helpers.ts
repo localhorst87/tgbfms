@@ -143,6 +143,8 @@ export async function getReferenceMatchData(matches: Match[]): Promise<MatchImpo
 /**
  * Set update time of the given matchdays to the current timestamp
  * 
+ * Does not updates the stats time, only the matches time!
+ * 
  * @param season the corresponding season
  * @param matchdays the matchday to set the new update time
  * @returns the list of matchdays where update time was set
@@ -152,13 +154,20 @@ export async function setNewUpdateTimes(season: number, matchdays: number[]): Pr
 
     for (let matchday of matchdays) {
         let updateTime: UpdateTime = await appdata.getLastUpdateTime(season, matchday);
-        updateTime.timestamp = getCurrentTimestamp();
+        updateTime.timestampMatches = getCurrentTimestamp();
 
         if (await appdata.setUpdateTime(updateTime))
-        matchdayTimeSet.push(matchday);
+            matchdayTimeSet.push(matchday);
     }
 
     return matchdayTimeSet;
+}
+
+export async function setNewStatsUpdateTime(season: number, matchday: number): Promise<boolean> {
+    let updateTime: UpdateTime = await appdata.getLastUpdateTime(season, matchday);
+    updateTime.timestampStats = getCurrentTimestamp();
+
+    return await appdata.setUpdateTime(updateTime);
 }
 
 export async function getMatchdayScoreSnapshots(season: number, matchdays: number[]): Promise<MatchdayScoreSnapshot[]> {
@@ -352,4 +361,78 @@ export function addLiveData(match: Match, imported: MatchImportData): Match {
     match.goalsAway = imported.goalsAway;
   
     return match;
+}
+
+/**
+ * Returns all matchdays that right now need a statistics update
+ * 
+ * @param season 
+ * @returns 
+ */
+export async function getMatchdaysForStatsUpdate(season: number): Promise<number[]> {
+    const lastFinishedMatch: Match = await appdata.getLastMatch(season, true);
+    if (lastFinishedMatch.matchId == -1) {
+        // no (finished) last match available => nothing to update
+
+        return [];
+    }
+
+    const lastMatches: Match[] = await appdata.getMatchesByTimestamp(lastFinishedMatch.timestamp);
+    const nextMatch: Match = await appdata.getNextMatch(season);
+
+    let matchdaysToUpdate: number[] = [];
+    let matchdaysChecked: number[] = [];
+
+    for (let lastMatch of lastMatches) {
+        if (matchdaysChecked.includes(lastMatch.matchday)) {
+            continue;
+        }
+        else {
+            let matchesSameKickoffAndMatchday: Match[] = lastMatches.filter((match: Match) => match.matchday == lastMatch.matchday);
+            
+            if (isMatchdayFinished(lastMatch, nextMatch, matchesSameKickoffAndMatchday)) {
+
+                if (nextMatch.matchday - lastMatch.matchday > 1) {
+                    // last match was a postponed match --> update matchday of postponed match anyway
+
+                    matchdaysToUpdate.push(lastMatch.matchday);
+                }
+                else {
+                    // either: nextMatch.matchday < lastMatch.matchday (next match is postponed match)
+                    // or: nextMatch.matchday - lastMatch.matchday == 1 (next match is from next matchday)
+                    // then: check if stats are already set. If no: update needed
+
+                    const updateTime: UpdateTime = await appdata.getLastUpdateTime(season, lastMatch.matchday);
+                    if (updateTime.timestampStats == -1) {
+                        matchdaysToUpdate.push(lastMatch.matchday)
+                    }
+                }
+            }
+
+            matchdaysChecked.push(lastMatch.matchday);
+        }
+    }
+
+    return matchdaysToUpdate;
+}
+
+/**
+ * Returns if the matchday of the last played match is finished
+ * 
+ * @param lastMatch last finished match, must not be an unknown match!
+ * @param nextMatch next match
+ * @returns 
+ */
+function isMatchdayFinished(lastMatch: Match, nextMatch: Match, matchesSameKickoffAndMatchday: Match[]): boolean {
+    if (nextMatch.matchday == lastMatch.matchday) {
+        // next match belongs to same matchday as last match
+
+        return false;
+    }
+    else {
+        // next match is from another matchday as last match
+        // check if the other matches that started at the same time are finished
+        
+        return matchesSameKickoffAndMatchday.every((match: Match) => match.isFinished);
+    }
 }

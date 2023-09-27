@@ -4,9 +4,8 @@ import * as sinon from "sinon";
 import * as sync_live_helpers from "../src/sync_live/sync_live_helpers";
 import * as appdata from "../src/data_access/appdata_access";
 import { Match, Bet, User } from "../../src/app/Businessrules/basic_datastructures";
-import { UpdateTime, SyncPhase, MatchImportData, MatchdayScoreSnapshot } from "../src/data_access/import_datastructures";
+import { UpdateTime, SyncPhase, MatchImportData } from "../src/data_access/import_datastructures";
 import * as util from "../src/util";
-import { Table } from "../src/data_access/export_datastructures";
 
 describe('sync_live_helpers', () => {
 
@@ -518,7 +517,7 @@ describe('sync_live_helpers', () => {
             const updateTimeAfter: UpdateTime = await appdata.getLastUpdateTime(2030, 1);
     
             expect(matchdaysUpdated).to.deep.equal([1]);
-            expect(updateTimeAfter.timestamp).to.be.greaterThan(updateTimeBefore.timestamp);        
+            expect(updateTimeAfter.timestampMatches).to.be.greaterThan(updateTimeBefore.timestampMatches);        
         });
     
         it('two matchdays', async () => {
@@ -529,8 +528,8 @@ describe('sync_live_helpers', () => {
             const updateTime2After: UpdateTime = await appdata.getLastUpdateTime(2030, 2);
     
             expect(matchdaysUpdated).to.deep.equal([1, 2]);
-            expect(updateTime1After.timestamp).to.be.greaterThan(updateTime1Before.timestamp);   
-            expect(updateTime2After.timestamp).to.be.greaterThan(updateTime2Before.timestamp);       
+            expect(updateTime1After.timestampMatches).to.be.greaterThan(updateTime1Before.timestampMatches);   
+            expect(updateTime2After.timestampMatches).to.be.greaterThan(updateTime2Before.timestampMatches);       
         });
         
     });

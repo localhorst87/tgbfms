@@ -195,27 +195,27 @@ export class DashboardComponent implements OnInit, OnChanges {
       this.tableData = []; // clear tableData
       let startMatchday: number;
       let matchdayCount: number;
-      // let endMatchday: number;
+      let finishedMatchday: number;
       let currentMatchday: number;
       let matchdaysToFetch: number[];
 
       if (this.matchdayCompleted > 0) {
         startMatchday = Math.max(1, this.matchdayCompleted - HISTORY_MATCHES + 1);
         matchdayCount = Math.min(this.matchdayCompleted, HISTORY_MATCHES);
-        // endMatchday = this.matchdayCompleted;
+        finishedMatchday = this.matchdayCompleted;
         currentMatchday = this.matchdayCurrent;
         matchdaysToFetch = Array.from({length: matchdayCount}, (_, i) => startMatchday + i);
       }
       else {
         startMatchday = 0;
         matchdayCount = 0;
-        // endMatchday = 0;
+        finishedMatchday = 0;
         currentMatchday = 0;
         matchdaysToFetch = [];
       }
 
       // update Form History Data
-      this.appdata.getUserStats$(SEASON, currentMatchday, this.userId).subscribe(
+      this.appdata.getUserStats$(SEASON, finishedMatchday, this.userId).subscribe(
         (userStats: UserStats) => {
           for (let matchday of matchdaysToFetch) {
             // add current form

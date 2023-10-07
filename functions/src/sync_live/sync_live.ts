@@ -1,6 +1,6 @@
 import { SEASON, NUMBER_OF_TEAMS, MATCHDAYS_PER_SEASON } from "../business_rules/rule_defined_values";
 import { Match, Bet, User, SeasonResult } from "../business_rules/basic_datastructures";
-import { MatchImportData, TeamRankingImportData, MatchdayScoreSnapshot, ResultFrequency, BoxPlot, UserStats, UpdateTime } from "../data_access/import_datastructures";
+import { MatchImportData, TeamRankingImportData, MatchdayScoreSnapshot, ResultFrequency, BoxPlot, UserStats } from "../data_access/import_datastructures";
 import { Table } from "../data_access/export_datastructures";
 import * as appdata from "../data_access/appdata_access";
 import * as matchdata from "../data_access/matchdata_access";

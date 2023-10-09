@@ -1,0 +1,157 @@
+<mat-progress-bar mode="query" color="accent" *ngIf="contentsLoaded==false" style="position: fixed; top: 56px; z-index: 999;"></mat-progress-bar>
+
+<div class="swiper-box-text" *ngIf="contentsLoaded">
+    <swiper
+        [autoplay]="autoplayOptionsNumbers"
+        [pagination]="true">
+        <ng-template swiperSlide>
+            <div class="number-container">
+                <div class="mat-caption">
+                    Aktuelle Form
+                </div>
+                <div class="mat-display-4">
+                    {{currentForm}}
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template swiperSlide>
+            <div class="number-container">
+                <div class="mat-caption">
+                    Punkte pro Spieltag
+                </div>
+                <div class="mat-display-4">
+                    {{meanPoints}}
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template swiperSlide>
+            <div class="number-container">
+                <div class="mat-caption">
+                    Fluktuation pro Spieltag
+                </div>
+                <div class="mat-display-4">
+                    {{standardDeviation}}
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template swiperSlide>
+            <div class="number-container">
+                <div class="mat-caption">
+                    Relative Fluktuation
+                </div>
+                <div class="mat-display-4">
+                    {{standardDevRel}}
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template swiperSlide>
+            <div class="number-container">
+                <div class="mat-caption">
+                    Höchste Punktzahl
+                </div>
+                <div class="mat-display-4">
+                    {{highestPoints}}
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template swiperSlide>
+            <div class="number-container">
+                <div class="mat-caption">
+                    Dein häufigster Tipp
+                </div>
+                <div class="mat-display-4">
+                    {{mostFrequentBet}}
+                </div>
+            </div>
+        </ng-template>
+    </swiper>
+</div>
+
+<div class="swiper-box-diagram" *ngIf="contentsLoaded">
+    <swiper
+        [autoplay]="autoplayOptionsDiagrams"
+        [pagination]="true">
+
+        <ng-template swiperSlide>
+            <div class="diagram-container">
+                <div class="mat-caption">
+                    Deine häufigsten Tipps
+                </div>
+                <div class="pie-container">
+                    <ngx-charts-pie-chart
+                        [results]="frequentBets"
+                        [legend]="false"
+                        [labels]="true"
+                        [tooltipDisabled]="true"
+                        [scheme]="pieColorScheme">
+                    </ngx-charts-pie-chart>
+                </div>
+            </div>  
+        </ng-template>
+
+        <ng-template swiperSlide>
+            <div class="diagram-container">
+                <div class="mat-caption">
+                    Dein Box-Plot
+                    <br><br>
+                </div>
+                <div class="boxplot-container">
+                    <ngx-charts-box-chart
+                        [results]="boxPlotData"
+                        [roundDomains]="false"
+                        [tooltipDisabled]="true"
+                        [strokeWidth]="2">
+                    </ngx-charts-box-chart>
+                </div>
+            </div>  
+        </ng-template>
+
+        <ng-template swiperSlide>
+            <div class="diagram-container">
+                <div class="mat-caption">
+                    Plazierungsverlauf
+                </div>
+                <div class="linechart-container">
+                    <ngx-charts-line-chart
+                        [xAxis]="true"
+                        [yAxis]="true"
+                        [results]="positionHistoryData"
+                        [showGridLines]="true"
+                        [yScaleMin]="positionHistoryOptions.yMin"
+                        [yScaleMax]="positionHistoryOptions.yMax"
+                        [yAxisTickFormatting]="positionHistoryOptions.formattingFcn"
+                        [yAxisTicks]="positionHistoryOptions.ticks"
+                        [roundDomains]="true"
+                        [tooltipDisabled]="true">
+                    </ngx-charts-line-chart>
+                </div>
+            </div>  
+        </ng-template>
+
+        <ng-template swiperSlide>
+            <div class="diagram-container">
+                <div class="mat-caption">
+                    Formverlauf
+                </div>
+                <div class="linechart-container">
+                    <ngx-charts-line-chart
+                        [xAxis]="true"
+                        [yAxis]="true"
+                        [results]="formHistoryData"
+                        [showGridLines]="true"
+                        [yScaleMin]="formHistoryOptions.yMin"
+                        [yScaleMax]="formHistoryOptions.yMax"
+                        [yAxisTicks]="formHistoryOptions.ticks"
+                        [yAxisTickFormatting]="formHistoryOptions.formattingFcn"
+                        [tooltipDisabled]="true">
+                    </ngx-charts-line-chart>
+                </div>
+            </div>  
+        </ng-template>
+    </swiper>
+</div>

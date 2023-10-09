@@ -20,6 +20,7 @@ export abstract class AppdataAccessService {
   public abstract getTeamNameByTeamId$(teamId: number, shortName?: boolean): Observable<string>;
   public abstract getTeamByTeamId$(teamId: number): Observable<Team>;
   public abstract getActiveUserIds$(): Observable<string>;
+  public abstract getActiveUsers$(): Observable<User[]>;
   public abstract getUserDataById$(userId: string): Observable<User>;
   public abstract getMatchdayScoreSnapshot$(season: number, matchday: number): Observable<MatchdayScoreSnapshot>;
   public abstract getOpenBets$(matchId: number): Observable<Bet>;

@@ -340,6 +340,23 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
+  /**
+   * Request the User profiles of all active users
+   * 
+   * @returns 
+   */
+  getActiveUsers$(): Observable<User[]> {
+    let userQuery$: Observable<User[]> = this.firestore.collection<User>(COLLECTION_NAME_USERS, ref =>
+      ref.where("isActive", "==", true)
+        .orderBy("displayName"))
+      .valueChanges({ idField: 'documentId' });
+
+    return userQuery$.pipe(
+      take(1),
+      distinct()
+    );
+  }
+
   getUserDataById$(userId: string): Observable<User> {
     // returns the user data according to the given ID
 

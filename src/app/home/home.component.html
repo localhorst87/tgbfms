@@ -4,7 +4,7 @@
       <mat-icon>notes</mat-icon>
     </button>
     <mat-menu #mainMenu="matMenu">
-      <button mat-menu-item disabled>
+      <button mat-menu-item (click)="selectedPage='statistics'">
         <mat-icon>insights</mat-icon>
         <span>Statistiken</span>
       </button>
@@ -77,6 +77,12 @@
 <app-rules
   *ngIf = "selectedPage == 'rules'">
 </app-rules>
+
+<app-statistics
+  *ngIf = "selectedPage == 'statistics'"
+  [user] = "loggedUser"
+  [matchdayCompleted] = "matchdayCompleted">
+</app-statistics>
 
 <mat-toolbar class="toolbar-bottom">
   <!-- dashboard -->

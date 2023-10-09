@@ -61,6 +61,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SwiperModule } from 'swiper/angular';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ConfigComponent } from './config/config.component';
+import { StatisticsComponent } from './statistics/statistics.component';
 
 @NgModule({
   declarations: [
@@ -74,7 +75,8 @@ import { ConfigComponent } from './config/config.component';
     DashboardComponent,
     PasswordResetComponent,
     RulesComponent,
-    ConfigComponent
+    ConfigComponent,
+    StatisticsComponent
   ],
   imports: [
     BrowserModule,

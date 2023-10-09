@@ -57,6 +57,7 @@ export class StatisticsComponent implements OnInit, OnChanges {
   autoplayOptionsNumbers: AutoplayOptions;
   autoplayOptionsDiagrams: AutoplayOptions;
   contentsLoaded: boolean;
+  usersLoaded: boolean;
 
   constructor(private appdata: AppdataAccessService) {
     this.user = {
@@ -111,13 +112,14 @@ export class StatisticsComponent implements OnInit, OnChanges {
     this.mostFrequentBet = "";
     this.autoplayOptionsNumbers = {
       delay: 5000,
-      disableOnInteraction: false
+      disableOnInteraction: true
     };
     this.autoplayOptionsDiagrams = {
       delay: 7500,
-      disableOnInteraction: false
+      disableOnInteraction: true
     };
     this.contentsLoaded = false;
+    this.usersLoaded = false;
   }
 
 
@@ -125,7 +127,13 @@ export class StatisticsComponent implements OnInit, OnChanges {
     this.appdata.getActiveUsers$().subscribe(
       (users: User[]) => {
         this.allUsers = users;
-      }
+        this.positionHistoryOptions.ticks = Array.from(users, (_, i) => users.length - i);
+        this.positionHistoryOptions.yMin = users.length;
+      },
+      (err) => { console.log(err); },
+      () => {
+        this.usersLoaded = true;
+      }   
     );
   }
 
@@ -185,9 +193,6 @@ export class StatisticsComponent implements OnInit, OnChanges {
 
           // Position history
           if (userStats.positionHistory !== undefined) {
-            this.positionHistoryOptions.yMin = this.allUsers.length;
-            this.positionHistoryOptions.ticks = Array.from(this.allUsers, (_, i) => this.allUsers.length - i);
-
             this.positionHistoryData.push({
               name: this.user.displayName,
               series: []

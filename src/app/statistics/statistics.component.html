@@ -1,6 +1,6 @@
-<mat-progress-bar mode="query" color="accent" *ngIf="contentsLoaded==false" style="position: fixed; top: 56px; z-index: 999;"></mat-progress-bar>
+<mat-progress-bar mode="query" color="accent" *ngIf="!contentsLoaded || !usersLoaded" style="position: fixed; top: 56px; z-index: 999;"></mat-progress-bar>
 
-<div class="swiper-box-text" *ngIf="contentsLoaded">
+<div class="swiper-box-text" *ngIf="contentsLoaded && usersLoaded">
     <swiper
         [autoplay]="autoplayOptionsNumbers"
         [pagination]="true">
@@ -72,7 +72,7 @@
     </swiper>
 </div>
 
-<div class="swiper-box-diagram" *ngIf="contentsLoaded">
+<div class="swiper-box-diagram" *ngIf="contentsLoaded && usersLoaded">
     <swiper
         [autoplay]="autoplayOptionsDiagrams"
         [pagination]="true">

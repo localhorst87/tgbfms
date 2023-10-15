@@ -79,7 +79,8 @@
         [yScaleMin]="formHistoryOptions.yMin"
         [yScaleMax]="formHistoryOptions.yMax"
         [yAxisTicks]="formHistoryOptions.ticks"
-        [tooltipDisabled]="True">
+        [tooltipDisabled]="True"
+        [scheme]="lineColorScheme">
       </ngx-charts-line-chart>
     </mat-card-content>
   </mat-card>
@@ -97,7 +98,8 @@
         [yAxisTickFormatting]="tableHistoryOptions.formattingFcn"
         [yAxisTicks]="tableHistoryOptions.ticks"
         [roundDomains]="True"
-        [tooltipDisabled]="True">
+        [tooltipDisabled]="True"
+        [scheme]="lineColorScheme">
       </ngx-charts-line-chart>
     </mat-card-content>
   </mat-card>

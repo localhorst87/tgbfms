@@ -8,6 +8,7 @@ import { FetchBasicDataService } from '../UseCases/fetch-basic-data.service';
 import { MatchInfo, Table, TableData } from '../UseCases/output_datastructures';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { UserStats } from '../Dataaccess/import_datastructures';
+import { Color, ScaleType } from '@swimlane/ngx-charts';
 SwiperCore.use([Pagination]);
 
 interface DataPoint {
@@ -55,6 +56,7 @@ export class DashboardComponent implements OnInit, OnChanges {
     ticks: number[];
     formattingFcn: (val: number) => number;
   };
+  lineColorScheme: Color;
   True: boolean = true;
   False: boolean = false;
 
@@ -147,13 +149,20 @@ export class DashboardComponent implements OnInit, OnChanges {
       yMin: -10,
       yMax: 10,
       ticks: [-10, -5, 0, 5, 10]
-    }
+    };
     this.tableHistoryOptions = {
       yMin: 1,
       yMax: 1,
       ticks: [],
       formattingFcn: val => Math.round(val)
-    }
+    };
+    this.lineColorScheme = {
+        name: "tgbfms",
+        selectable: true,
+        group: ScaleType.Linear,
+        domain: ["#ffa726"]
+    };
+
   }
 
   ngOnInit(): void {

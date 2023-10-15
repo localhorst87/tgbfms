@@ -25,7 +25,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .swiper {
@@ -40,8 +40,12 @@
 }
 
 .boxplot-container {
-  width: 50%;
-  height: 80%;
+  width: 60%;
+  height: 70%;
+}
+
+.compare-select {
+  font-size: small;
 }
 
 .pie-container {
@@ -51,37 +55,5 @@
 
 .linechart-container {
   width: 90%;
-  height: 65%;
+  height: 55%;
 }
-
-// .ngx-charts .box-chart { // text color bar chart
-//   fill: var(--text-primary-color);
-//   font-family: "Roboto Mono";
-// }
-
-// .ngx-charts .pie-chart { // text color pie chart
-//   fill: var(--text-primary-color);
-//   font-family: "Roboto Mono";
-// }
-
-// .ngx-charts .bar { // bar colors
-//   fill: var(--accent-color);
-//   stroke: var(--text-primary-color);
-// }
-
-// .ngx-charts .bar-line { // line color
-//   stroke: var(--text-primary-color);
-// }
-
-// .ngx-charts .line-chart { // text color line chart
-//   fill: var(--default-text-color);
-//   font-family: "Roboto Mono";
-// }
-
-// .ngx-charts .line { // line color
-//   stroke: var(--accent-color);
-// }
-
-// .swiper-pagination-bullet-active {
-//   background: var(--accent-color);
-// }

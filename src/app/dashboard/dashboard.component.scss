@@ -85,9 +85,13 @@ tspan {
   font-family: "Roboto Mono";
 }
 
-.ngx-charts .line { // line color
-  stroke: var(--accent-color);
+.ngx-charts .gridline-path {
+  stroke: var(--grid-line-color) !important;
 }
+
+// .ngx-charts .line { // line color
+//   stroke: var(--accent-color);
+// }
 
 .swiper-pagination-bullet-active {
   background: var(--accent-color);

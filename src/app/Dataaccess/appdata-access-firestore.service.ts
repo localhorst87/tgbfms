@@ -345,7 +345,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
    * 
    * @returns 
    */
-  getActiveUsers$(): Observable<User[]> {
+  getActiveUsers$(): Observable<User> {
     let userQuery$: Observable<User[]> = this.firestore.collection<User>(COLLECTION_NAME_USERS, ref =>
       ref.where("isActive", "==", true)
         .orderBy("displayName"))
@@ -353,6 +353,7 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
 
     return userQuery$.pipe(
       take(1),
+      switchMap((userArray: User[]) => from(userArray)),
       distinct()
     );
   }
@@ -460,26 +461,30 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     );
   }
 
-  getUserStats$(season: number, matchday: number, userId: string): Observable<UserStats> {
-    let query$: Observable<UserStats[]> = this.firestore.collection<UserStats>(COLLECTION_NAME_USER_STATS, ref =>
-      ref
-        .where("season", "==", season)
-        .where("matchday", "==", matchday)
-        .where("userId", "==", userId))
-      .valueChanges({ idField: 'documentId' });
+  getUserStats$(season: number, matchday: number, userId?: string): Observable<UserStats> {
+    let query$: Observable<UserStats[]>;
 
-      return query$.pipe(
-        map((statsArray: UserStats[]) => {
-          if (statsArray.length > 0) {
-            return statsArray[0];
-          }
-          else {
-            return this.makeUnknownUserStats(season, matchday, userId);
-          }
-        }),
-        take(1),
-        distinct()
-      );    
+    if (userId !== undefined) {
+      query$ = this.firestore.collection<UserStats>(COLLECTION_NAME_USER_STATS, ref =>
+        ref
+          .where("season", "==", season)
+          .where("matchday", "==", matchday)
+          .where("userId", "==", userId))
+        .valueChanges({ idField: 'documentId' });
+    }
+    else {
+      query$ = this.firestore.collection<UserStats>(COLLECTION_NAME_USER_STATS, ref =>
+        ref
+          .where("season", "==", season)
+          .where("matchday", "==", matchday))
+        .valueChanges({ idField: 'documentId' });
+    }
+
+    return query$.pipe(
+      take(1),
+      switchMap((statsArray: UserStats[]) => from(statsArray)),
+      distinct((userStats: UserStats) => userStats.userId)
+    );
   }
 
   setBet(bet: Bet): Promise<void> {
@@ -661,15 +666,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
       matchday: matchday,
       id: id,
       tableData: []
-    };
-  }
-
-  private makeUnknownUserStats(season: number, matchday: number, userId: string): UserStats {
-    return {
-      documentId: "",
-      season: season,
-      matchday: matchday,
-      userId: userId
     };
   }
 

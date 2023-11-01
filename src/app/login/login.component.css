@@ -23,3 +23,8 @@ button {
 p {
   text-align: center;
 }
+
+.forgot-password {
+  text-align: center;
+  margin-top: 20px;
+}

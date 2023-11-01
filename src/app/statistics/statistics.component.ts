@@ -160,7 +160,6 @@ export class StatisticsComponent implements OnChanges {
     this.user = {
       documentId: "",
       id: "",
-      email: "",
       displayName: "",
       isAdmin: false,
       isActive: false,

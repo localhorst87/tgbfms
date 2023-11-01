@@ -978,10 +978,10 @@ describe('AppdataAccessFirestoreService', () => {
   // ---------------------------------------------------------------------------
 
   it("getActiveUserIds$, users available", (done) => {
-    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", email: "test1@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
-    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", email: "test2@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
-    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", email: "test3@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
-    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", email: "test4@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser1, targetUser2, targetUser3, targetUser4])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1000,10 +1000,10 @@ describe('AppdataAccessFirestoreService', () => {
   });
 
   it("getActiveUserIds$, users available, double datasets", (done) => {
-    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", email: "test1@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
-    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", email: "test2@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
-    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", email: "test3@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
-    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", email: "test4@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser1, targetUser1, targetUser2, targetUser2, targetUser3, targetUser4])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1022,10 +1022,10 @@ describe('AppdataAccessFirestoreService', () => {
   });
 
   it("getActiveUserIds$, emitting twice", (done) => {
-    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", email: "test1@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
-    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", email: "test2@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
-    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", email: "test3@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
-    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", email: "test4@mail.com", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser1: User = { documentId: "test_id_1", isAdmin: true, isActive: true, id: "test_user_id_1", displayName: "Username1", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser2: User = { documentId: "test_id_2", isAdmin: true, isActive: true, id: "test_user_id_2", displayName: "Username2", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser3: User = { documentId: "test_id_3", isAdmin: true, isActive: true, id: "test_user_id_3", displayName: "Username3", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser4: User = { documentId: "test_id_4", isAdmin: true, isActive: true, id: "test_user_id_4", displayName: "Username4", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser1, targetUser2, targetUser3, targetUser4], [targetUser1, targetUser2, targetUser3, targetUser4])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1046,7 +1046,7 @@ describe('AppdataAccessFirestoreService', () => {
   it("getActiveUserIds$, no datasets available", (done) => {
     const argument: number = 1;
 
-    const defaultUser: User = { documentId: "", isAdmin: false, isActive: false, id: "default_id", displayName: "", email: "", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const defaultUser: User = { documentId: "", isAdmin: false, isActive: false, id: "default_id", displayName: "", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1069,7 +1069,7 @@ describe('AppdataAccessFirestoreService', () => {
   it("getUserDataById$, one dataset", (done) => {
     const argument: string = "test_user_id";
 
-    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", email: "test@mail.com", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1090,7 +1090,7 @@ describe('AppdataAccessFirestoreService', () => {
   it("getUserDataById$, more than one dataset", (done) => {
     const argument: string = "test_user_id";
 
-    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", email: "test@mail.com", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser, targetUser])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1112,7 +1112,7 @@ describe('AppdataAccessFirestoreService', () => {
   it("getUserDataById$, emitting twice", (done) => {
     const argument: string = "test_user_id";
 
-    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", email: "test@mail.com", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const targetUser: User = { documentId: "test_id_123", isAdmin: true, isActive: true, id: argument, displayName: "Username", configs: {theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([targetUser], [targetUser])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 
@@ -1134,7 +1134,7 @@ describe('AppdataAccessFirestoreService', () => {
   it("getUserDataById$, no dataset available", (done) => {
     const argument: string = "test_user";
 
-    const unknownUser: User = { documentId: "", isAdmin: false, isActive: false, id: argument, displayName: "unknown user", email: "", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
+    const unknownUser: User = { documentId: "", isAdmin: false, isActive: false, id: argument, displayName: "unknown user", configs: { theme: "unknown", notificationLevel: -1, notificationTime: -1} };
     const collectionStub: any = { valueChanges: jasmine.createSpy("valueChanges").and.returnValue(of([])) };
     const firestoreStub: any = { collection: jasmine.createSpy("collection").and.returnValue(collectionStub) };
 

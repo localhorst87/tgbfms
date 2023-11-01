@@ -601,7 +601,6 @@ export class AppdataAccessFirestoreService implements AppdataAccessService {
     return {
       documentId: "",
       id: userId,
-      email: "",
       displayName: "unknown user",
       isAdmin: false,
       isActive: false,

@@ -2,7 +2,8 @@ import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Router } from "@angular/router";
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AngularFireAuth } from '@angular/fire/compat/auth'; 
+import firebase from 'firebase/compat/app';
 import { AppdataAccessService } from '../Dataaccess/appdata-access.service';
 import { User } from '../Businessrules/basic_datastructures';
 
@@ -31,7 +32,6 @@ export class AuthenticationService {
           let newUser: User = {
             documentId: this.appData.createDocumentId(),
             id: userCredential.user.uid,
-            email: email,
             displayName: displayName,
             isAdmin: false,
             isActive: false, // will be set to true after email verification
@@ -74,6 +74,8 @@ export class AuthenticationService {
         let snackbarMsg: string = "E-Mail versendet. Bitte überprüfe dein Postfach.";
         let confirmMsg: string = "OK";
         this.snackbar.open(snackbarMsg, confirmMsg);
+        
+        return true;
       })
       .catch(
         err => {
@@ -90,6 +92,8 @@ export class AuthenticationService {
             confirmMsg = "OK";
             this.snackbar.open(snackbarMsg, confirmMsg);
           }
+
+          return false;
         }
       );
   }
@@ -153,7 +157,7 @@ export class AuthenticationService {
     );
   }
 
-  public getLoggedUser$(): Observable<any> {
+  public getLoggedUser$(): Observable<firebase.User | null> {
     // returns the Observable for the currently logged in user
 
     return this.fireAuth.user;

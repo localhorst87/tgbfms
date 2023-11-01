@@ -8,7 +8,7 @@
         <mat-icon>insights</mat-icon>
         <span>Statistiken</span>
       </button>
-      <button mat-menu-item disabled>
+      <button mat-menu-item (click)="selectedPage='profile'">
         <mat-icon>manage_accounts</mat-icon>
         <span>Profil</span>
       </button>
@@ -73,6 +73,11 @@
   [user] = "loggedUser"
   (userConfigChange) = "updateUser($event)">
 </app-config>
+
+<app-user-profile
+  *ngIf = "selectedPage == 'profile'"
+  [user] = "loggedUser">
+</app-user-profile>
 
 <app-rules
   *ngIf = "selectedPage == 'rules'">

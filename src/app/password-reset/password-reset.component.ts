@@ -27,9 +27,9 @@ export class PasswordResetComponent implements OnInit {
   sendResetMail(): void {
     if (this.email.valid) {
       this.authenticator.sendResetMail(this.email.value)
-        .then(() => {
+        .then((isSuccessful: boolean) => {
+          this.isValid = isSuccessful;
           this.buttonClicked = true;
-          this.isValid = true;
         })
         .catch((error: any) => {
           this.lastError = error;

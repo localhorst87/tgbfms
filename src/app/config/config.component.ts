@@ -23,7 +23,6 @@ export class ConfigComponent implements OnInit, OnChanges {
     this.user = {
       documentId: "",
       id: "",
-      email: "",
       displayName: "",
       isAdmin: false,
       isActive: false,

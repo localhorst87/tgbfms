@@ -1,0 +1,33 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.container-element {
+    width: 100%;
+    margin : 0 auto;
+}
+
+.input-field {
+    width: 85%;
+}
+
+.header-title {
+    margin-top: 20px;
+    margin-left: 15px;
+}
+
+.content-container {
+    height: calc(100% - 2*56px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+  }
+  
+.panel {
+    width: 95%;
+    margin-bottom: 15px;
+}

@@ -56,3 +56,15 @@ export interface BoxPlot {
   upperQuartile: number;
   maximum: number;
 }
+
+export interface CurrentMatchdays {
+  matchdayClosest: number;
+  matchdayNextMatch: number;
+  matchdayLastMatch: number;
+  matchdayRecent: number;
+  matchdayCompleted: number;
+}
+
+export interface SimpleResult {
+  operationSuccessful: boolean;
+}

@@ -1,0 +1,106 @@
+<div class="content-container">
+  
+  <div class="panel">
+
+    <p class="mat-h0 header-title">Zugangsdaten ändern</p>
+
+    <mat-expansion-panel style="width: 100%;">
+      <mat-expansion-panel-header class="right-aligned-header">
+        <mat-panel-title>Email-Adresse ändern</mat-panel-title>
+        <mat-panel-description>
+          <mat-icon>alternate_email</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="container">
+        <div class="container-element">
+          <mat-form-field appearance="outline" class="input-field">
+            <mat-label>Neue Email-Adresse</mat-label>
+            <input matInput placeholder="neue.adresse@deinprovider.de" [formControl]="email">
+            <mat-error *ngIf="email.invalid">{{getEmailErrorMessage(email)}}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="container-element">
+          <mat-form-field appearance="outline" class="input-field">
+            <mat-label>Neue Email-Adresse wiederholen</mat-label>
+            <input matInput placeholder="neue.adresse@deinprovider.de" [formControl]="emailRepeat">
+            <mat-error *ngIf="emailRepeat.invalid">{{getEmailErrorMessage(emailRepeat)}}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="container-element">
+          <button mat-raised-button (click)="changeEmail()" color="primary" [disabled]="checkEmailChangePreconditions() === false">
+            beantragen
+          </button>
+        </div>
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel style="width: 100%;">
+      <mat-expansion-panel-header class="right-aligned-header">
+        <mat-panel-title>Passwort ändern</mat-panel-title>        
+        <mat-panel-description>
+          <mat-icon>password</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="container">
+        <div class="container-element">
+          <mat-form-field appearance="outline" class="input-field">
+            <mat-label>Neues Passwort</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" [formControl]="password">
+            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+              <mat-icon>{{hidePassword? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="password.invalid">{{getPasswordErrorMessage(password)}}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="container-element">
+          <mat-form-field appearance="outline" class="input-field">
+            <mat-label>Neues Passwort wiederholen</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" [formControl]="passwordRepeat" >
+            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+              <mat-icon>{{hidePassword? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="passwordRepeat.invalid">{{getPasswordErrorMessage(passwordRepeat)}}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="container-element">
+          <button mat-raised-button (click)="changePassword()" color="primary" [disabled]="checkPasswordChangePreconditions() === false">
+            ändern
+          </button>
+        </div>
+      </div>
+    </mat-expansion-panel>
+
+    <p class="mat-h0 header-title">Eigenschaften ändern</p>
+
+    <mat-expansion-panel style="width: 100%;">
+      <mat-expansion-panel-header class="right-aligned-header">
+        <mat-panel-title>Nutzernamen ändern</mat-panel-title>
+        <mat-panel-description> 
+          <mat-icon>badge</mat-icon>
+        </mat-panel-description>        
+      </mat-expansion-panel-header>
+
+      <div class="container">
+        <div class="container-element">
+          <mat-form-field appearance="outline" class="input-field">
+            <mat-label>Neuer Username</mat-label>
+            <input matInput placeholder="{{user.displayName}}" [formControl]="username">
+          </mat-form-field>
+        </div>
+
+        <div class="container-element">
+          <button mat-raised-button (click)="changeUsername()" color="primary" [disabled]="username.value.length === 0">
+            beantragen
+          </button>
+        </div>
+      </div>
+    </mat-expansion-panel>
+
+  </div>
+</div>

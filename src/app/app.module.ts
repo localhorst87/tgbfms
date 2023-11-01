@@ -10,6 +10,7 @@ import '@angular/common/locales/global/de';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { AngularFirestoreModule, SETTINGS } from '@angular/fire/compat/firestore';
+import { AngularFireFunctionsModule, REGION } from '@angular/fire/compat/functions';
 import { environment } from '../environments/environment';
 
 import { AppdataAccessService } from './Dataaccess/appdata-access.service';
@@ -62,6 +63,7 @@ import { SwiperModule } from 'swiper/angular';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ConfigComponent } from './config/config.component';
 import { StatisticsComponent } from './statistics/statistics.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
 
 @NgModule({
   declarations: [
@@ -76,7 +78,8 @@ import { StatisticsComponent } from './statistics/statistics.component';
     PasswordResetComponent,
     RulesComponent,
     ConfigComponent,
-    StatisticsComponent
+    StatisticsComponent,
+    UserProfileComponent
   ],
   imports: [
     BrowserModule,
@@ -84,6 +87,7 @@ import { StatisticsComponent } from './statistics/statistics.component';
     HttpClientModule,
     ReactiveFormsModule,
     AngularFireModule.initializeApp(environment.firebase),
+    AngularFireFunctionsModule,
     AngularFireAnalyticsModule,
     AngularFirestoreModule,
     BrowserAnimationsModule,
@@ -117,6 +121,7 @@ import { StatisticsComponent } from './statistics/statistics.component';
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'de' },
+    { provide: REGION, useValue: 'europe-west3'},
     { provide: AppdataAccessService, useClass: AppdataAccessFirestoreService },
     { provide: MatchdataAccessService, useClass: MatchdataAccessOpenligaService },
     { provide: PointCalculatorService, useClass: PointCalculatorTrendbasedService },

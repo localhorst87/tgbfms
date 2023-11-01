@@ -44,7 +44,6 @@ describe('FetchBetOverviewService', () => {
       {
         documentId: "userdata_document_id_0",
         id: "test_user_id_1",
-        email: "user1@email.com",
         displayName: "test_user_id_1",
         isAdmin: false,
         isActive: true,
@@ -57,7 +56,6 @@ describe('FetchBetOverviewService', () => {
       {
         documentId: "userdata_document_id_0",
         id: "test_user_id_2",
-        email: "user1@email.com",
         displayName: "test_user_id_1",
         isAdmin: false,
         isActive: true,

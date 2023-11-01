@@ -1,5 +1,5 @@
 import { Component, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
-import { Observable, interval, range, of } from 'rxjs';
+import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
 import SwiperCore from "swiper";
 import { Pagination } from "swiper";

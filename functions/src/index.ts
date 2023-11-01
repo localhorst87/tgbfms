@@ -4,6 +4,58 @@ import * as sync_matchplan from "./sync_matchplan/sync_matchplan";
 import * as sync_topmatch from "./sync_topmatch/sync_topmatch";
 import * as fix_bets from "./fix_bets/fix_bets";
 import * as email_notifier from "./email_notifier/email_notifier";
+import * as auth_services from "./services/auth/auth_services";
+import * as basic_data_services from "./services/basic/basic_data_service";
+
+export const changeUsername = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (data, context) => {
+    const oldUsername: string = data.oldUsername;
+    const newUsername: string = data.newUsername;
+    const isSuccessful: boolean = await auth_services.changeUsername(oldUsername, newUsername);
+    
+    return {
+      operationSuccessful: isSuccessful
+    };
+});
+
+changeUsername
+
+export const changeEmail = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (data, context) => {
+    const userId: string = data.userId;
+    const newEmail: string = data.newEmail;
+    const isSuccessful: boolean = await auth_services.changeEmail(userId, newEmail);
+    
+    return {
+      operationSuccessful: isSuccessful
+    };
+});
+
+export const changePassword = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (data, context) => {
+    const userId: string = data.userId;
+    const newPassword: string = data.newPassword;
+    const isSuccessful: boolean = await auth_services.changePassword(userId, newPassword);
+    
+    return {
+      operationSuccessful: isSuccessful
+    };
+});
+
+export const getCurrentMatchdays = functions
+  .region('europe-west3')
+  .https
+  .onCall(async (data, context) => {
+    const matchdays: basic_data_services.CurrentMatchdays = await basic_data_services.getCurrentMatchdays();
+    
+    return matchdays;
+});
 
 /**
  * Synchronizes results, ranking and scores

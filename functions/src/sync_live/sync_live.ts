@@ -60,9 +60,9 @@ export async function syncLive(): Promise<void> {
   // refresh stats if needed
   // for the unusual case that a postponed match is set at the same time as other matches
   // multiple matches can be returned
-  const matchdaysStatsUpdate: number[] = await helper.getMatchdaysForStatsUpdate(SEASON);
-  for (let matchday of matchdaysStatsUpdate)
-    await updateStats(SEASON, matchday);
+  const matchdayStatsUpdate: number = await helper.getMatchdayForStatsUpdate(SEASON);
+  if (matchdayStatsUpdate > 0)
+    await updateStats(SEASON, matchdayStatsUpdate);
 
   return;
 }

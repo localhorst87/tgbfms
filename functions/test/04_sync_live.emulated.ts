@@ -56,7 +56,6 @@ describe('sync_live_helpers', () => {
             {
                 id: "user_id_0",
                 documentId: "",
-                email: "",
                 displayName: "",
                 isAdmin: false,
                 isActive: true,
@@ -69,7 +68,6 @@ describe('sync_live_helpers', () => {
             {
                 id: "user_id_1",
                 documentId: "",
-                email: "",
                 displayName: "",
                 isAdmin: false,
                 isActive: true,
@@ -82,7 +80,6 @@ describe('sync_live_helpers', () => {
             {
                 id: "user_id_2",
                 documentId: "",
-                email: "",
                 displayName: "",
                 isAdmin: false,
                 isActive: true,

@@ -22,7 +22,6 @@ describe('sync_live_helpers', () => {
                 id: "gLwLn9HxwkMwHf28drJGVhRbC1y1",
                 isActive: true,
                 isAdmin: true,
-                email: "bla@gmx.de",
                 displayName: "Avlov",
                 configs: {
                     notificationLevel: 0,
@@ -79,7 +78,6 @@ describe('sync_live_helpers', () => {
                     id: "gLwLn9HxwkMwHf28drJGVhRbC1y1",
                     isActive: true,
                     isAdmin: true,
-                    email: "bla@gmx.de",
                     displayName: "Avlov",
                     configs: {
                         notificationLevel: 0,
@@ -92,7 +90,6 @@ describe('sync_live_helpers', () => {
                     id: "QeJBkfpnDha5h28jxZvRnSJcr322",
                     isActive: true,
                     isAdmin: false,
-                    email: "bla@gmx.de",
                     displayName: "Avlov",
                     configs: {
                         notificationLevel: 0,

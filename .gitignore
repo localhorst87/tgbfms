@@ -59,3 +59,4 @@ functions/firestore-debug.log
 functions/pubsub-debug.log
 functions/ui-debug.log
 .gitignore
+package-lock.json

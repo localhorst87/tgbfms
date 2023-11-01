@@ -1,6 +1,7 @@
 import {Bet, User} from "../business_rules/basic_datastructures";
 import {SyncPhase, Email} from "../data_access/import_datastructures";
 import * as appdata from "../data_access/appdata_access";
+import { getAuth } from "firebase-admin/auth"
 import * as util from "../util";
 
 const EMOJI_ALARM: string =  String.fromCodePoint(0x23F0);
@@ -29,7 +30,9 @@ export async function getUsersWithNotification(): Promise<User[]> {
 export async function maySendNotification(user: User): Promise<boolean> {
     if (user.configs.notificationLevel === 1) {
         const dateDayBegin: Date = util.getBeginningOfDayDate();
-        let mailsSent: Email[] = await appdata.getMail(user.email, dateDayBegin);
+        const emailUser: string = (await getAuth().getUser(user.id)).email!;
+        
+        let mailsSent: Email[] = await appdata.getMail(emailUser, dateDayBegin);
         mailsSent = mailsSent.filter(mail => mail.delivery !== undefined && mail.delivery.state == "SUCCESS"); 
         
         if (mailsSent.length > 0)
@@ -89,9 +92,11 @@ export async function composeMessage(user: User): Promise<Email> {
         + "und du hast noch nicht alle Spiele getippt!<br><br>"
         + "<b><a href='https://tgbfms.web.app/' target='_blank'>Direkt zur App</a></b>";
 
+    const emailUser: string = (await getAuth().getUser(user.id)).email!;
+
     return {
         documentId: "",
-        to: user.email,
+        to: emailUser,
         message: {
             subject: EMOJI_ALARM + EMOJI_BALL + "Friendly Tipp-Reminder",
             html: content

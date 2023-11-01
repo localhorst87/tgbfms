@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { Match, Bet, SeasonBet, SeasonResult } from "../business_rules/basic_datastructures";
+import { Match, Bet, SeasonBet, SeasonResult, User } from "../business_rules/basic_datastructures";
 import { RELEVANT_FIRST_PLACES_COUNT, RELEVANT_LAST_PLACES_COUNT } from "../business_rules/rule_defined_values"
 import { UpdateTime, MatchdayScoreSnapshot, UserStats } from "./import_datastructures";
 import { Table } from "./export_datastructures";
@@ -106,6 +106,27 @@ export function makeUnknownBet(matchId: number, userId: string): Bet {
   };
 }
 
+/**
+ * Creates a dummy User with the given user ID
+ * 
+ * @param id the (not registered) user ID
+ * @returns A dummy User
+ */
+export function makeUnknownUser(id: string): User {
+  return {
+    documentId: "",
+    id: id,
+    isActive: false,
+    isAdmin: false,
+    displayName: "",
+    configs: {
+        notificationLevel: 0,
+        notificationTime: 0,
+        theme: ""
+    }
+  };
+}
+
 
 /**
  * Creates an UpdateTime instance with the current timestamp for the given
@@ -133,7 +154,6 @@ export function makeUnknownUpdateTime(season: number, matchday: number): UpdateT
  * @returns the dummy snapshot
  */
 export function makeUnknownScoreSnapshot(season: number, matchday: number): MatchdayScoreSnapshot {
-
   return {
     documentId: "",
     season: season,

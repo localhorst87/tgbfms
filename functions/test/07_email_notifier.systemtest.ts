@@ -79,7 +79,6 @@ describe('email_notifier', () => {
       var user: User = {
           documentId: "",
           id: "userid0",
-          email: "user0@tgbfms.app",
           displayName: "user0",
           isActive: true,
           isAdmin: false,
@@ -204,7 +203,6 @@ describe('email_notifier', () => {
       var user: User = {
           documentId: "",
           id: "userid1",
-          email: "user1@tgbfms.app",
           displayName: "user1",
           isActive: true,
           isAdmin: false,
@@ -255,7 +253,6 @@ describe('email_notifier', () => {
       const user: User = {
         documentId: "",
         id: "userid2",
-        email: "user2@tgbfms.app",
         displayName: "user2",
         isActive: true,
         isAdmin: false,

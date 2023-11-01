@@ -153,6 +153,29 @@ export function getLastMatch(season: number, mustBeFinished: boolean = false): P
   );
 }
 
+/**
+ * Requests the last X matches
+ * 
+ * @param season 
+ * @param count the number of matches to request
+ * @returns 
+ */
+export function getLastMatches(season: number, count: number): Promise<Match[]> {
+  const timestampNow: number = util.getCurrentTimestamp();
+
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
+    .where("season", "==", season)
+    .where("timestamp", "<", timestampNow)
+    .limit(count)
+    .orderBy("timestamp", "desc");
+
+  return query.get().then(
+    (querySnapshot: admin.firestore.QuerySnapshot) => {
+      return helper.processSnapshot<Match>(querySnapshot);
+    }
+  );
+}
+
 export function getMatchesByTimestamp(timestamp: number): Promise<Match[]> {
   let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_MATCHES)
     .where("timestamp", "==", timestamp);
@@ -532,6 +555,58 @@ export async function getActiveUsers(): Promise<User[]> {
       return helper.processSnapshot<User>(querySnapshot);
     }
   );
+}
+
+/**
+ * Yields the user with the given user ID or a dummy User, if the ID is uknown
+ * 
+ * @param id the user ID
+ * @returns 
+ */
+export async function getUser(id: string): Promise<User> {
+  let query: admin.firestore.Query = admin.firestore().collection(COLLECTION_NAME_USERS)
+  .where("id", "==", id);
+
+return query.get().then(
+  (querySnapshot: admin.firestore.QuerySnapshot) => {
+    const userList: User[] = helper.processSnapshot<User>(querySnapshot);
+    if (userList.length > 0) {
+      return userList[0];
+    }
+    else {
+      return helper.makeUnknownUser(id);
+    }
+  }
+);
+}
+
+/**
+ * Sets the given user in the database app. If the dataset is already existing in the App DB
+ * it will update the User, else it will add a new User
+ * 
+ * @param user 
+ * @returns 
+ */
+export async function setUser(user: User): Promise<boolean> {
+  let documentReference: admin.firestore.DocumentReference;
+  if (user.documentId == "") {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_USERS).doc()
+  }
+  else {
+    documentReference = admin.firestore().collection(COLLECTION_NAME_USERS).doc(user.documentId);
+  }
+
+  // documentId should not be a property in the dataset itself, as it is meta-data
+  let userToSet: any = { ...user };
+  delete userToSet.documentId;
+
+  return documentReference.set(userToSet)
+    .then(() => {
+      return true;
+    })
+    .catch((err: any) => {
+      return false;
+    });
 }
 
 /**

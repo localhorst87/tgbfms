@@ -47,7 +47,6 @@ export interface Team {
 export interface User {
   documentId: string;
   id: string;
-  email: string;
   displayName: string;
   isAdmin: boolean;
   isActive: boolean;

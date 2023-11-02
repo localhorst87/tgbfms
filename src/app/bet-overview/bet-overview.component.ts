@@ -34,6 +34,7 @@ export class BetOverviewComponent implements OnInit, OnChanges {
   highlightResults: FormControl; // assigned to slider-toggle
   @Input() selectedMatchday: number; // (will be pre allocated with closest matchday)
   isLoading: boolean;
+  dummyNames: string[];
 
   constructor(
     private fetchBetService: FetchBetOverviewService,
@@ -58,6 +59,26 @@ export class BetOverviewComponent implements OnInit, OnChanges {
     this.highlightResults = this.formBuilder.control(false);
     this.selectedMatchday = -1;
     this.isLoading = false;
+    this.dummyNames = [
+      "Dortmund",
+      "Schalke",
+      "Bayern",
+      "Werder",
+      "Frankfurt",
+      "Wolfsburg",
+      "Leipzig",
+      "Hannover",
+      "Nürnberg",
+      "Leverkusen",
+      "Gladbach",
+      "Hamburg",
+      "Pauli",
+      "Stuttgart",
+      "Mainz",
+      "Augsburg",
+      "Berlin",
+      "Bochum"
+    ];
   }
 
   resetData(): void {

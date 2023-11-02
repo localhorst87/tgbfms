@@ -71,3 +71,8 @@ mat-slider {
   position: relative;
   top: -2px; /* used to adjust the icon */
 }
+
+#blur {
+	color: transparent;
+  filter: blur(3px);
+}

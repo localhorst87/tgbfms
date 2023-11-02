@@ -39,6 +39,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
   selectedMatchdayHasBegun: boolean;
   precedingMatchdayIsFinished: boolean; // w.r.t. selected matchday
   isLoading: boolean;
+  dummyNames: string[];
 
   constructor(
     private fetchBetService: FetchBetWriteDataService,
@@ -73,6 +74,26 @@ export class BetWriteComponent implements OnInit, OnChanges {
     this.selectedMatchdayHasBegun = false;
     this.precedingMatchdayIsFinished = false;
     this.isLoading = false;
+    this.dummyNames = [
+      "Dortmund",
+      "Schalke",
+      "Bayern",
+      "Werder",
+      "Frankfurt",
+      "Wolfsburg",
+      "Leipzig",
+      "Hannover",
+      "Nürnberg",
+      "Leverkusen",
+      "Gladbach",
+      "Hamburg",
+      "Pauli",
+      "Stuttgart",
+      "Mainz",
+      "Augsburg",
+      "Berlin",
+      "Bochum"
+    ];
   }
 
   get bets() {

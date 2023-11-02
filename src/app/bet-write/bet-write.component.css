@@ -89,3 +89,8 @@ mat-slider {
 .load-button {
   width: 100%;
 }
+
+#blur{
+	color: transparent;
+  filter: blur(3px);
+}

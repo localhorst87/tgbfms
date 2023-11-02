@@ -1,10 +1,17 @@
+<!-- shows up when loading content. has absolute position under the top toolbar -->
+<mat-progress-bar mode="query" color="accent" *ngIf="isLoading" class="loading-bar" style="position: fixed; top: 56px; z-index: 999;"></mat-progress-bar>
+
 <div class="content-container">
   
   <div class="panel">
 
     <p class="mat-h0 header-title">Zugangsdaten ändern</p>
 
-    <mat-expansion-panel style="width: 100%;">
+    <mat-expansion-panel 
+      [expanded]="isEmailExpanded"
+      (opened)="isEmailExpanded = true"
+      (closed)="isEmailExpanded = false"
+      style="width: 100%;">
       <mat-expansion-panel-header class="right-aligned-header">
         <mat-panel-title>Email-Adresse ändern</mat-panel-title>
         <mat-panel-description>
@@ -37,7 +44,11 @@
       </div>
     </mat-expansion-panel>
 
-    <mat-expansion-panel style="width: 100%;">
+    <mat-expansion-panel 
+      [expanded]="isPasswordExpanded"
+      (opened)="isPasswordExpanded = true"
+      (closed)="isPasswordExpanded = false"
+      style="width: 100%;">
       <mat-expansion-panel-header class="right-aligned-header">
         <mat-panel-title>Passwort ändern</mat-panel-title>        
         <mat-panel-description>
@@ -78,7 +89,11 @@
 
     <p class="mat-h0 header-title">Eigenschaften ändern</p>
 
-    <mat-expansion-panel style="width: 100%;">
+    <mat-expansion-panel 
+      [expanded]="isUsernameExpanded"
+      (opened)="isUsernameExpanded = true"
+      (closed)="isUsernameExpanded = false"
+      style="width: 100%;">
       <mat-expansion-panel-header class="right-aligned-header">
         <mat-panel-title>Nutzernamen ändern</mat-panel-title>
         <mat-panel-description> 

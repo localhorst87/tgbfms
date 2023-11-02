@@ -52,6 +52,18 @@ mat-icon {
   vertical-align: middle;
 }
 
+#blur-strong {
+	color: var(--text-primary-color);
+  opacity: 0.6;
+  filter: blur(16px);
+}
+
+#blur-soft {
+	color: var(--text-primary-color);
+  opacity: 0.25;
+  filter: blur(3px);
+}
+
 tspan {
   font-family: "Roboto Mono";
 }

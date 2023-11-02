@@ -162,7 +162,6 @@ export class DashboardComponent implements OnInit, OnChanges {
         group: ScaleType.Linear,
         domain: ["#ffa726"]
     };
-
   }
 
   ngOnInit(): void {

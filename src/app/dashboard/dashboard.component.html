@@ -3,7 +3,7 @@
 
 <div class="dashboard-element-container">
   <!-- Next matches swipe cards -->
-  <swiper [pagination]="true">
+  <swiper [pagination]="true" *ngIf="elementsLoaded>=5">
       <ng-template swiperSlide *ngFor="let match of nextMatchesInfo">
 
           <table>
@@ -59,19 +59,70 @@
       </ng-template>
   </swiper>
 
+  <!-- Placeholder while loading -->
+  <swiper [pagination]="false" *ngIf="elementsLoaded<5">
+    <ng-template swiperSlide *ngFor="let i of [0, 1, 2, 3, 4]">
+
+        <table>
+          <tr>
+            <td class="mat-caption" id="blur-soft">3. (34 Pkt)</td>
+            <td></td>
+            <td class="mat-caption" id="blur-soft">12. (19 Pkt)</td>
+          </tr>
+
+          <tr>
+            <td class="mat-display-3" id="blur-strong">BVB</td>
+            <td class="mat-display-3" id="blur-strong">-</td>
+            <td class="mat-display-3" id="blur-strong">S04</td>
+          </tr>
+
+          <tr>
+            <td colspan=3 class="mat-caption" id="blur-soft"> 
+              {{ 170000000 | date: "EEEEEE dd.MM. - HH:mm" }} Uhr
+              <mat-icon
+                color="accent">
+                highlight_off
+              </mat-icon>
+            </td>
+          </tr>
+
+        </table>
+
+    </ng-template>
+  </swiper>
+
   <mat-card class="card-container">
-    <mat-card-subtitle>Aktuelle Form</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="elementsLoaded<5" id="blur-soft">Aktuelle Form</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="elementsLoaded>=5">Aktuelle Form</mat-card-subtitle>
     <mat-card-content class="vertical-center">
-      <span class="big-numbers">
+      <span class="big-numbers" *ngIf="elementsLoaded>=5">
         {{currentForm | number: '1.1-1':'en-us'}}
+      </span>
+      <span class="big-numbers" id="blur-strong" *ngIf="elementsLoaded<5">
+        {{ 3.8 | number: '1.1-1':'en-us'}}
       </span>
     </mat-card-content>
   </mat-card>
 
   <mat-card class="card-container ">
-    <mat-card-subtitle>Dein Formverlauf</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="elementsLoaded<5" id="blur-soft">Dein Formverlauf</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="elementsLoaded>=5">Dein Formverlauf</mat-card-subtitle>
     <mat-card-content class="table-chart-item">
       <ngx-charts-line-chart
+        *ngIf="elementsLoaded>=5"
+        [xAxis]="True"
+        [yAxis]="True"
+        [results]="formHistoryData"
+        [showGridLines]="True"
+        [yScaleMin]="formHistoryOptions.yMin"
+        [yScaleMax]="formHistoryOptions.yMax"
+        [yAxisTicks]="formHistoryOptions.ticks"
+        [tooltipDisabled]="True"
+        [scheme]="lineColorScheme">
+      </ngx-charts-line-chart>
+      <ngx-charts-line-chart
+        *ngIf="elementsLoaded<5"
+        id="blur-soft"
         [xAxis]="True"
         [yAxis]="True"
         [results]="formHistoryData"
@@ -86,9 +137,26 @@
   </mat-card>
 
   <mat-card class="card-container ">
-    <mat-card-subtitle>Tabellenplatzverlauf</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="elementsLoaded<5" id="blur-soft">Tabellenplatzverlauf</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="elementsLoaded>=5">Tabellenplatzverlauf</mat-card-subtitle>
     <mat-card-content class="table-chart-item">
       <ngx-charts-line-chart
+        *ngIf="elementsLoaded>=5"
+        [xAxis]="True"
+        [yAxis]="True"
+        [results]="tableHistoryData"
+        [showGridLines]="True"
+        [yScaleMin]="tableHistoryOptions.yMin"
+        [yScaleMax]="tableHistoryOptions.yMax"
+        [yAxisTickFormatting]="tableHistoryOptions.formattingFcn"
+        [yAxisTicks]="tableHistoryOptions.ticks"
+        [roundDomains]="True"
+        [tooltipDisabled]="True"
+        [scheme]="lineColorScheme">
+      </ngx-charts-line-chart>
+      <ngx-charts-line-chart
+        *ngIf="elementsLoaded<5"
+        id="blur-soft"
         [xAxis]="True"
         [yAxis]="True"
         [results]="tableHistoryData"
@@ -105,14 +173,25 @@
   </mat-card>
 
   <mat-card class="card-container">
-    <mat-card-subtitle>Rückstand auf {{tableLeader}}</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="elementsLoaded<5" id="blur-soft">Rückstand auf Mauri</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="elementsLoaded>=5">Rückstand auf {{tableLeader}}</mat-card-subtitle>
     <mat-card-content class="table-chart-item">
       <ngx-charts-bar-horizontal
-      [results]="tableData"
-      [yAxis]="True"
-      [legend]="False"
-      [showDataLabel]="True"
-      [tooltipDisabled]="True">
+        *ngIf="elementsLoaded>=5"
+        [results]="tableData"
+        [yAxis]="True"
+        [legend]="False"
+        [showDataLabel]="True"
+        [tooltipDisabled]="True">
+      </ngx-charts-bar-horizontal>
+      <ngx-charts-bar-horizontal
+        *ngIf="elementsLoaded<5"
+        id="blur-strong"
+        [results]="tableData"
+        [yAxis]="True"
+        [legend]="False"
+        [showDataLabel]="True"
+        [tooltipDisabled]="True">
       </ngx-charts-bar-horizontal>
     </mat-card-content>
   </mat-card>

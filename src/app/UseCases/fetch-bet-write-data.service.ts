@@ -24,7 +24,7 @@ export class FetchBetWriteDataService {
     // returns the required BetWriteData of the given matchday as Observable
 
     return this.appData.getMatchesByMatchday$(season, matchday).pipe(
-      mergeMap(match => this.makeBetWriteData$(match, userId)),
+      concatMap(match => this.makeBetWriteData$(match, userId)),
       distinct(betWriteData => betWriteData.matchId) // prevents adding new form on changing a bet if real-time reading is active
     );
   }

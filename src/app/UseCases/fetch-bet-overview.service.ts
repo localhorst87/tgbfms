@@ -25,7 +25,7 @@ export class FetchBetOverviewService {
     // returns the requested frame data (data without user bets) as Observable
 
     return this.appData.getMatchesByMatchday$(season, matchday).pipe(
-      mergeMap((match: Match) => this.makeFrameData$(match, userId)),
+      concatMap((match: Match) => this.makeFrameData$(match, userId)),
       distinct()
     );
   }

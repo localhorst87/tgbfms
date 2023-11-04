@@ -73,7 +73,7 @@ export class BetWriteComponent implements OnInit, OnChanges {
     this.votedTopMatch = -1;
     this.selectedMatchdayHasBegun = false;
     this.precedingMatchdayIsFinished = false;
-    this.isLoading = false;
+    this.isLoading = true;
     this.dummyNames = [
       "Dortmund",
       "Schalke",

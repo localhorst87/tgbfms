@@ -4,7 +4,7 @@
 <div class="content-container">
 
   <!-- settings to display matches are integrated into an expansion panel -->
-  <div class="settings-panel">
+  <div class="settings-panel" *ngIf="!isLoading">
     <mat-expansion-panel
       [expanded]="isPanelExpanded"
       (opened)="isPanelExpanded = true"
@@ -49,6 +49,20 @@
           <mat-icon>downloading</mat-icon> Spieltag {{ matchdayForm.value }}
         </button>
       </div>
+    </mat-expansion-panel>
+  </div>
+  <div class="settings-panel" *ngIf="isLoading">
+    <mat-expansion-panel
+      id="blur"
+      [expanded]="false">
+      <mat-expansion-panel-header>
+          <mat-panel-title>
+            Spieltag 28
+          </mat-panel-title>
+          <mat-panel-description class="subheading-mono-letters" *ngIf="selectedMatchday > 0">
+            {{ 170000000 | date: "EEEEEE dd.MM."}} - {{ 170250000 | date: "EEEEEE dd.MM."}}
+          </mat-panel-description>
+      </mat-expansion-panel-header>
     </mat-expansion-panel>
   </div>
 

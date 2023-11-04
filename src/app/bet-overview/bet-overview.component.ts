@@ -59,7 +59,7 @@ export class BetOverviewComponent implements OnInit, OnChanges {
     this.enableAutoClose = this.formBuilder.control(true);
     this.highlightResults = this.formBuilder.control(false);
     this.selectedMatchday = -1;
-    this.isLoading = false;
+    this.isLoading = true;
     this.isLoadingBets = false;
     this.dummyNames = [
       "Dortmund",

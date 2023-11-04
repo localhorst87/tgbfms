@@ -1,5 +1,5 @@
 <!-- shows up when loading content. has absolute position under the top toolbar -->
-<mat-progress-bar mode="query" color="accent" *ngIf="isLoading" class="loading-bar"></mat-progress-bar>
+<mat-progress-bar mode="query" color="accent" *ngIf="isLoading || isLoadingBets" class="loading-bar"></mat-progress-bar>
 
 <div class="content-container">
 
@@ -163,7 +163,7 @@
     </ng-container>
   </mat-accordion>
 </div>
-<div class="matches-box" *ngIf="isLoading">
+<div class="matches-box" *ngIf="selectedDisplayMethod=='matchday' && isLoading">
   <mat-accordion [multi]="false">
     <ng-container *ngFor="let i of [0, 1, 2, 3, 4, 5, 6, 7, 8]">
       <mat-expansion-panel
@@ -184,7 +184,7 @@
 </div>
 
 <!-- display of the season bets -->
-<div class="season-box" *ngIf="selectedDisplayMethod=='season'">
+<div class="season-box" *ngIf="selectedDisplayMethod=='season' && !isLoading">
   <mat-accordion [multi]="!enableAutoClose.value">
     <ng-container *ngFor="let frameData of seasonFrameData">
       <mat-expansion-panel
@@ -258,6 +258,22 @@
             </td>
           </tr>
         </table>
+      </mat-expansion-panel>
+    </ng-container>
+  </mat-accordion>
+</div>
+<div class="season-box" *ngIf="selectedDisplayMethod=='season' && isLoading">
+  <mat-accordion [multi]="!enableAutoClose.value">
+    <ng-container *ngFor="let i of [1, 2, 16, 17, 18]">
+      <mat-expansion-panel
+        class="bet-panel"
+        id="blur"
+        disabled="true">
+        <mat-expansion-panel-header class="right-aligned-header">
+          <mat-panel-title>
+            Platz {{ i }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
       </mat-expansion-panel>
     </ng-container>
   </mat-accordion>

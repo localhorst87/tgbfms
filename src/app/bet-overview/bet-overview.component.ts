@@ -34,6 +34,7 @@ export class BetOverviewComponent implements OnInit, OnChanges {
   highlightResults: FormControl; // assigned to slider-toggle
   @Input() selectedMatchday: number; // (will be pre allocated with closest matchday)
   isLoading: boolean;
+  isLoadingBets: boolean;
   dummyNames: string[];
 
   constructor(
@@ -59,6 +60,7 @@ export class BetOverviewComponent implements OnInit, OnChanges {
     this.highlightResults = this.formBuilder.control(false);
     this.selectedMatchday = -1;
     this.isLoading = false;
+    this.isLoadingBets = false;
     this.dummyNames = [
       "Dortmund",
       "Schalke",
@@ -142,17 +144,17 @@ export class BetOverviewComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoadingBets = true;
 
     this.fetchBetService.fetchUserBetDataByMatchday$(matchId).pipe(toArray()).subscribe(
       (overviewUserData: BetOverviewUserData[]) => {
         this.betData.set(matchId, overviewUserData);
       },
       err => {
-        this.isLoading = false;
+        this.isLoadingBets = false;
       },
       () => {
-        this.isLoading = false;
+        this.isLoadingBets = false;
       }
     );
   }
@@ -165,17 +167,17 @@ export class BetOverviewComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoadingBets = true;
 
     this.fetchBetService.fetchUserSeasonBetData$(SEASON, place).pipe(toArray()).subscribe(
       (overviewUserData: SeasonBetOverviewUserData[]) => {
         this.seasonBetData.set(place, overviewUserData); // init if user appears 1st time
       },
       err => {
-        this.isLoading = false;
+        this.isLoadingBets = false;
       },
       () => {
-        this.isLoading = false;
+        this.isLoadingBets = false;
       }
     )
   }

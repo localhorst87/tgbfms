@@ -42,3 +42,7 @@ jobs:
           args: deploy --project tgbfms --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: delete artifact
+      - uses: geekyeggo/delete-artifact@v2
+        with:
+          name: dist

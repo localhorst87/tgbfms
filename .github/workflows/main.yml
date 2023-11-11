@@ -17,8 +17,10 @@ jobs:
           node-version: 16
       - name: Install Dependencies
         run: npm install
+      - name: Set environment variable from secrets
+        run: echo "export const envionment = ${{ secrets.FIREBASE_ENV }};" > ./src/environments/environment.prod.ts
       - name: Build
-        run: npm run build --prod --output-hashing=all
+        run: npm run build -- --configuration production --output-hashing=all
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:

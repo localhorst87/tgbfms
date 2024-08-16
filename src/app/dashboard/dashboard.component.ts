@@ -215,10 +215,10 @@ export class DashboardComponent implements OnInit, OnChanges {
         matchdaysToFetch = Array.from({length: matchdayCount}, (_, i) => startMatchday + i);
       }
       else {
-        startMatchday = 0;
-        matchdayCount = 0;
-        finishedMatchday = 0;
-        currentMatchday = 0;
+        startMatchday = 1;
+        matchdayCount = 1;
+        finishedMatchday = 1;
+        currentMatchday = 1;
         matchdaysToFetch = [];
       }
 

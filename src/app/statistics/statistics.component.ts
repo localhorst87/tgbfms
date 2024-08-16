@@ -176,7 +176,11 @@ export class StatisticsComponent implements OnChanges {
   }
 
   ngOnChanges(): void {
-    if (this.matchdayCompleted > 0 && this.user.id != "") {
+    if (this.user.id != "") {
+
+      if (this.matchdayCompleted < 1) {
+        this.matchdayCompleted = 1;
+      }
 
       combineLatest(this.appdata.getActiveUsers$().pipe(toArray()), this.appdata.getUserStats$(SEASON, this.matchdayCompleted).pipe(toArray())).subscribe(
         ([allUsers, allStats]) => {

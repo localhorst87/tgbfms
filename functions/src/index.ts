@@ -6,6 +6,7 @@ import * as fix_bets from "./fix_bets/fix_bets";
 import * as email_notifier from "./email_notifier/email_notifier";
 import * as auth_services from "./services/auth/auth_services";
 import * as basic_data_services from "./services/basic/basic_data_service";
+import * as init_season from "./init_season/init_season";
 
 export const changeUsername = functions
   .region('europe-west3')
@@ -19,8 +20,6 @@ export const changeUsername = functions
       operationSuccessful: isSuccessful
     };
 });
-
-changeUsername
 
 export const changeEmail = functions
   .region('europe-west3')
@@ -143,3 +142,18 @@ export const notifyUsers = functions
     await email_notifier.notifyMissingBets();
     return null;
   });
+
+/**
+ * initiates table and stats
+ * 
+ * At 20:00 on August 5th
+ */
+export const initSeason = functions
+  .region('europe-west3')
+  .pubsub
+  .schedule('0 20 5 8 *')
+  .timeZone('Europe/Berlin')
+  .onRun(async (context: functions.EventContext) => {
+    await init_season.initSeason();
+    return null;
+});

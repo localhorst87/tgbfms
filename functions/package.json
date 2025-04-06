@@ -15,7 +15,7 @@
     "test_fly": "mocha -r ts-node/register 'test/*.fly.ts' --reporter spec;"
   },
   "engines": {
-    "node": "16"
+    "node": "22"
   },
   "main": "lib/index.js",
   "dependencies": {
@@ -31,6 +31,7 @@
     "chai": "^4.3.6",
     "mocha": "^10.0.0",
     "sinon": "^13.0.2",
+    "ts-node": "^10.9.2",
     "typescript": "^4.5.4"
   },
   "private": true

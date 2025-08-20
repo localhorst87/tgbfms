@@ -64,7 +64,7 @@ export class UserProfileComponent implements OnInit {
   changeEmail(): void {
     this.isLoading = true;
 
-    const callable = this.functions.httpsCallable('changeEmail');
+    const callable = this.functions.httpsCallable('changeEmail2ndGen');
     callable({ userId: this.user.id, newEmail: this.email.value }).subscribe(
       (result: SimpleResult) => {
         if (result.operationSuccessful === true) {
@@ -87,7 +87,7 @@ export class UserProfileComponent implements OnInit {
   changePassword(): void {
     this.isLoading = true;
 
-    const callable = this.functions.httpsCallable('changePassword');
+    const callable = this.functions.httpsCallable('changePassword2ndGen');
     callable({ userId: this.user.id, newPassword: this.password.value }).subscribe(
       (result: SimpleResult) => {
         if (result.operationSuccessful === true) {
@@ -110,7 +110,7 @@ export class UserProfileComponent implements OnInit {
   changeUsername(): void {
     this.isLoading = true;
 
-    const callable = this.functions.httpsCallable('changeUsername');
+    const callable = this.functions.httpsCallable('changeUsername2ndGen');
     callable({ oldUsername: this.user.displayName, newUsername: this.username.value }).subscribe(
       (result: SimpleResult) => {
         if (result.operationSuccessful === true) {

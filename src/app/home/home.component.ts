@@ -82,7 +82,7 @@ export class HomeComponent implements OnInit {
   }
 
   setMatchdays(): void {
-    const callable = this.functions.httpsCallable('getCurrentMatchdays');
+    const callable = this.functions.httpsCallable('getCurrentMatchdays2ndGen');
     callable({}).subscribe(
       (currentMatchdays: CurrentMatchdays) => {
         this.matchdayLastMatch = currentMatchdays.matchdayLastMatch;
